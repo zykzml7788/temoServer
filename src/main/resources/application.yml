@@ -1,0 +1,37 @@
+server:
+  port: 8096
+
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT-5
+  datasource:
+    url: jdbc:mysql://localhost:3306/apicasemanager?characterEncoding=UTF-8
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    # 初始化大小，最小，最大
+    initialSize: 5
+    minIdle: 5
+    maxActive: 50
+    # 配置获取连接等待超时的时间
+    maxWait: 60000
+
+#mybatis-plus配置控制台打印完整带参数SQL语句
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+# logback日志配置
+logging:
+  config: classpath:logback-spring.xml
+  path: src/main/java/com/creams/temo/log/springboot-log.log
+
+#pagehelper分页插件配置
+pagehelper:
+  helperDialect: postgresql #设置sql语言
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
