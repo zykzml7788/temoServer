@@ -22,16 +22,10 @@ spring:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath*:mapper/*.xml
 
 
 # logback日志配置
 logging:
   config: classpath:logback-spring.xml
   path: src/main/java/com/creams/temo/log/springboot-log.log
-
-#pagehelper分页插件配置
-pagehelper:
-  helperDialect: postgresql #设置sql语言
-  reasonable: true
-  supportMethodsArguments: true
-  params: count=countSql

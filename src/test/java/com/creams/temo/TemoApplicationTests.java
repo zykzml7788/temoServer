@@ -73,7 +73,7 @@ public class TemoApplicationTests {
 
     @Test
     public void test5(){
-        System.out.println(new Gson().toJson(projectService.queryByName("测试")));
+//        System.out.println(new Gson().toJson(projectService.queryByName("测试")));
     }
 
     @Test

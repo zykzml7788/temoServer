@@ -11,4 +11,5 @@ public interface EnvMapper extends BaseMapper<Env> {
 
     @Select("select env_id,env_name,host,port from env where project_id = #{projectId}")
     List<EnvResponse> queryEnvByProjectId(String projectId);
+
 }

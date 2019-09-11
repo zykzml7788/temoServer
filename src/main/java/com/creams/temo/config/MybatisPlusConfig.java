@@ -19,21 +19,6 @@ import java.util.Properties;
 public class MybatisPlusConfig {
 
     @Bean
-    public PaginationInterceptor paginationInterceptor() {
-        PaginationInterceptor page = new PaginationInterceptor();
-        page.setDialectType("mysql");
-        return page;
-    }
-
-    @Bean
-    public PerformanceInterceptor performanceInterceptor() {
-        PerformanceInterceptor page = new PerformanceInterceptor();
-        page.setFormat(true);
-        return page;
-    }
-
-    //配置mybatis的分页插件pageHelper
-    @Bean
     public PageHelper pageHelper(){
         PageHelper pageHelper = new PageHelper();
         Properties properties = new Properties();

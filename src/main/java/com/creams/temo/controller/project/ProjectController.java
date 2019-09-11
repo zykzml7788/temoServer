@@ -38,10 +38,9 @@ public class ProjectController {
     @GetMapping("/{page}")
     public JsonResult queryProject(@PathVariable @ApiParam("页数") Integer page, @RequestParam("filter")@ApiParam(value = "查询条件") String filter){
         try{
-            List<ProjectResponse> projectResponseList = projectService.queryByName(filter);
+            PageInfo<ProjectResponse> pageInfo = projectService.queryByName(page,filter);
+            List<ProjectResponse> projectResponseList = pageInfo.getList();
             logger.info("查询出数据：\n"+projectResponseList);
-            PageHelper.startPage(page, 10);
-            PageInfo<ProjectResponse> pageInfo = new PageInfo<>(projectResponseList);
             Map<String,Object> map = new HashMap<>();
             map.put("list",pageInfo.getList());
             map.put("total",pageInfo.getTotal());
@@ -101,11 +100,8 @@ public class ProjectController {
             return new JsonResult("项目名称不能为空！",400,null,false);
         }
         try{
-            Integer i = projectService.updateProjectById(projectId,project);
-            if (i>0){
-                return new JsonResult("操作成功",200,null,true);
-            }
-            return new JsonResult("操作失败",500,null,false);
+            String id = projectService.updateProjectById(projectId,project);
+            return new JsonResult("操作成功",200,id,true);
         }catch (Exception e){
             logger.error(e.getMessage());
             return new JsonResult("系统错误",500,null,true);
