@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.creams.temo.mapper.project.DatabaseMapper">
+
+    <resultMap id="DatabaseResultMap" type="com.creams.temo.entity.project.Database">
+        <result property="id" column="id"/>
+        <result property="dbId" column="dbId" jdbcType="VARCHAR"/>
+        <result property="dbName" column="dbName" jdbcType="VARCHAR"/>
+        <result property="host" column="host" jdbcType="VARCHAR"/>
+        <result property="port" column="port" />
+        <result property="user" column="user" jdbcType="VARCHAR"/>
+        <result property="pwd" column="pwd" jdbcType="VARCHAR"/>
+        <result property="dbLibraryName" column="dbLibraryName" jdbcType="VARCHAR"/>
+        <result property="creator" column="creator" jdbcType="VARCHAR"/>
+        <result property="createTime" column="createtime" jdbcType="TIMESTAMP"/>
+        <result property="modifier" column="modifier" jdbcType="VARCHAR"/>
+        <result property="modifyTime" column="modifyTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="addDatabase">
+        insert into db (db_id ,db_name,host,port,user,pwd,db_library_name)
+        VALUES
+        (#{dbId},#{dbName},#{host},#{port},#{user},#{pwd},#{dbLibraryName})
+    </insert>
+
+
+    <update id="updataDatabaseById">
+        update  db  set db_name=#{dbName},host=#{host},port=#{port},user=#{user},pwd=#{pwd},db_library_name=#{dbLibraryName}
+        where db_id = #{dbId}
+    </update>
+
+    <!--<select id="addDatabase" parameterType="string" resultMap="DatabaseResultMap">-->
+        <!--select pid,pname,createtime,updatetime from project-->
+         <!--where pname like concat('%',#{pname},'%')-->
+          <!--order by updatetime desc-->
+    <!--</select>-->
+
+
+</mapper>
