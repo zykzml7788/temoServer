@@ -1,16 +1,23 @@
-package com.creams.temo.entity.project;
+package com.creams.temo.entity.project.response;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiParam;
 import lombok.Data;
-import java.sql.Timestamp;
 
+import java.sql.Timestamp;
+import java.util.List;
+
+/**
+ * @author jelly
+ * @since 1.0
+ */
 @Data
 @TableName(value = "db")
-public class Database {
+public class DatabaseResponse {
 
     @ApiModelProperty("主键")
     @TableId(value = "id", type = IdType.AUTO)
@@ -43,7 +50,4 @@ public class Database {
     @ApiModelProperty("数据库名称")
     @TableField(value = "db_library_name")
     private String dbLibraryName;
-
-
-
 }
