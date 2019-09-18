@@ -13,10 +13,7 @@
         <result property="user" column="user" jdbcType="VARCHAR"/>
         <result property="pwd" column="pwd" jdbcType="VARCHAR"/>
         <result property="dbLibraryName" column="dbLibraryName" jdbcType="VARCHAR"/>
-        <result property="creator" column="creator" jdbcType="VARCHAR"/>
-        <result property="createTime" column="createtime" jdbcType="TIMESTAMP"/>
-        <result property="modifier" column="modifier" jdbcType="VARCHAR"/>
-        <result property="modifyTime" column="modifyTime" jdbcType="TIMESTAMP"/>
+
     </resultMap>
 
     <insert id="addDatabase">
@@ -26,16 +23,10 @@
     </insert>
 
 
-    <update id="updataDatabaseById">
+    <update id="updateDatabaseById">
         update  db  set db_name=#{dbName},host=#{host},port=#{port},user=#{user},pwd=#{pwd},db_library_name=#{dbLibraryName}
         where db_id = #{dbId}
     </update>
-
-    <!--<select id="addDatabase" parameterType="string" resultMap="DatabaseResultMap">-->
-        <!--select pid,pname,createtime,updatetime from project-->
-         <!--where pname like concat('%',#{pname},'%')-->
-          <!--order by updatetime desc-->
-    <!--</select>-->
 
 
 </mapper>
