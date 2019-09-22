@@ -1,10 +1,9 @@
-package com.creams.temo.controller.project;
+package com.creams.temo.controller.database;
 
 import com.creams.temo.entity.JsonResult;
-import com.creams.temo.entity.project.Database;
 import com.creams.temo.entity.project.request.DatabaseRequest;
 import com.creams.temo.entity.project.response.DatabaseResponse;
-import com.creams.temo.service.project.DatabaseService;
+import com.creams.temo.service.database.DatabaseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -49,12 +48,12 @@ public class DatabaseController {
 
     @ApiOperation("查询数据库详情")
     @GetMapping(value = "/queryDatabaseById/{id}")
-    public JsonResult queryDatabaseById(@PathVariable("id") @ApiParam("数据库id") int dbId){
+    public JsonResult queryDatabaseById(@PathVariable("id") @ApiParam("数据库id") String dbId){
 
         try {
-            Database database = databaseService.queryDatabaseById(dbId);
-            if (database != null){
-                return new JsonResult("操作成功",200,database,true);
+            DatabaseResponse databaseResponse = databaseService.queryDatabaseById(dbId);
+            if (databaseResponse != null){
+                return new JsonResult("操作成功",200,databaseResponse,true);
             }else {
                 return new JsonResult("数据为空",200,null,true);
             }
@@ -82,7 +81,7 @@ public class DatabaseController {
 
     @ApiOperation("修改数据库")
     @PutMapping(value = "updateDatabaseById/{id}")
-    public JsonResult updateDatabaseById(@PathVariable("id") @ApiParam("数据库id") int dbId, @RequestBody DatabaseRequest databaseRequest){
+    public JsonResult updateDatabaseById(@PathVariable("id") @ApiParam("数据库id") String dbId, @RequestBody DatabaseRequest databaseRequest){
         try {
             databaseService.updateDatabaseById(databaseRequest);
             return new JsonResult("操作成功", 200, null, true);
@@ -96,7 +95,7 @@ public class DatabaseController {
 
     @ApiOperation("删除数据库")
     @DeleteMapping(value = "/deleteDatabaseById/{id}")
-    public JsonResult deleteDatabaseById(@PathVariable("id") @ApiParam("数据库id") int dbId){
+    public JsonResult deleteDatabaseById(@PathVariable("id") @ApiParam("数据库id") String dbId){
         try {
             databaseService.deleteDabaseById(dbId);
             return new JsonResult("操作成功", 200, null, true);

@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.creams.temo.mapper.project.DatabaseMapper">
+<mapper namespace="com.creams.temo.mapper.database.DatabaseMapper">
 
-    <resultMap id="DatabaseResultMap" type="com.creams.temo.entity.project.Database">
+    <resultMap id="DatabaseResultMap" type="com.creams.temo.entity.project.response.DatabaseResponse">
         <result property="id" column="id"/>
         <result property="dbId" column="dbId" jdbcType="VARCHAR"/>
         <result property="dbName" column="dbName" jdbcType="VARCHAR"/>

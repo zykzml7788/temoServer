@@ -1,4 +1,4 @@
-package com.creams.temo.mapper.project;
+package com.creams.temo.mapper.database;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.creams.temo.entity.project.Database;
@@ -18,7 +18,7 @@ public interface DatabaseMapper extends BaseMapper<Database> {
     List<DatabaseResponse> queryDatabase();
 
     @Select("SELECT * FROM db WHERE db_id= #{db_id} ")
-    Database queryDatabaseById(@Param("db_id") int dbId);
+    DatabaseResponse queryDatabaseById(@Param("db_id") String dbId);
 
 
     boolean addDatabase(DatabaseRequest databaseRequest);
@@ -26,7 +26,7 @@ public interface DatabaseMapper extends BaseMapper<Database> {
     boolean updateDatabaseById(DatabaseRequest databaseRequest);
 
     @Delete("delete from db where db_id= #{db_id}")
-    boolean deteleDatabaseById(@Param("db_id") int dbId);
+    boolean deteleDatabaseById(@Param("db_id") String dbId);
 
 
 }

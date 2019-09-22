@@ -1,9 +1,8 @@
-package com.creams.temo.service.project;
+package com.creams.temo.service.database;
 
-import com.creams.temo.entity.project.Database;
 import com.creams.temo.entity.project.request.DatabaseRequest;
 import com.creams.temo.entity.project.response.DatabaseResponse;
-import com.creams.temo.mapper.project.DatabaseMapper;
+import com.creams.temo.mapper.database.DatabaseMapper;
 import com.creams.temo.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,10 +29,10 @@ public class DatabaseService {
      * @param dbId
      * @return
      */
-    public Database queryDatabaseById(int dbId){
+    public DatabaseResponse queryDatabaseById(String dbId){
 
-        Database database = databaseMapper.queryDatabaseById(dbId);
-        return database;
+        DatabaseResponse databaseResponse = databaseMapper.queryDatabaseById(dbId);
+        return databaseResponse;
     }
 
     /**
@@ -65,7 +64,7 @@ public class DatabaseService {
      * @param dbId
      * @return
      */
-    public boolean deleteDabaseById(int dbId){
+    public boolean deleteDabaseById(String dbId){
         boolean result = true;
         databaseMapper.deteleDatabaseById(dbId);
         return result;
