@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.creams.temo.mapper.database.ScriptMapper">
+
+    <resultMap id="ScriptResultMap" type="com.creams.temo.entity.project.response.ScriptResponse">
+        <result property="id" column="id"/>
+        <result property="scriptId" column="scriptId" jdbcType="VARCHAR"/>
+        <result property="scriptName" column="scriptName" jdbcType="VARCHAR"/>
+        <result property="dbId" column="dbId" jdbcType="VARCHAR"/>
+        <result property="sqlScript" column="sqlScript" jdbcType="VARCHAR"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+
+    </resultMap>
+
+    <!--<select id="queryAllScript" resultType="com.creams.temo.entity.project.response.ScriptResponse">-->
+        <!--SELECT * FROM script-->
+    <!--</select>-->
+
+    <insert id="addScript">
+        insert into script (script_id,script_name,db_id,sql_script,create_time)
+        VALUES
+        (#{scriptId},#{scriptName},#{dbId},#{sqlScript},now())
+    </insert>
+
+
+    <update id="updateScriptById">
+        update  script  set script_name=#{scriptName},sql_script=#{sqlScript},update_time=now()
+        where script_id = #{scriptId}
+    </update>
+
+
+</mapper>
