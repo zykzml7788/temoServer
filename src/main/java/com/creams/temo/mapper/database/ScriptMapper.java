@@ -1,7 +1,7 @@
 package com.creams.temo.mapper.database;
 
-import com.creams.temo.entity.project.request.ScriptRequest;
-import com.creams.temo.entity.project.response.ScriptResponse;
+import com.creams.temo.entity.database.request.ScriptRequest;
+import com.creams.temo.entity.database.response.ScriptResponse;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

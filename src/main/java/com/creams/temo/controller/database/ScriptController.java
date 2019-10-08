@@ -1,8 +1,8 @@
 package com.creams.temo.controller.database;
 
 import com.creams.temo.entity.JsonResult;
-import com.creams.temo.entity.project.request.ScriptRequest;
-import com.creams.temo.entity.project.response.ScriptResponse;
+import com.creams.temo.entity.database.request.ScriptRequest;
+import com.creams.temo.entity.database.response.ScriptResponse;
 import com.creams.temo.service.database.ScriptService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

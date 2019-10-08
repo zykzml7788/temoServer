@@ -4,7 +4,7 @@
 
 <mapper namespace="com.creams.temo.mapper.database.ScriptMapper">
 
-    <resultMap id="ScriptResultMap" type="com.creams.temo.entity.project.response.ScriptResponse">
+    <resultMap id="ScriptResultMap" type="com.creams.temo.entity.database.response.ScriptResponse">
         <result property="id" column="id"/>
         <result property="scriptId" column="scriptId" jdbcType="VARCHAR"/>
         <result property="scriptName" column="scriptName" jdbcType="VARCHAR"/>

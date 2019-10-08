@@ -1,15 +1,11 @@
-package com.creams.temo.entity.project.response;
+package com.creams.temo.entity.database.response;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiParam;
 import lombok.Data;
-
-import java.sql.Timestamp;
-import java.util.List;
 
 /**
  * @author jelly

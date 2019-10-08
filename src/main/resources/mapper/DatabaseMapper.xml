@@ -4,7 +4,7 @@
 
 <mapper namespace="com.creams.temo.mapper.database.DatabaseMapper">
 
-    <resultMap id="DatabaseResultMap" type="com.creams.temo.entity.project.response.DatabaseResponse">
+    <resultMap id="DatabaseResultMap" type="com.creams.temo.entity.database.response.DatabaseResponse">
         <result property="id" column="id"/>
         <result property="dbId" column="dbId" jdbcType="VARCHAR"/>
         <result property="dbName" column="dbName" jdbcType="VARCHAR"/>

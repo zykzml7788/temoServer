@@ -1,4 +1,4 @@
-package com.creams.temo.entity.project;
+package com.creams.temo.entity.database.response;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -7,9 +7,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+/**
+ * @author jelly
+ * @since 1.0
+ */
 @Data
 @TableName(value = "script")
-public class Script {
+public class ScriptResponse {
 
     @ApiModelProperty("主键")
     @TableId(value = "id", type = IdType.AUTO)
@@ -38,7 +42,6 @@ public class Script {
     @ApiModelProperty("修改时间")
     @TableField(value = "update_time")
     private String updateTime;
-
 
 
 }

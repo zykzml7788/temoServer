@@ -1,11 +1,12 @@
 package com.creams.temo.service.database;
 
-import com.creams.temo.entity.project.request.DatabaseRequest;
-import com.creams.temo.entity.project.response.DatabaseResponse;
+import com.creams.temo.entity.database.request.DatabaseRequest;
+import com.creams.temo.entity.database.response.DatabaseResponse;
 import com.creams.temo.mapper.database.DatabaseMapper;
 import com.creams.temo.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class DatabaseService {
      * @param databaseRequest
      * @return
      */
+    @Transactional
     public String addDatabase(DatabaseRequest databaseRequest){
         String dbId = StringUtil.uuid();
         databaseRequest.setDbId(dbId);
@@ -52,6 +54,7 @@ public class DatabaseService {
      * @param databaseRequest
      * @return
      */
+    @Transactional
     public boolean updateDatabaseById(DatabaseRequest databaseRequest){
         boolean result = true;
         databaseMapper.updateDatabaseById(databaseRequest);
@@ -64,6 +67,7 @@ public class DatabaseService {
      * @param dbId
      * @return
      */
+    @Transactional
     public boolean deleteDabaseById(String dbId){
         boolean result = true;
         databaseMapper.deteleDatabaseById(dbId);

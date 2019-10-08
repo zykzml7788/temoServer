@@ -1,9 +1,10 @@
 package com.creams.temo.mapper.database;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.creams.temo.entity.project.Database;
-import com.creams.temo.entity.project.request.DatabaseRequest;
-import com.creams.temo.entity.project.response.DatabaseResponse;
+
+import com.creams.temo.entity.database.Database;
+import com.creams.temo.entity.database.request.DatabaseRequest;
+import com.creams.temo.entity.database.response.DatabaseResponse;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

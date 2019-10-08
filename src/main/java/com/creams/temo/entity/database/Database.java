@@ -1,19 +1,22 @@
-package com.creams.temo.entity.project.request;
+package com.creams.temo.entity.database;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-public class DatabaseRequest {
+@TableName(value = "db")
+public class Database {
 
-    @ApiModelProperty(value = "数据库id",hidden = true)
+    @ApiModelProperty("主键")
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+    @ApiModelProperty("数据库id")
     @TableField(value = "db_id")
-
     private String dbId;
 
     @ApiModelProperty("数据库名称")
@@ -24,7 +27,7 @@ public class DatabaseRequest {
     @TableField(value = "host")
     private String host;
 
-    @ApiModelProperty("端口号")
+    @ApiModelProperty("断口号")
     @TableField(value = "port")
     private Integer port;
 
@@ -39,5 +42,7 @@ public class DatabaseRequest {
     @ApiModelProperty("数据库名称")
     @TableField(value = "db_library_name")
     private String dbLibraryName;
+
+
 
 }

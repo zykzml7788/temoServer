@@ -1,16 +1,15 @@
 package com.creams.temo.service.database;
 
 
-import com.creams.temo.entity.project.request.ScriptRequest;
-import com.creams.temo.entity.project.response.ScriptResponse;
+import com.creams.temo.entity.database.request.ScriptRequest;
+import com.creams.temo.entity.database.response.ScriptResponse;
 import com.creams.temo.mapper.database.ScriptMapper;
 import com.creams.temo.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Date;
-import java.text.SimpleDateFormat;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
-import java.sql.Timestamp;
 
 @Service
 public class ScriptService {
@@ -43,6 +42,7 @@ public class ScriptService {
      * @param scriptRequest
      * @return
      */
+    @Transactional
     public String addScript(ScriptRequest scriptRequest){
 
         String scriptId = StringUtil.uuid();
@@ -56,6 +56,7 @@ public class ScriptService {
      * @param scriptRequest
      * @return
      */
+    @Transactional
     public boolean updateScriptById(ScriptRequest scriptRequest){
         boolean result = true;
         scriptMapper.updateScriptById(scriptRequest);
@@ -68,6 +69,7 @@ public class ScriptService {
      * @param scriptId
      * @return
      */
+    @Transactional
     public boolean deleteScriptById(String scriptId){
         boolean result = true;
         scriptMapper.deleteScriptById(scriptId);
