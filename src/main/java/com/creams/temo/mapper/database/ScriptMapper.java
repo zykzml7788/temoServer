@@ -12,8 +12,8 @@ import java.util.List;
 @Mapper
 public interface ScriptMapper {
 
-    @Select("SELECT * FROM script")
-    List<ScriptResponse> queryAllScript();
+
+    List<ScriptResponse> queryAllScript(@Param("script_name") String scriptName);
 
     @Select("SELECT * FROM script WHERE script_id= #{script_id}")
     ScriptResponse queryScriptById(@Param("script_id") String scriptId);

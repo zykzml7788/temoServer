@@ -3,11 +3,14 @@ package com.creams.temo.service.database;
 
 import com.creams.temo.entity.database.request.ScriptRequest;
 import com.creams.temo.entity.database.response.ScriptResponse;
+import com.creams.temo.entity.project.response.ProjectResponse;
 import com.creams.temo.mapper.database.ScriptMapper;
 import com.creams.temo.util.StringUtil;
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.github.pagehelper.PageInfo;
 
 import java.util.List;
 
@@ -21,9 +24,13 @@ public class ScriptService {
      * 查询所有Script
      * @return
      */
-    public List<ScriptResponse> queryAllScript(){
-        List<ScriptResponse> scriptResponses = scriptMapper.queryAllScript();
-        return scriptResponses;
+    @Transactional
+    public PageInfo<ScriptResponse> queryAllScript(Integer page, String scriptName){
+        //设置分页数据
+        PageHelper.startPage(page, 10);
+        List<ScriptResponse> scriptResponsesList = scriptMapper.queryAllScript(scriptName);
+        PageInfo<ScriptResponse> pageInfo = new PageInfo<>(scriptResponsesList);
+        return pageInfo;
     }
 
     /**
@@ -31,6 +38,7 @@ public class ScriptService {
      * @param scriptId
      * @return
      */
+    @Transactional
     public ScriptResponse queryScriptById(String scriptId){
 
         ScriptResponse scriptResponse = scriptMapper.queryScriptById(scriptId);

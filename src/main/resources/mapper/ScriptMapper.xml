@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-
+<!--        column和db定义的名字需要一致-->
 <mapper namespace="com.creams.temo.mapper.database.ScriptMapper">
 
     <resultMap id="ScriptResultMap" type="com.creams.temo.entity.database.response.ScriptResponse">
         <result property="id" column="id"/>
-        <result property="scriptId" column="scriptId" jdbcType="VARCHAR"/>
-        <result property="scriptName" column="scriptName" jdbcType="VARCHAR"/>
-        <result property="dbId" column="dbId" jdbcType="VARCHAR"/>
-        <result property="sqlScript" column="sqlScript" jdbcType="VARCHAR"/>
-        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
-        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="scriptId" column="script_id" jdbcType="VARCHAR"/>
+        <result property="scriptName" column="script_name" jdbcType="VARCHAR"/>
+        <result property="dbId" column="db_id" jdbcType="VARCHAR"/>
+        <result property="sqlScript" column="sql_script" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
 
     </resultMap>
 
-    <!--<select id="queryAllScript" resultType="com.creams.temo.entity.project.response.ScriptResponse">-->
-        <!--SELECT * FROM script-->
-    <!--</select>-->
-
+    <select id="queryAllScript" resultMap="ScriptResultMap">
+        select * from script
+         where script_name like concat('%',#{script_name},'%')
+          order by create_time desc
+    </select>
+<!--#{scriptId} 大括号里面需要和dao传对象一致（实体类）-->
     <insert id="addScript">
         insert into script (script_id,script_name,db_id,sql_script,create_time)
         VALUES

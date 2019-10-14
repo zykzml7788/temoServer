@@ -3,14 +3,20 @@ package com.creams.temo.controller.database;
 import com.creams.temo.entity.JsonResult;
 import com.creams.temo.entity.database.request.ScriptRequest;
 import com.creams.temo.entity.database.response.ScriptResponse;
+import com.creams.temo.entity.project.response.ProjectResponse;
 import com.creams.temo.service.database.ScriptService;
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -26,24 +32,26 @@ public class ScriptController {
     private ScriptService scriptService;
 
 
-    @ApiOperation("查询脚本列表")
+    @ApiOperation(value = "模糊查询脚本列表", notes = "分页查询脚本")
     @GetMapping(value = "/queryAllScript")
-    public List<ScriptResponse> queryAllScript(){
-        List<ScriptResponse> scriptResponses = scriptService.queryAllScript();
-        return scriptResponses;
+    public JsonResult queryAllScript(@RequestParam(defaultValue = "0") Integer page,
+                                     @RequestParam(value = "filter", required = false)
+                                         @ApiParam(value = "查询条件") String filter){
 
-//        try {
-//            List<ScriptResponse> scriptResponses = scriptService.queryAllScript();
-//            if (scriptResponses != null){
-//                return new JsonResult("操作成功",200,scriptResponses,true);
-//            }else {
-//                return new JsonResult("数据为空",200,null,true);
-//            }
-//
-//        }catch (Exception e){
-//            e.printStackTrace();
-//            return new JsonResult("操作失败",500,null,false);
-//        }
+        try {
+            if (filter == null){
+                filter = "";
+            }
+            PageInfo<ScriptResponse> pageInfo = scriptService.queryAllScript(page, filter);
+            Map<String,Object> map = new HashMap<>();
+            map.put("list",pageInfo.getList());
+            map.put("total",pageInfo.getTotal());
+            return new JsonResult("操作成功",200,map,true);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败",500,null,false);
+        }
 
     }
 

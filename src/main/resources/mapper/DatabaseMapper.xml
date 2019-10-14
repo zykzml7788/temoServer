@@ -6,13 +6,13 @@
 
     <resultMap id="DatabaseResultMap" type="com.creams.temo.entity.database.response.DatabaseResponse">
         <result property="id" column="id"/>
-        <result property="dbId" column="dbId" jdbcType="VARCHAR"/>
-        <result property="dbName" column="dbName" jdbcType="VARCHAR"/>
+        <result property="dbId" column="db_id" jdbcType="VARCHAR"/>
+        <result property="dbName" column="db_name" jdbcType="VARCHAR"/>
         <result property="host" column="host" jdbcType="VARCHAR"/>
         <result property="port" column="port" />
         <result property="user" column="user" jdbcType="VARCHAR"/>
         <result property="pwd" column="pwd" jdbcType="VARCHAR"/>
-        <result property="dbLibraryName" column="dbLibraryName" jdbcType="VARCHAR"/>
+        <result property="dbLibraryName" column="db_library_name" jdbcType="VARCHAR"/>
 
     </resultMap>
 
