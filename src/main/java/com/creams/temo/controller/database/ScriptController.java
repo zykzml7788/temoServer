@@ -33,8 +33,8 @@ public class ScriptController {
 
 
     @ApiOperation(value = "模糊查询脚本列表", notes = "分页查询脚本")
-    @GetMapping(value = "/queryAllScript")
-    public JsonResult queryAllScript(@RequestParam(defaultValue = "0") Integer page,
+    @GetMapping(value = "/{page}")
+    public JsonResult queryAllScript(@PathVariable("page") @ApiParam("页数") Integer page,
                                      @RequestParam(value = "filter", required = false)
                                          @ApiParam(value = "查询条件") String filter){
 
@@ -57,7 +57,7 @@ public class ScriptController {
 
 
     @ApiOperation("查询脚本详情")
-    @GetMapping(value = "/queryScriptById/{id}")
+    @GetMapping(value = "/{id}/info")
     public JsonResult queryScriptById(@PathVariable("id") @ApiParam("脚本id") String scriptId){
 
         try {
@@ -76,7 +76,7 @@ public class ScriptController {
     }
 
     @ApiOperation("新增脚本")
-    @PostMapping(value = "/addScript")
+    @PostMapping(value = "/")
     public JsonResult addScript(@RequestBody ScriptRequest scriptRequest){
         try {
             String scriptId = scriptService.addScript(scriptRequest);
@@ -90,8 +90,8 @@ public class ScriptController {
     }
 
     @ApiOperation("修改脚本")
-    @PutMapping(value = "updateScriptById/{id}")
-    public JsonResult updateScriptById( @RequestBody ScriptRequest scriptRequest){
+    @PutMapping(value = "/{id}")
+    public JsonResult updateScriptById(@PathVariable("id") @ApiParam("脚本id") String scriptId ,@RequestBody ScriptRequest scriptRequest){
         try {
             scriptService.updateScriptById(scriptRequest);
             return new JsonResult("操作成功", 200, null, true);
@@ -104,7 +104,7 @@ public class ScriptController {
 
 
     @ApiOperation("删除脚本")
-    @DeleteMapping(value = "/deleteDatabaseById/{id}")
+    @DeleteMapping(value = "/{id}")
     public JsonResult deleteScriptById(@PathVariable("id") @ApiParam("脚本id") String scriptId){
         try {
             scriptService.deleteScriptById(scriptId);
