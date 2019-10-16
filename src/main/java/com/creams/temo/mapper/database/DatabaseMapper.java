@@ -15,10 +15,10 @@ import java.util.List;
 @Mapper
 public interface DatabaseMapper extends BaseMapper<Database> {
 
-    @Select("SELECT * FROM db where db_name=#{name}")
+    @Select("SELECT * FROM db where db_name like concat('%',#{db_name},'%')")
     List<DatabaseResponse> queryDatabase(String name);
 
-    @Select("SELECT * FROM db WHERE db_id= #{db_id} ")
+    @Select("SELECT * FROM db WHERE db_id = #{db_id}")
     DatabaseResponse queryDatabaseById(@Param("db_id") String dbId);
 
 

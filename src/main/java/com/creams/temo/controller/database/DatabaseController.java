@@ -32,8 +32,10 @@ public class DatabaseController {
     @ApiOperation("查询数据库列表")
     @GetMapping(value = "/{page}")
     public JsonResult queryAllDatabase(@PathVariable(required = false) @ApiParam("页数") Integer page,
-                                       @RequestParam("filter") @ApiParam("查询条件") String filter){
-
+                                       @RequestParam(value = "filter",required = false) @ApiParam("查询条件") String filter){
+        if (filter == null){
+            filter = "";
+        }
         try {
             PageInfo<DatabaseResponse> pageInfo = databaseService.queryDatabaseByName(page, filter);
             HashMap<String,Object> map = new HashMap<>();
