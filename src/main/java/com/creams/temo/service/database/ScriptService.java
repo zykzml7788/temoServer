@@ -46,6 +46,20 @@ public class ScriptService {
     }
 
     /**
+     * 获取envId下的所有脚本
+     * @param envId
+     * @return
+     */
+    @Transactional
+    public PageInfo<ScriptResponse> queryScriptByEnvId(Integer page, String envId){
+        //设置分页数据
+        PageHelper.startPage(page, 10);
+        List<ScriptResponse> scriptResponseList = scriptMapper.queryScriptByEnvId(envId);
+        PageInfo<ScriptResponse> pageInfo = new PageInfo<>(scriptResponseList);
+        return pageInfo;
+    }
+
+    /**
      * 新增Script
      * @param scriptRequest
      * @return

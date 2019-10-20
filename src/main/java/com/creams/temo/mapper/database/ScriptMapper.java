@@ -18,6 +18,8 @@ public interface ScriptMapper {
     @Select("SELECT * FROM script WHERE script_id= #{script_id}")
     ScriptResponse queryScriptById(@Param("script_id") String scriptId);
 
+    @Select("SELECT * FROM script WHERE env_id= #{env_id}")
+    List<ScriptResponse> queryScriptByEnvId(@Param("env_id") String envId);
 
     boolean addScript(ScriptRequest scriptRequest);
 
