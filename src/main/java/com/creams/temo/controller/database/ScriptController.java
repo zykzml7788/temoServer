@@ -34,7 +34,7 @@ public class ScriptController {
 
     @ApiOperation(value = "模糊查询脚本列表", notes = "分页查询脚本")
     @GetMapping(value = "/queryAllScript")
-    public JsonResult queryAllScript(@RequestParam(defaultValue = "1") Integer page,
+    public JsonResult queryAllScript(@RequestParam(defaultValue = "0") Integer page,
                                      @RequestParam(value = "filter", required = false)
                                          @ApiParam(value = "查询条件") String filter){
 
@@ -64,29 +64,6 @@ public class ScriptController {
             ScriptResponse scriptResponse = scriptService.queryScriptById(scriptId);
             if (scriptResponse != null){
                 return new JsonResult("操作成功",200,scriptResponse,true);
-            }else {
-                return new JsonResult("数据为空",200,null,true);
-            }
-
-        }catch (Exception e){
-            e.printStackTrace();
-            return new JsonResult("操作失败",500,null,false);
-        }
-
-    }
-
-
-    @ApiOperation("根据环境获取脚本列表")
-    @GetMapping(value = "/queryScriptByEnvId/{id}")
-    public JsonResult queryScriptByEnvId(@RequestParam(defaultValue = "1")Integer page, @PathVariable("id") @ApiParam("环境id") String envId){
-
-        try {
-            PageInfo<ScriptResponse> pageInfo = scriptService.queryScriptByEnvId(page, envId);
-            Map<String,Object> map = new HashMap<>();
-            map.put("list",pageInfo.getList());
-            map.put("total",pageInfo.getTotal());
-            if (map != null){
-                return new JsonResult("操作成功",200,map,true);
             }else {
                 return new JsonResult("数据为空",200,null,true);
             }

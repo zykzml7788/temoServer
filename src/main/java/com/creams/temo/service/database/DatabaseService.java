@@ -4,6 +4,8 @@ import com.creams.temo.entity.database.request.DatabaseRequest;
 import com.creams.temo.entity.database.response.DatabaseResponse;
 import com.creams.temo.mapper.database.DatabaseMapper;
 import com.creams.temo.util.StringUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +19,13 @@ public class DatabaseService {
     private DatabaseMapper databaseMapper;
 
     /**
-     * 查询所有Database
+     * 分页查询数据库配置信息
      * @return
      */
-    public List<DatabaseResponse> queryAllDatabase(){
-        List<DatabaseResponse> databaseResponses = databaseMapper.queryDatabase();
-        return databaseResponses;
+    public PageInfo<DatabaseResponse> queryDatabaseByName(Integer page, String name){
+        PageHelper.startPage(page, 10);
+        List<DatabaseResponse> databaseResponses = databaseMapper.queryDatabase(name);
+        return new PageInfo<>(databaseResponses);
     }
 
     /**
