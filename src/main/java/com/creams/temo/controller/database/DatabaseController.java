@@ -17,7 +17,7 @@ import java.util.List;
 
 
 /**
- * 项目控制层
+ * 数据库配置管理控制层
  */
 
 @RestController
@@ -29,9 +29,9 @@ public class DatabaseController {
     private DatabaseService databaseService;
 
 
-    @ApiOperation("查询数据库列表")
+    @ApiOperation("模糊查询数据库列表")
     @GetMapping(value = "/{page}")
-    public JsonResult queryAllDatabase(@PathVariable(required = false) @ApiParam("页数") Integer page,
+    public JsonResult queryDatabaseByName(@PathVariable(required = false) @ApiParam("页数") Integer page,
                                        @RequestParam(value = "filter",required = false) @ApiParam("查询条件") String filter){
         if (filter == null){
             filter = "";

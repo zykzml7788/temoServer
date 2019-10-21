@@ -20,7 +20,7 @@ import java.util.Map;
 
 
 /**
- * 项目控制层
+ * 脚本管理控制层
  */
 
 @RestController
@@ -32,9 +32,9 @@ public class ScriptController {
     private ScriptService scriptService;
 
 
-    @ApiOperation(value = "模糊查询脚本列表", notes = "分页查询脚本")
+    @ApiOperation(value = "根据脚本名称和数据库id模糊查询脚本列表", notes = "分页查询脚本")
     @GetMapping(value = "/{page}")
-    public JsonResult queryAllScript(@RequestParam(defaultValue = "0") Integer page,
+    public JsonResult queryScriptByNameAndDbId(@RequestParam(defaultValue = "0") Integer page,
                                      @RequestParam(value = "filter", required = false)
                                          @ApiParam(value = "查询条件") String filter){
 
@@ -42,7 +42,7 @@ public class ScriptController {
             if (filter == null){
                 filter = "";
             }
-            PageInfo<ScriptResponse> pageInfo = scriptService.queryAllScript(page, filter);
+            PageInfo<ScriptResponse> pageInfo = scriptService.queryScriptByNameAndDbId(page, filter);
             Map<String,Object> map = new HashMap<>();
             map.put("list",pageInfo.getList());
             map.put("total",pageInfo.getTotal());

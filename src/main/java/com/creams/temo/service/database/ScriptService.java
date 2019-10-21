@@ -25,7 +25,7 @@ public class ScriptService {
      * @return
      */
     @Transactional
-    public PageInfo<ScriptResponse> queryAllScript(Integer page, String scriptName){
+    public PageInfo<ScriptResponse> queryScriptByNameAndDbId(Integer page, String scriptName){
         //设置分页数据
         PageHelper.startPage(page, 10);
         List<ScriptResponse> scriptResponsesList = scriptMapper.queryAllScript(scriptName);
