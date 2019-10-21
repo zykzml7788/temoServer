@@ -4,18 +4,20 @@ import com.creams.temo.entity.JsonResult;
 import com.creams.temo.entity.database.request.DatabaseRequest;
 import com.creams.temo.entity.database.response.DatabaseResponse;
 import com.creams.temo.service.database.DatabaseService;
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 
 
 /**
- * 项目控制层
+ * 数据库配置管理控制层
  */
 
 @RestController
@@ -27,17 +29,19 @@ public class DatabaseController {
     private DatabaseService databaseService;
 
 
-    @ApiOperation("查询数据库列表")
-    @GetMapping(value = "/queryAllDatabase")
-    public JsonResult queryAllDatabase(){
+    @ApiOperation("模糊查询数据库列表")
+    @GetMapping(value = "/{page}")
+    public JsonResult queryDatabaseByName(@PathVariable(required = false) @ApiParam("页数") Integer page,
+                                       @RequestParam(value = "filter",required = false) @ApiParam("查询条件") String filter){
+        if (filter == null){
+            filter = "";
+        }
         try {
-            List<DatabaseResponse> databaseResponses = databaseService.queryAllDatabase();
-            if (databaseResponses != null){
-                return new JsonResult("操作成功",200,databaseResponses,true);
-            }else {
-                return new JsonResult("数据为空",200,null,true);
-            }
-
+            PageInfo<DatabaseResponse> pageInfo = databaseService.queryDatabaseByName(page, filter);
+            HashMap<String,Object> map = new HashMap<>();
+            map.put("list", pageInfo.getList());
+            map.put("total", pageInfo.getTotal());
+            return new JsonResult("操作成功", 200, map, true);
         }catch (Exception e){
             e.printStackTrace();
             return new JsonResult("操作失败",500,null,false);
@@ -47,7 +51,7 @@ public class DatabaseController {
 
 
     @ApiOperation("查询数据库详情")
-    @GetMapping(value = "/queryDatabaseById/{id}")
+    @GetMapping(value = "/{id}/info")
     public JsonResult queryDatabaseById(@PathVariable("id") @ApiParam("数据库id") String dbId){
 
         try {
@@ -65,8 +69,8 @@ public class DatabaseController {
 
     }
 
-    @ApiOperation("创建项目")
-    @PostMapping(value = "/addDatabase")
+    @ApiOperation("新增数据库配置")
+    @PostMapping(value = "/")
     public JsonResult addDatabase(@RequestBody DatabaseRequest databaseRequest){
         try {
             String dbId = databaseService.addDatabase(databaseRequest);
@@ -80,7 +84,7 @@ public class DatabaseController {
     }
 
     @ApiOperation("修改数据库")
-    @PutMapping(value = "updateDatabaseById/{id}")
+    @PutMapping(value = "/{id}")
     public JsonResult updateDatabaseById(@PathVariable("id") @ApiParam("数据库id") String dbId, @RequestBody DatabaseRequest databaseRequest){
         try {
             databaseService.updateDatabaseById(databaseRequest);
@@ -94,7 +98,7 @@ public class DatabaseController {
 
 
     @ApiOperation("删除数据库")
-    @DeleteMapping(value = "/deleteDatabaseById/{id}")
+    @DeleteMapping(value = "/{id}")
     public JsonResult deleteDatabaseById(@PathVariable("id") @ApiParam("数据库id") String dbId){
         try {
             databaseService.deleteDabaseById(dbId);

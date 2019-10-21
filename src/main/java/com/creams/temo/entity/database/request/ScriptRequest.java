@@ -26,6 +26,11 @@ public class ScriptRequest {
     @TableField(value = "sql_script")
     private String sqlScript;
 
+
+    @ApiModelProperty("环境id")
+    @TableField(value = "end_id")
+    private String envId;
+
     @ApiModelProperty(value ="sql脚本",hidden = true)
     @TableField(value = "create_time")
     private Timestamp createTime;
