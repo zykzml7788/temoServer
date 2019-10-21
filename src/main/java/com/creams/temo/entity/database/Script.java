@@ -31,6 +31,10 @@ public class Script {
     @TableField(value = "sql_script")
     private String sqlScript;
 
+    @ApiModelProperty("环境id")
+    @TableField(value = "env_id")
+    private String envId;
+
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time")
     private String createTime;
@@ -38,6 +42,8 @@ public class Script {
     @ApiModelProperty("修改时间")
     @TableField(value = "update_time")
     private String updateTime;
+
+
 
 
 

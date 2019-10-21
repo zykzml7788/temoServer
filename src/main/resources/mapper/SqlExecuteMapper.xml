@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--        column和db定义的名字需要一致-->
+<mapper namespace="com.creams.temo.mapper.database.SqlExecuteMapper">
+    <select id="select" resultType="java.util.LinkedHashMap" parameterType="java.lang.String">
+        ${value}
+        </select>
+
+    <insert id="insert" parameterType="java.lang.String">
+        ${value }
+    </insert>
+
+    <update id="update" parameterType="java.lang.String">
+        ${value }
+    </update>
+
+    <delete id="delete" parameterType="java.lang.String">
+        ${value }
+    </delete>
+
+</mapper>

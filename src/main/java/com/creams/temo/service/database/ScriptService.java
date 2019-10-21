@@ -25,7 +25,7 @@ public class ScriptService {
      * @return
      */
     @Transactional
-    public PageInfo<ScriptResponse> queryAllScript(Integer page, String scriptName){
+    public PageInfo<ScriptResponse> queryScriptByNameAndDbId(Integer page, String scriptName){
         //设置分页数据
         PageHelper.startPage(page, 10);
         List<ScriptResponse> scriptResponsesList = scriptMapper.queryAllScript(scriptName);
@@ -43,6 +43,20 @@ public class ScriptService {
 
         ScriptResponse scriptResponse = scriptMapper.queryScriptById(scriptId);
         return scriptResponse;
+    }
+
+    /**
+     * 获取envId下的所有脚本
+     * @param envId
+     * @return
+     */
+    @Transactional
+    public PageInfo<ScriptResponse> queryScriptByEnvId(Integer page, String envId){
+        //设置分页数据
+        PageHelper.startPage(page, 10);
+        List<ScriptResponse> scriptResponseList = scriptMapper.queryScriptByEnvId(envId);
+        PageInfo<ScriptResponse> pageInfo = new PageInfo<>(scriptResponseList);
+        return pageInfo;
     }
 
     /**
