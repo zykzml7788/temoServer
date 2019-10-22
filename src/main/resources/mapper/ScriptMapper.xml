@@ -17,9 +17,14 @@
 
     <select id="queryAllScript" resultMap="ScriptResultMap">
         select * from script
-         where script_name like concat('%',#{script_name},'%')
+         where
+         <if test="db_id!=null">
+             db_id=#{db_id} and
+         </if>
+           script_name like concat('%',#{script_name},'%')
           order by create_time desc
     </select>
+
 <!--#{scriptId} 大括号里面需要和dao传对象一致（实体类）-->
     <insert id="addScript">
         insert into script (script_id,script_name,db_id,sql_script,create_time)
