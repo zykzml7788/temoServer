@@ -34,15 +34,17 @@ public class ScriptController {
 
     @ApiOperation(value = "根据脚本名称和数据库id模糊查询脚本列表", notes = "分页查询脚本")
     @GetMapping(value = "/{page}")
-    public JsonResult queryScriptByNameAndDbId(@RequestParam(defaultValue = "0") Integer page,
-                                     @RequestParam(value = "filter", required = false)
-                                         @ApiParam(value = "查询条件") String filter){
+    public JsonResult queryScriptByNameAndDbId(@RequestParam(defaultValue = "1") Integer page,
+                                               @RequestParam(value = "dbId", required = false)
+                                               @ApiParam(value = "数据库id") String dbId,
+                                               @RequestParam(value = "dbName", required = false)
+                                               @ApiParam(value = "脚本名称") String scriptName){
 
         try {
-            if (filter == null){
-                filter = "";
+            if (scriptName == null){
+                scriptName = "";
             }
-            PageInfo<ScriptResponse> pageInfo = scriptService.queryScriptByNameAndDbId(page, filter);
+            PageInfo<ScriptResponse> pageInfo = scriptService.queryScriptByNameAndDbId(page,dbId,scriptName);
             Map<String,Object> map = new HashMap<>();
             map.put("list",pageInfo.getList());
             map.put("total",pageInfo.getTotal());

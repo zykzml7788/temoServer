@@ -13,7 +13,7 @@ import java.util.List;
 public interface ScriptMapper {
 
 
-    List<ScriptResponse> queryAllScript(@Param("script_name") String scriptName);
+    List<ScriptResponse> queryAllScript(@Param("db_id")String dbId, @Param("script_name") String scriptName);
 
     @Select("SELECT * FROM script WHERE script_id= #{script_id}")
     ScriptResponse queryScriptById(@Param("script_id") String scriptId);
