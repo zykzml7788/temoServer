@@ -15,7 +15,7 @@ import java.util.List;
 @Mapper
 public interface DatabaseMapper extends BaseMapper<Database> {
 
-    @Select("SELECT * FROM db where db_name like concat('%',#{db_name},'%') order by updatetime asc")
+    @Select("SELECT * FROM db where db_name like concat('%',#{db_name},'%') order by updatetime desc")
     List<DatabaseResponse> queryDatabase(String name);
 
     @Select("SELECT * FROM db WHERE db_id = #{db_id}")
