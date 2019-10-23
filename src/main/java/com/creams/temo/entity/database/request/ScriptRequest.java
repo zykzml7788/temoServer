@@ -27,18 +27,4 @@ public class ScriptRequest {
     private String sqlScript;
 
 
-    @ApiModelProperty("环境id")
-    @TableField(value = "end_id")
-    private String envId;
-
-    @ApiModelProperty(value ="sql脚本",hidden = true)
-    @TableField(value = "create_time")
-    private Timestamp createTime;
-
-    @ApiModelProperty(value ="sql脚本",hidden = true)
-    @TableField(value = "update_time")
-    private Timestamp updateTime;
-
-
-
 }

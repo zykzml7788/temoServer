@@ -31,9 +31,6 @@ public class Script {
     @TableField(value = "sql_script")
     private String sqlScript;
 
-    @ApiModelProperty("环境id")
-    @TableField(value = "env_id")
-    private String envId;
 
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time")
