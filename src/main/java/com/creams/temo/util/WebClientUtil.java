@@ -128,12 +128,53 @@ public class WebClientUtil {
         return response.block();
     }
 
+    /**
+     *  put请求
+     * @param url 请求地址
+     * @param json  json字符串
+     * @return
+     */
+    private Map put(String url, String json){
+        Mono<Map> response = webClient.put().uri(url)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromObject(json))
+                .retrieve()
+                .bodyToMono(Map.class).timeout(Duration.of(10, ChronoUnit.SECONDS))
+                .doAfterSuccessOrError((obj, ex) -> {
+                    logger.info("请求方式：PUT,请求地址："+url+",请求体:\n"+json.toString()+",响应结果为:\n"+obj);
+                    if(ex != null){
+                        logger.error("请求方式：PUT,请求地址："+url+",请求体:\n"+json.toString()+",响应异常为:"+ex.getMessage());
+                    }
+                });;
+        return response.block();
+    }
+
+    /**
+     *  delete请求
+     * @param url 请求地址
+     * @return
+     */
+    private Map delete(String url){
+        Mono<Map> response = webClient.delete().uri(url)
+                .retrieve()
+                .bodyToMono(Map.class).timeout(Duration.of(10, ChronoUnit.SECONDS))
+                .doAfterSuccessOrError((obj, ex) -> {
+                    logger.info("请求方式：DELETE,请求地址："+url+",响应结果为:\n"+obj);
+                    if(ex != null){
+                        logger.error("请求方式：DELETE,请求地址："+url+",响应异常为:"+ex.getMessage());
+                    }
+                });;
+        return response.block();
+    }
+
     public static void main(String[] args) {
         WebClientUtil webClientUtil = new WebClientUtil("http://129.204.148.24:8080/temo",null,null);
 //        System.out.println(webClientUtil.get("/project/1?filter="));
-        System.out.println(webClientUtil.postByJson("/project/", "{\n" +
-                "\t\"envs\": [],\n" +
-                "\t\"pname\": \"测试webClient\"\n" +
-                "}"));
+//       webClientUtil.put("/project/a3c948f2-bd99-4315-8e7c-1c1dd9991a8b", "{\n" +
+//               "\t\"pid\": \"a3c948f2-bd99-4315-8e7c-1c1dd9991a8b\",\n" +
+//               "\t\"envs\": [],\n" +
+//               "\t\"pname\": \"测试webClientAAA\"\n" +
+//               "}");
+//        webClientUtil.delete("/project/69cce7db-7b7f-4fbc-b1f8-d0f8e5dea6f4");
     }
 }
