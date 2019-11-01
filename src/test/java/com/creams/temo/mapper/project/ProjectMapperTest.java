@@ -16,13 +16,13 @@ public class ProjectMapperTest {
     @Autowired
     private ProjectMapper projectMapper;
 
-    @Test
-    public void queryProjectById() {
-        projectMapper.queryProjectById("123");
-    }
-
-    @Test
-    public void queryProjectByName() {
-        projectMapper.deleteById(1);
-    }
+//    @Test
+//    public void queryProjectById() {
+//        projectMapper.queryProjectById("123");
+//    }
+//
+//    @Test
+//    public void queryProjectByName() {
+//        projectMapper.deleteById(1);
+//    }
 }
