@@ -124,6 +124,11 @@
             <artifactId>pagehelper-spring-boot-starter</artifactId>
             <version>1.2.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>1.7.2</version>
+        </dependency>
         <!-- mp 依赖 -->
         <dependency>
             <groupId>com.baomidou</groupId>
