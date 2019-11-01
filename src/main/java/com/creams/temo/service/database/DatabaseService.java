@@ -18,6 +18,10 @@ public class DatabaseService {
     @Autowired
     private DatabaseMapper databaseMapper;
 
+    public List<DatabaseResponse> queryAllDatabase(){
+        return databaseMapper.queryAllDatabase();
+    }
+
     /**
      * 分页查询数据库配置信息
      * @return
