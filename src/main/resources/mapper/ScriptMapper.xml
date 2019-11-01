@@ -22,7 +22,7 @@
              db_id=#{db_id} and
          </if>
            script_name like concat('%',#{script_name},'%')
-          order by create_time desc
+          order by update_time desc
     </select>
 
 <!--#{scriptId} 大括号里面需要和dao传对象一致（实体类）-->
