@@ -18,7 +18,7 @@
     <select id="queryAllScript" resultMap="ScriptResultMap">
         select * from script
          where
-         <if test="db_id !=null and !=''">
+         <if test="db_id !=null and db_id !=''">
              db_id=#{db_id} and
          </if>
            script_name like concat('%',#{script_name},'%')
