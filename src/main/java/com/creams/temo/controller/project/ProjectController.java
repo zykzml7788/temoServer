@@ -36,8 +36,13 @@ public class ProjectController {
 
     @ApiOperation("模糊查询项目列表")
     @GetMapping("/{page}")
-    public JsonResult queryProject(@PathVariable @ApiParam("页数") Integer page, @RequestParam("filter")@ApiParam(value = "查询条件") String filter){
+    public JsonResult queryProject(@PathVariable @ApiParam("页数") Integer page,
+                                   @RequestParam(value = "filter", required = false)
+                                   @ApiParam(value = "查询条件") String filter){
         try{
+            if (filter == null){
+                filter = "";
+            }
             PageInfo<ProjectResponse> pageInfo = projectService.queryByName(page,filter);
             List<ProjectResponse> projectResponseList = pageInfo.getList();
             logger.info("查询出数据：\n"+projectResponseList);
