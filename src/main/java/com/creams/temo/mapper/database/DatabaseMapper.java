@@ -18,8 +18,8 @@ public interface DatabaseMapper extends BaseMapper<Database> {
     @Select("SELECT * FROM db order by updatetime desc")
     List<DatabaseResponse> queryAllDatabase();
 
-    @Select("SELECT * FROM db where db_name like concat('%',#{db_name},'%')")
-    List<DatabaseResponse> queryDatabase(String name);
+    @Select("SELECT * FROM db where db_name like concat('%',#{db_name},'%') order by updatetime desc")
+    List<DatabaseResponse> queryDatabase(@Param("db_name") String name);
 
     @Select("SELECT * FROM db WHERE db_id = #{db_id}")
     DatabaseResponse queryDatabaseById(@Param("db_id") String dbId);
