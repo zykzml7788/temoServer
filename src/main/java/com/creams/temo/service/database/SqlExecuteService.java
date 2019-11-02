@@ -31,7 +31,7 @@ public class SqlExecuteService {
         // 构建数据库实例
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl(String.format("jdbc:mysql://%s:%d/%s", databaseInfo.getHost(),databaseInfo.getPort(),
+        dataSource.setUrl(String.format("jdbc:mysql://%s:%d/%s?characterEncoding=utf-8", databaseInfo.getHost(),databaseInfo.getPort(),
                 databaseInfo.getDbLibraryName()));
         dataSource.setUsername(databaseInfo.getUser());
         dataSource.setPassword(databaseInfo.getPwd());
