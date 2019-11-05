@@ -46,4 +46,12 @@ public class DatabaseResponse {
     @ApiModelProperty("数据库名称")
     @TableField(value = "db_library_name")
     private String dbLibraryName;
+
+    @ApiModelProperty("更新时间")
+    @TableField(value = "updatetime")
+    private String updatetime;
+
+    @ApiModelProperty("创建时间")
+    @TableField(value = "createtime")
+    private String createtime;
 }

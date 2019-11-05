@@ -36,9 +36,7 @@ public class ProjectController {
 
     @ApiOperation("模糊查询项目列表")
     @GetMapping("/{page}")
-    public JsonResult queryProject(@PathVariable @ApiParam("页数") Integer page,
-                                   @RequestParam(value = "filter", required = false)
-                                   @ApiParam(value = "查询条件") String filter){
+    public JsonResult queryProject(@PathVariable @ApiParam("页数") Integer page, @RequestParam(value = "filter",required = false)@ApiParam(value = "查询条件") String filter){
         try{
             if (filter == null){
                 filter = "";

@@ -34,7 +34,7 @@ public class ScriptController {
 
     @ApiOperation(value = "根据脚本名称和数据库id模糊查询脚本列表", notes = "分页查询脚本")
     @GetMapping(value = "/{page}")
-    public JsonResult queryScriptByNameAndDbId(@RequestParam(defaultValue = "1") Integer page,
+    public JsonResult queryScriptByNameAndDbId(@PathVariable(value = "page") Integer page,
                                                @RequestParam(value = "dbId", required = false)
                                                @ApiParam(value = "数据库id") String dbId,
                                                @RequestParam(value = "dbName", required = false)
