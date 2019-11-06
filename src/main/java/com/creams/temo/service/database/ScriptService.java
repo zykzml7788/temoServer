@@ -2,8 +2,11 @@ package com.creams.temo.service.database;
 
 
 import com.creams.temo.entity.database.request.ScriptRequest;
+import com.creams.temo.entity.database.response.DatabaseResponse;
+import com.creams.temo.entity.database.response.ScriptDbResponse;
 import com.creams.temo.entity.database.response.ScriptResponse;
 import com.creams.temo.entity.project.response.ProjectResponse;
+import com.creams.temo.mapper.database.DatabaseMapper;
 import com.creams.temo.mapper.database.ScriptMapper;
 import com.creams.temo.util.StringUtil;
 import com.github.pagehelper.PageHelper;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.github.pagehelper.PageInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,6 +23,9 @@ public class ScriptService {
 
     @Autowired
     private ScriptMapper scriptMapper;
+
+    @Autowired
+    private DatabaseMapper databaseMapper;
 
     /**
      * 查询所有Script
@@ -31,6 +38,36 @@ public class ScriptService {
         List<ScriptResponse> scriptResponsesList = scriptMapper.queryAllScript(dbId, scriptName);
         PageInfo<ScriptResponse> pageInfo = new PageInfo<>(scriptResponsesList);
         return pageInfo;
+    }
+
+    /***
+     * 根据dbId和scriptName获取对应脚本所属数据库
+     * @param dbId
+     * @param scriptName
+     * @return
+     */
+
+    @Transactional
+    public List<ScriptDbResponse> queryScriptDbByNameAndDbId(String dbId, String scriptName){
+        List<ScriptDbResponse> scriptDbResponses = new ArrayList<>();
+
+        List<ScriptResponse> scriptResponse = scriptMapper.queryAllScript(dbId, scriptName);
+
+        if (scriptResponse.size()>0){
+            for (int i=0;i<scriptResponse.size();i++){
+                DatabaseResponse databaseResponse = databaseMapper.queryDatabaseById(scriptResponse.get(0).getDbId());
+                ScriptDbResponse scriptDbResponse = new ScriptDbResponse();
+                scriptDbResponse.setSqlScript(scriptResponse.get(i).getSqlScript());
+                scriptDbResponse.setScriptId(scriptResponse.get(i).getScriptId());
+                scriptDbResponse.setScriptName(scriptResponse.get(i).getScriptName());
+                scriptDbResponse.setId(scriptResponse.get(i).getId());
+                scriptDbResponse.setCreateTime(scriptResponse.get(i).getCreateTime());
+                scriptDbResponse.setUpdateTime(scriptResponse.get(i).getUpdateTime());
+                scriptDbResponse.setDb(databaseResponse);
+                scriptDbResponses.add(scriptDbResponse);
+            }
+        }
+        return scriptDbResponses;
     }
 
     /**

@@ -2,6 +2,7 @@ package com.creams.temo.controller.database;
 
 import com.creams.temo.entity.JsonResult;
 import com.creams.temo.entity.database.request.ScriptRequest;
+import com.creams.temo.entity.database.response.ScriptDbResponse;
 import com.creams.temo.entity.database.response.ScriptResponse;
 import com.creams.temo.entity.project.response.ProjectResponse;
 import com.creams.temo.service.database.ScriptService;
@@ -37,7 +38,7 @@ public class ScriptController {
     public JsonResult queryScriptByNameAndDbId(@PathVariable(value = "page") Integer page,
                                                @RequestParam(value = "dbId", required = false)
                                                @ApiParam(value = "数据库id") String dbId,
-                                               @RequestParam(value = "dbName", required = false)
+                                               @RequestParam(value = "scriptName", required = false)
                                                @ApiParam(value = "脚本名称") String scriptName){
 
         try {
@@ -49,6 +50,33 @@ public class ScriptController {
             map.put("list",pageInfo.getList());
             map.put("total",pageInfo.getTotal());
             return new JsonResult("操作成功",200,map,true);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败",500,null,false);
+        }
+
+    }
+
+    @ApiOperation(value = "根据脚本名称和数据库id获取所属数据库")
+    @GetMapping(value = "/info")
+    public JsonResult queryScriptDbByNameAndDbId(@RequestParam(value = "dbId", required = false)
+                                                 @ApiParam(value = "数据库id") String dbId,
+                                                 @RequestParam(value = "scriptName", required = false)
+                                                 @ApiParam(value = "脚本名称") String scriptName){
+
+        try {
+            if (scriptName == null){
+                scriptName = "";
+            }
+
+            List<ScriptDbResponse> scriptDbResponses = scriptService.queryScriptDbByNameAndDbId(dbId,scriptName);
+            if (!scriptDbResponses.isEmpty()){
+
+                return new JsonResult("操作成功",200,scriptDbResponses,true);
+            }else {
+                return new JsonResult("数据为空",200,null,true);
+            }
 
         }catch (Exception e){
             e.printStackTrace();
