@@ -48,13 +48,13 @@ public class ScriptService {
      */
 
     @Transactional
-    public List<ScriptDbResponse> queryScriptDbByNameAndDbId(String dbId, String scriptName){
+    public PageInfo<ScriptDbResponse> queryScriptDbByNameAndDbId(Integer page, String dbId, String scriptName){
+        PageHelper.startPage(page, 10);
         List<ScriptDbResponse> scriptDbResponses = new ArrayList<>();
-
         List<ScriptResponse> scriptResponse = scriptMapper.queryAllScript(dbId, scriptName);
 
         if (scriptResponse.size()>0){
-            for (int i=0;i<scriptResponse.size();i++){
+            for (int i=0; i<scriptResponse.size(); i++){
                 DatabaseResponse databaseResponse = databaseMapper.queryDatabaseById(scriptResponse.get(0).getDbId());
                 ScriptDbResponse scriptDbResponse = new ScriptDbResponse();
                 scriptDbResponse.setSqlScript(scriptResponse.get(i).getSqlScript());
@@ -67,7 +67,8 @@ public class ScriptService {
                 scriptDbResponses.add(scriptDbResponse);
             }
         }
-        return scriptDbResponses;
+        PageInfo<ScriptDbResponse> pageInfo = new PageInfo<>(scriptDbResponses);
+        return pageInfo;
     }
 
     /**

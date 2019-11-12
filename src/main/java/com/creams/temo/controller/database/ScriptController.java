@@ -33,8 +33,8 @@ public class ScriptController {
     private ScriptService scriptService;
 
 
-    @ApiOperation(value = "根据脚本名称和数据库id模糊查询脚本列表", notes = "分页查询脚本")
-    @GetMapping(value = "/{page}")
+    @ApiOperation(value = "根据脚本名称和数据库id模糊查询脚本列表(已废弃)", notes = "分页查询脚本")
+    @GetMapping(value = "/{page}/discard")
     public JsonResult queryScriptByNameAndDbId(@PathVariable(value = "page") Integer page,
                                                @RequestParam(value = "dbId", required = false)
                                                @ApiParam(value = "数据库id") String dbId,
@@ -59,8 +59,9 @@ public class ScriptController {
     }
 
     @ApiOperation(value = "根据脚本名称和数据库id获取所属数据库")
-    @GetMapping(value = "/info")
-    public JsonResult queryScriptDbByNameAndDbId(@RequestParam(value = "dbId", required = false)
+    @GetMapping(value = "/{page}")
+    public JsonResult queryScriptDbByNameAndDbId(@PathVariable(value = "page")  Integer page ,
+                                                 @RequestParam(value = "dbId", required = false)
                                                  @ApiParam(value = "数据库id") String dbId,
                                                  @RequestParam(value = "scriptName", required = false)
                                                  @ApiParam(value = "脚本名称") String scriptName){
@@ -69,14 +70,14 @@ public class ScriptController {
             if (scriptName == null){
                 scriptName = "";
             }
-
-            List<ScriptDbResponse> scriptDbResponses = scriptService.queryScriptDbByNameAndDbId(dbId,scriptName);
-            if (!scriptDbResponses.isEmpty()){
-
-                return new JsonResult("操作成功",200,scriptDbResponses,true);
-            }else {
-                return new JsonResult("数据为空",200,null,true);
+            if (page == null){
+                page = 1;
             }
+            PageInfo<ScriptDbResponse> pageInfo = scriptService.queryScriptDbByNameAndDbId(page,dbId,scriptName);
+            Map<String, Object> map = new HashMap<>();
+            map.put("list", pageInfo.getList());
+            map.put("total", pageInfo.getTotal());
+            return new JsonResult("操作成功",200,map,true);
 
         }catch (Exception e){
             e.printStackTrace();
