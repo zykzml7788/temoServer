@@ -116,12 +116,14 @@ public class ScriptService {
      * @param scriptRequest
      * @return
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateScriptById(ScriptRequest scriptRequest){
-        boolean result = true;
-        scriptMapper.updateScriptById(scriptRequest);
-        return result;
-
+        boolean result;
+        result = scriptMapper.updateScriptById(scriptRequest);
+        if (result){
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -129,11 +131,13 @@ public class ScriptService {
      * @param scriptId
      * @return
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteScriptById(String scriptId){
-        boolean result = true;
-        scriptMapper.deleteScriptById(scriptId);
-        return result;
+        boolean result;
+        result = scriptMapper.deleteScriptById(scriptId);
+        if (result){
+            return true;
+        }
+        return false;
     }
-
 }
