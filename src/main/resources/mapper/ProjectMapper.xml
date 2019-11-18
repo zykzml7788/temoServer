@@ -4,18 +4,17 @@
 
 <mapper namespace="com.creams.temo.mapper.project.ProjectMapper">
 
-    <resultMap id="ProjectResponseResultMap" type="com.creams.temo.entity.project.response.ProjectResponse">
-        <result property="pid" column="pid" jdbcType="VARCHAR"/>
-        <result property="pname" column="pname" jdbcType="VARCHAR"/>
-        <result property="createTime" column="createtime" jdbcType="TIMESTAMP"/>
-        <result property="updateTime" column="updatetime" jdbcType="TIMESTAMP"/>
-    </resultMap>
+<resultMap id="ProjectResponseResultMap" type="com.creams.temo.entity.project.response.ProjectResponse">
+    <result property="pid" column="pid" jdbcType="VARCHAR"/>
+    <result property="pname" column="pname" jdbcType="VARCHAR"/>
+    <result property="createTime" column="createtime" jdbcType="TIMESTAMP"/>
+    <result property="updateTime" column="updatetime" jdbcType="TIMESTAMP"/>
+</resultMap>
 
-    <select id="queryProjectByName" parameterType="string" resultMap="ProjectResponseResultMap">
+<select id="queryProjectByName" parameterType="string" resultMap="ProjectResponseResultMap">
         select pid,pname,createtime,updatetime from project
          where pname like concat('%',#{pname},'%')
           order by updatetime desc
     </select>
-
 
 </mapper>

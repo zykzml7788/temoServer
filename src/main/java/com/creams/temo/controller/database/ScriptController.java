@@ -2,6 +2,7 @@ package com.creams.temo.controller.database;
 
 import com.creams.temo.entity.JsonResult;
 import com.creams.temo.entity.database.request.ScriptRequest;
+import com.creams.temo.entity.database.response.ScriptDbResponse;
 import com.creams.temo.entity.database.response.ScriptResponse;
 import com.creams.temo.entity.project.response.ProjectResponse;
 import com.creams.temo.service.database.ScriptService;
@@ -32,12 +33,12 @@ public class ScriptController {
     private ScriptService scriptService;
 
 
-    @ApiOperation(value = "根据脚本名称和数据库id模糊查询脚本列表", notes = "分页查询脚本")
-    @GetMapping(value = "/{page}")
+    @ApiOperation(value = "根据脚本名称和数据库id模糊查询脚本列表(已废弃)", notes = "分页查询脚本")
+    @GetMapping(value = "/{page}/discard")
     public JsonResult queryScriptByNameAndDbId(@PathVariable(value = "page") Integer page,
                                                @RequestParam(value = "dbId", required = false)
                                                @ApiParam(value = "数据库id") String dbId,
-                                               @RequestParam(value = "dbName", required = false)
+                                               @RequestParam(value = "scriptName", required = false)
                                                @ApiParam(value = "脚本名称") String scriptName){
 
         try {
@@ -48,6 +49,34 @@ public class ScriptController {
             Map<String,Object> map = new HashMap<>();
             map.put("list",pageInfo.getList());
             map.put("total",pageInfo.getTotal());
+            return new JsonResult("操作成功",200,map,true);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败",500,null,false);
+        }
+
+    }
+
+    @ApiOperation(value = "根据脚本名称和数据库id获取所属数据库")
+    @GetMapping(value = "/{page}")
+    public JsonResult queryScriptDbByNameAndDbId(@PathVariable(value = "page")  Integer page ,
+                                                 @RequestParam(value = "dbId", required = false)
+                                                 @ApiParam(value = "数据库id") String dbId,
+                                                 @RequestParam(value = "scriptName", required = false)
+                                                 @ApiParam(value = "脚本名称") String scriptName){
+
+        try {
+            if (scriptName == null){
+                scriptName = "";
+            }
+            if (page == null){
+                page = 1;
+            }
+            PageInfo<ScriptDbResponse> pageInfo = scriptService.queryScriptDbByNameAndDbId(page,dbId,scriptName);
+            Map<String, Object> map = new HashMap<>();
+            map.put("list", pageInfo.getList());
+            map.put("total", pageInfo.getTotal());
             return new JsonResult("操作成功",200,map,true);
 
         }catch (Exception e){

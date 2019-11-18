@@ -2,8 +2,11 @@ package com.creams.temo.service.database;
 
 
 import com.creams.temo.entity.database.request.ScriptRequest;
+import com.creams.temo.entity.database.response.DatabaseResponse;
+import com.creams.temo.entity.database.response.ScriptDbResponse;
 import com.creams.temo.entity.database.response.ScriptResponse;
 import com.creams.temo.entity.project.response.ProjectResponse;
+import com.creams.temo.mapper.database.DatabaseMapper;
 import com.creams.temo.mapper.database.ScriptMapper;
 import com.creams.temo.util.StringUtil;
 import com.github.pagehelper.PageHelper;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.github.pagehelper.PageInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,6 +23,9 @@ public class ScriptService {
 
     @Autowired
     private ScriptMapper scriptMapper;
+
+    @Autowired
+    private DatabaseMapper databaseMapper;
 
     /**
      * 查询所有Script
@@ -30,6 +37,36 @@ public class ScriptService {
         PageHelper.startPage(page, 10);
         List<ScriptResponse> scriptResponsesList = scriptMapper.queryAllScript(dbId, scriptName);
         PageInfo<ScriptResponse> pageInfo = new PageInfo<>(scriptResponsesList);
+        return pageInfo;
+    }
+
+    /***
+     * 根据dbId和scriptName获取对应脚本所属数据库
+     * @param dbId
+     * @param scriptName
+     * @return
+     */
+
+    public PageInfo<ScriptDbResponse> queryScriptDbByNameAndDbId(Integer page, String dbId, String scriptName){
+        PageHelper.startPage(page, 10);
+        List<ScriptDbResponse> scriptDbResponses = new ArrayList<>();
+        List<ScriptResponse> scriptResponse = scriptMapper.queryAllScript(dbId, scriptName);
+
+        if (scriptResponse.size()>0){
+            for (ScriptResponse response : scriptResponse) {
+                DatabaseResponse databaseResponse = databaseMapper.queryDatabaseById(response.getDbId());
+                ScriptDbResponse scriptDbResponse = new ScriptDbResponse();
+                scriptDbResponse.setSqlScript(response.getSqlScript());
+                scriptDbResponse.setScriptId(response.getScriptId());
+                scriptDbResponse.setScriptName(response.getScriptName());
+                scriptDbResponse.setId(response.getId());
+                scriptDbResponse.setCreateTime(response.getCreateTime());
+                scriptDbResponse.setUpdateTime(response.getUpdateTime());
+                scriptDbResponse.setDb(databaseResponse);
+                scriptDbResponses.add(scriptDbResponse);
+            }
+        }
+        PageInfo<ScriptDbResponse> pageInfo = new PageInfo<>(scriptDbResponses);
         return pageInfo;
     }
 
@@ -78,12 +115,14 @@ public class ScriptService {
      * @param scriptRequest
      * @return
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateScriptById(ScriptRequest scriptRequest){
-        boolean result = true;
-        scriptMapper.updateScriptById(scriptRequest);
-        return result;
-
+        boolean result;
+        result = scriptMapper.updateScriptById(scriptRequest);
+        if (result){
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -91,11 +130,13 @@ public class ScriptService {
      * @param scriptId
      * @return
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteScriptById(String scriptId){
-        boolean result = true;
-        scriptMapper.deleteScriptById(scriptId);
-        return result;
+        boolean result;
+        result = scriptMapper.deleteScriptById(scriptId);
+        if (result){
+            return true;
+        }
+        return false;
     }
-
 }
