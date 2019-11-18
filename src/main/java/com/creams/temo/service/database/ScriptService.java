@@ -9,6 +9,7 @@ import com.creams.temo.entity.project.response.ProjectResponse;
 import com.creams.temo.mapper.database.DatabaseMapper;
 import com.creams.temo.mapper.database.ScriptMapper;
 import com.creams.temo.util.StringUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class ScriptService {
      */
 
     public PageInfo<ScriptDbResponse> queryScriptDbByNameAndDbId(Integer page, String dbId, String scriptName){
-        PageHelper.startPage(page, 10);
+        Page<ScriptDbResponse> p = PageHelper.startPage(page, 10);
         List<ScriptDbResponse> scriptDbResponses = new ArrayList<>();
         List<ScriptResponse> scriptResponse = scriptMapper.queryAllScript(dbId, scriptName);
 
@@ -66,8 +67,7 @@ public class ScriptService {
                 scriptDbResponses.add(scriptDbResponse);
             }
         }
-        PageInfo<ScriptDbResponse> pageInfo = new PageInfo<>(scriptDbResponses);
-        return pageInfo;
+        return new PageInfo<>(p.getResult());
     }
 
     /**

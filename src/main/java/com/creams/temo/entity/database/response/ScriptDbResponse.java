@@ -20,8 +20,6 @@ public class ScriptDbResponse {
 
     private String sqlScript;
 
-    private String envId;
-
     private String createTime;
 
     private String updateTime;
