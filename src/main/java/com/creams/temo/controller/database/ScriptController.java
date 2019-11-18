@@ -33,32 +33,13 @@ public class ScriptController {
     private ScriptService scriptService;
 
 
-    @ApiOperation(value = "根据脚本名称和数据库id模糊查询脚本列表(已废弃)", notes = "分页查询脚本")
-    @GetMapping(value = "/{page}/discard")
-    public JsonResult queryScriptByNameAndDbId(@PathVariable(value = "page") Integer page,
-                                               @RequestParam(value = "dbId", required = false)
-                                               @ApiParam(value = "数据库id") String dbId,
-                                               @RequestParam(value = "scriptName", required = false)
-                                               @ApiParam(value = "脚本名称") String scriptName){
-
-        try {
-            if (scriptName == null){
-                scriptName = "";
-            }
-            PageInfo<ScriptResponse> pageInfo = scriptService.queryScriptByNameAndDbId(page,dbId,scriptName);
-            Map<String,Object> map = new HashMap<>();
-            map.put("list",pageInfo.getList());
-            map.put("total",pageInfo.getTotal());
-            return new JsonResult("操作成功",200,map,true);
-
-        }catch (Exception e){
-            e.printStackTrace();
-            return new JsonResult("操作失败",500,null,false);
-        }
-
+    @ApiOperation(value = "查询所有脚本", notes = "查询所有脚本")
+    @GetMapping(value = "/")
+    public JsonResult queryAllScript(){
+        return new JsonResult("操作成功",200,scriptService.queryAllScript(),true);
     }
 
-    @ApiOperation(value = "根据脚本名称和数据库id获取所属数据库")
+    @ApiOperation(value = "根据脚本名称和数据库id获取脚本")
     @GetMapping(value = "/{page}")
     public JsonResult queryScriptDbByNameAndDbId(@PathVariable(value = "page")  Integer page ,
                                                  @RequestParam(value = "dbId", required = false)

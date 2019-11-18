@@ -12,10 +12,19 @@
         <result property="sqlScript" column="sql_script" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-
     </resultMap>
 
-    <select id="queryAllScript" resultMap="ScriptResultMap">
+    <resultMap id="ScriptDbResultMap" type="com.creams.temo.entity.database.response.ScriptDbResponse">
+        <result property="id" column="id"/>
+        <result property="scriptId" column="script_id" jdbcType="VARCHAR"/>
+        <result property="scriptName" column="script_name" jdbcType="VARCHAR"/>
+        <result property="dbId" column="db_id" jdbcType="VARCHAR"/>
+        <result property="sqlScript" column="sql_script" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="queryScriptDb" resultMap="ScriptDbResultMap">
         select * from script
          where
          <if test="db_id !=null and db_id !=''">

@@ -16,6 +16,8 @@ public class ScriptDbResponse {
 
     private String scriptName;
 
+    private String dbId;
+
     private DatabaseResponse Db;
 
     private String sqlScript;

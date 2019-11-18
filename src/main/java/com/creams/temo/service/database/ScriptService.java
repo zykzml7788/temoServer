@@ -33,12 +33,8 @@ public class ScriptService {
      * @return
      */
     @Transactional
-    public PageInfo<ScriptResponse> queryScriptByNameAndDbId(Integer page,String dbId, String scriptName){
-        //设置分页数据
-        PageHelper.startPage(page, 10);
-        List<ScriptResponse> scriptResponsesList = scriptMapper.queryAllScript(dbId, scriptName);
-        PageInfo<ScriptResponse> pageInfo = new PageInfo<>(scriptResponsesList);
-        return pageInfo;
+    public List<ScriptResponse> queryAllScript(){
+        return scriptMapper.queryAllScript();
     }
 
     /***
@@ -48,26 +44,12 @@ public class ScriptService {
      * @return
      */
 
-    public PageInfo<ScriptDbResponse> queryScriptDbByNameAndDbId(Integer page, String dbId, String scriptName){
-        Page<ScriptDbResponse> p = PageHelper.startPage(page, 10);
-        List<ScriptDbResponse> scriptDbResponses = new ArrayList<>();
-        List<ScriptResponse> scriptResponse = scriptMapper.queryAllScript(dbId, scriptName);
-
-        if (scriptResponse.size()>0){
-            for (ScriptResponse response : scriptResponse) {
-                DatabaseResponse databaseResponse = databaseMapper.queryDatabaseById(response.getDbId());
-                ScriptDbResponse scriptDbResponse = new ScriptDbResponse();
-                scriptDbResponse.setSqlScript(response.getSqlScript());
-                scriptDbResponse.setScriptId(response.getScriptId());
-                scriptDbResponse.setScriptName(response.getScriptName());
-                scriptDbResponse.setId(response.getId());
-                scriptDbResponse.setCreateTime(response.getCreateTime());
-                scriptDbResponse.setUpdateTime(response.getUpdateTime());
-                scriptDbResponse.setDb(databaseResponse);
-                scriptDbResponses.add(scriptDbResponse);
-            }
-        }
-        return new PageInfo<>(p.getResult());
+    public PageInfo<ScriptDbResponse>   queryScriptDbByNameAndDbId(Integer page, String dbId, String scriptName){
+        PageHelper.startPage(page, 10);
+        List<ScriptDbResponse> scriptResponses = scriptMapper.queryScriptDb(dbId, scriptName);
+        PageInfo<ScriptDbResponse> pageInfo= new PageInfo<>(scriptResponses);
+        pageInfo.getList().forEach(n->n.setDb(databaseMapper.queryDatabaseById(n.getDbId())));
+        return new PageInfo<>(scriptResponses);
     }
 
     /**
