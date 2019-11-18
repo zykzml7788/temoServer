@@ -47,22 +47,21 @@ public class ScriptService {
      * @return
      */
 
-    @Transactional
     public PageInfo<ScriptDbResponse> queryScriptDbByNameAndDbId(Integer page, String dbId, String scriptName){
         PageHelper.startPage(page, 10);
         List<ScriptDbResponse> scriptDbResponses = new ArrayList<>();
         List<ScriptResponse> scriptResponse = scriptMapper.queryAllScript(dbId, scriptName);
 
         if (scriptResponse.size()>0){
-            for (int i=0; i<scriptResponse.size(); i++){
-                DatabaseResponse databaseResponse = databaseMapper.queryDatabaseById(scriptResponse.get(0).getDbId());
+            for (ScriptResponse response : scriptResponse) {
+                DatabaseResponse databaseResponse = databaseMapper.queryDatabaseById(response.getDbId());
                 ScriptDbResponse scriptDbResponse = new ScriptDbResponse();
-                scriptDbResponse.setSqlScript(scriptResponse.get(i).getSqlScript());
-                scriptDbResponse.setScriptId(scriptResponse.get(i).getScriptId());
-                scriptDbResponse.setScriptName(scriptResponse.get(i).getScriptName());
-                scriptDbResponse.setId(scriptResponse.get(i).getId());
-                scriptDbResponse.setCreateTime(scriptResponse.get(i).getCreateTime());
-                scriptDbResponse.setUpdateTime(scriptResponse.get(i).getUpdateTime());
+                scriptDbResponse.setSqlScript(response.getSqlScript());
+                scriptDbResponse.setScriptId(response.getScriptId());
+                scriptDbResponse.setScriptName(response.getScriptName());
+                scriptDbResponse.setId(response.getId());
+                scriptDbResponse.setCreateTime(response.getCreateTime());
+                scriptDbResponse.setUpdateTime(response.getUpdateTime());
                 scriptDbResponse.setDb(databaseResponse);
                 scriptDbResponses.add(scriptDbResponse);
             }
