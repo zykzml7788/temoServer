@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.creams.temo.mapper.testcase.SavesMapper">
+
+    <select id="querySaves" resultType="com.creams.temo.entity.testcase.response.SavesResponse">
+        select * from saves
+        <where>
+            <if test="saveId !=null and saveId !=''" >
+                and save_id = #{saveId}
+            </if>
+
+            <if test="caseId !=null and caseId != ''">
+                and case_id = #{caseId}
+            </if>
+        </where>
+        order by createTime desc
+    </select>
+
+    <insert id="addSaves">
+       INSERT INTO saves(save_id, jexpression, key, save_from, case_id)
+       VALUES
+       (#{saveId}, #{jexpression}, #{key}, #{saveFrom}, #{caseId});
+    </insert>
+
+    <update id="updateSavesById">
+       UPDATE saves SET
+       jexpression = #{jexpression} ,
+       key = #{key},
+       save_from = #{saveFrom},
+       case_id = #{caseId}
+       WHERE
+       save_id = #{saveId};
+    </update>
+
+</mapper>

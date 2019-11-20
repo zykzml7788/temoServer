@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.creams.temo.mapper.testcase.TestCaseMapper">
+
+    <select id="queryTestCase" resultType="com.creams.temo.entity.testcase.response.TestCaseResponse">
+        select * from testcase
+        <where>
+            <if test="caseId !=null and caseId !=''" >
+                and case_id = #{caseId}
+            </if>
+            <if test="envId !=null and envId !=''">
+                and env_id = #{envId}
+            </if>
+            <if test="setId !=null and setId !=''">
+                and set_id = #{setId}
+            </if>
+            <if test="caseDesc !=null and caseDesc !=''">
+                and case_desc like concat('%', #{caseDesc}, '%')
+            </if>
+            <if test="dbId !=null and dbId !=''">
+                and db_id = #{dbId}
+            </if>
+            <if test="caseType !=null and caseType != ''">
+                and case_type = #{caseType}
+            </if>
+        </where>
+        order by createTime desc
+    </select>
+
+    <insert id="addTestCase">
+        INSERT INTO testcase
+        (case_id, sorting, case_desc, env_id, url, method, header, cookies, param, body, file, set_id, sql_script, db_id, case_type)
+         VALUES
+         (#{caseId}, #{sorting}, #{caseDesc}, #{envId}, #{url}, #{method}, #{header}, #{cookies}, #{param}, #{body},
+         #{file}, #{setId}, #{sqlScript}, #{dbId}, #{caseType})
+
+    </insert>
+
+    <update id="updateTestCaseById">
+        update  testcase set
+        sorting = #{sorting},
+        case_desc = #{caseDesc},
+        env_id = #{envId},
+        url = #{url},
+        method = #{method},
+        header = #{header},
+        cookies = #{cookies},
+        param = #{param},
+        body = #{body},
+        file = #{file},
+        set_id = #{setId},
+        set_script = #{setScript},
+        db_id = #{dbId}
+        where case_id = #{caseId}
+    </update>
+
+</mapper>
