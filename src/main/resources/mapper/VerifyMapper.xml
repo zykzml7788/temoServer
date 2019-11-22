@@ -18,9 +18,9 @@
 
     <insert id="addVerify">
        INSERT INTO verify
-       (verify_id, verify_type, jexpression, expect, relationship, rexpression, case_id)
+       (verify_type, jexpression, expect, relationship, rexpression, case_id)
        VALUES
-       (#{verifyId}, #{verifyType}, #{jexpression}, #{expect}, #{relationShip}, #{rexpression}, #{caseId});
+       (#{verifyType}, #{jexpression}, #{expect}, #{relationShip}, #{rexpression}, #{caseId})
     </insert>
 
     <update id="updateVerifyById">

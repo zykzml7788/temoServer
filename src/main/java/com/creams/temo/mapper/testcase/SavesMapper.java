@@ -1,7 +1,6 @@
 package com.creams.temo.mapper.testcase;
 
 import com.creams.temo.entity.testcase.response.SavesResponse;
-import com.creams.temo.entity.testcase.response.TestCaseResponse;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -12,6 +11,7 @@ import java.util.List;
 public interface SavesMapper {
 
     List<SavesResponse> querySaves();
+
 
     boolean addSaves(SavesResponse savesResponse);
 

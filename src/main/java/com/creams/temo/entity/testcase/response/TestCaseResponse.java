@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class TestCaseResponse {
 
     @ApiModelProperty("用例id")
     @TableField(value = "case_id")
-    private String caseID;
+    private String caseId;
 
     @ApiModelProperty("排序")
     @TableField(value = "sorting")
@@ -67,4 +69,10 @@ public class TestCaseResponse {
     @ApiModelProperty("用例类型")
     @TableField(value = "case_type")
     private String caseType;
+
+
+    private List<VerifyResponse> verify;
+
+    private List<SavesResponse> saves;
+
 }

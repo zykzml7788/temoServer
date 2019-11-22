@@ -21,9 +21,9 @@
 
     <insert id="addStScript">
        INSERT INTO st_script
-       (st_script_id, st_script_name, st_script_type, set_id, ex_script_id)
+       (st_script_name, st_script_type, set_id, ex_script_id)
        VALUES
-       (#{stScriptId}, #{stScriptName}, #{stScriptType}, #{setId}, #{exScriptId});
+       (#{stScriptName}, #{stScriptType}, #{setId}, #{exScriptId})
     </insert>
 
     <update id="updateStScriptById">

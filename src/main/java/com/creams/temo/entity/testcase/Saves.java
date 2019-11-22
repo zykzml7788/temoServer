@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+
 @Data
 @TableName(value = "saves")
 public class Saves {
@@ -25,8 +26,8 @@ public class Saves {
     private String jexpression;
 
     @ApiModelProperty("自定义key")
-    @TableField(value = "key")
-    private String key;
+    @TableField(value = "param_key")
+    private String paramKey;
 
     @ApiModelProperty("关联取值来源（响应头，响应体")
     @TableField(value = "save_form")

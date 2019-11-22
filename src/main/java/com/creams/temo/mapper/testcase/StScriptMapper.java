@@ -1,6 +1,5 @@
 package com.creams.temo.mapper.testcase;
 
-import com.creams.temo.entity.testcase.response.SavesResponse;
 import com.creams.temo.entity.testcase.response.StScriptResponse;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;

@@ -17,9 +17,9 @@
     </select>
 
     <insert id="addSaves">
-       INSERT INTO saves(save_id, jexpression, key, save_from, case_id)
+       INSERT INTO saves (jexpression, param_key, save_from, case_id)
        VALUES
-       (#{saveId}, #{jexpression}, #{key}, #{saveFrom}, #{caseId});
+       (#{jexpression}, #{paramKey}, #{saveFrom}, #{caseId})
     </insert>
 
     <update id="updateSavesById">
@@ -29,7 +29,7 @@
        save_from = #{saveFrom},
        case_id = #{caseId}
        WHERE
-       save_id = #{saveId};
+       save_id = #{saveId}
     </update>
 
 </mapper>
