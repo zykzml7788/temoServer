@@ -1,6 +1,6 @@
 package com.creams.temo.util;
 
-import com.creams.temo.config.Status;
+import com.creams.temo.config.RedisStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -559,7 +559,7 @@ public class RedisUtil {
      * @param expireEnum 有效期的枚举类
      * @param values 待添加的数据
      */
-    public void addToListRight(String listKey, Status.ExpireEnum expireEnum, Object... values) {
+    public void addToListRight(String listKey, RedisStatus.ExpireEnum expireEnum, Object... values) {
         //绑定操作
         BoundListOperations<String, Object> boundValueOperations = redisTemplate.boundListOps(listKey);
         //插入数据

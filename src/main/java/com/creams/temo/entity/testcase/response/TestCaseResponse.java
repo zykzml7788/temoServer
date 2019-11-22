@@ -15,15 +15,15 @@ public class TestCaseResponse {
 
     @ApiModelProperty("排序")
     @TableField(value = "sorting")
-    private String sorting;
+    private Integer sorting;
 
     @ApiModelProperty("用例描述")
     @TableField(value = "case_desc")
     private String caseDesc;
 
     @ApiModelProperty("环境id")
-    @TableField(value = "envId")
-    private String env_id;
+    @TableField(value = "env_id")
+    private String envId;
 
     @ApiModelProperty("接口地址")
     @TableField(value = "url")
@@ -70,9 +70,5 @@ public class TestCaseResponse {
     @TableField(value = "case_type")
     private String caseType;
 
-
-    private List<VerifyResponse> verify;
-
-    private List<SavesResponse> saves;
 
 }

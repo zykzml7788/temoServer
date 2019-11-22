@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
-public abstract class Status {
+public abstract class RedisStatus {
     /**
      * 过期时间相关枚举
      */

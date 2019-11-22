@@ -1,6 +1,7 @@
 package com.creams.temo.controller.testcase;
 
 import com.creams.temo.entity.JsonResult;
+import com.creams.temo.entity.testcase.request.TestCaseRequest;
 import com.creams.temo.entity.testcase.response.TestCaseResponse;
 import com.creams.temo.service.testcase.TestCaseService;
 import io.swagger.annotations.Api;
@@ -24,9 +25,9 @@ public class TestCaseController {
 
     @ApiOperation(value = "新增用例")
     @PostMapping(value = "/")
-    public JsonResult addTestCase(@RequestBody TestCaseResponse testCaseResponse){
+    public JsonResult addTestCase(@RequestBody TestCaseRequest testCaseRequest){
         try {
-            String caseId = testCaseService.addTestCase(testCaseResponse);
+            String caseId = testCaseService.addTestCase(testCaseRequest);
             return new JsonResult("操作成功", 200, caseId, true);
         }catch (Exception e){
             e.printStackTrace();

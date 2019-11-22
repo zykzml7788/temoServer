@@ -1,5 +1,8 @@
 package com.creams.temo.service.testcase;
 
+import com.creams.temo.entity.testcase.request.SavesRequest;
+import com.creams.temo.entity.testcase.request.TestCaseRequest;
+import com.creams.temo.entity.testcase.request.VerifyRequest;
 import com.creams.temo.entity.testcase.response.SavesResponse;
 import com.creams.temo.entity.testcase.response.TestCaseResponse;
 import com.creams.temo.entity.testcase.response.VerifyResponse;
@@ -27,30 +30,31 @@ public class TestCaseService {
 
     /**
      * 新增用例信息
-     * @param testCaseResponse
+     * @param testCaseRequest
      * @return
      */
     @Transactional
-    public String addTestCase(TestCaseResponse testCaseResponse){
+    public String addTestCase(TestCaseRequest testCaseRequest){
         String caseId = StringUtil.uuid();
         String verifyId = StringUtil.uuid();
         String savesId = StringUtil.uuid();
-        testCaseResponse.setCaseId(caseId);
-        List<SavesResponse> savesResponses = testCaseResponse.getSaves();
-        List<VerifyResponse> verifyServices = testCaseResponse.getVerify();
-        for (SavesResponse s: savesResponses
+        testCaseRequest.setCaseId(caseId);
+        List<SavesRequest> savesRequests = testCaseRequest.getSaves();
+        List<VerifyRequest> verifyRequests = testCaseRequest.getVerify();
+        for (SavesRequest s: savesRequests
              ) {
             s.setCaseId(caseId);
             s.setSaveId(savesId);
             savesMapper.addSaves(s);
         }
 
-        for (VerifyResponse v: verifyServices
+        for (VerifyRequest v: verifyRequests
              ) {
             v.setCaseId(caseId);
             v.setVerifyId(verifyId);
             verifyMapper.addVerify(v);
         }
+        testCaseMapper.addTestCase(testCaseRequest);
 
         return caseId;
     }

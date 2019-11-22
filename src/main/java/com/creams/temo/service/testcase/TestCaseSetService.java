@@ -1,6 +1,7 @@
 package com.creams.temo.service.testcase;
 
 
+import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.mapper.testcase.TestCaseSetMapper;
 import com.creams.temo.util.StringUtil;
@@ -21,13 +22,13 @@ public class TestCaseSetService {
     /**
      * 查询用例集
      * @param page
-     * @param testCaseSetResponse
+     * @param testCaseSetRequest
      * @return
      */
     @Transactional
-    public PageInfo<TestCaseSetResponse> queryTestCaseSet(Integer page, TestCaseSetResponse testCaseSetResponse){
+    public PageInfo<TestCaseSetResponse> queryTestCaseSet(Integer page, TestCaseSetRequest testCaseSetRequest){
         PageHelper.startPage(page, 10);
-        List<TestCaseSetResponse> testCaseSet = testCaseSetMapper.queryTestCaseSet(testCaseSetResponse);
+        List<TestCaseSetResponse> testCaseSet = testCaseSetMapper.queryTestCaseSet(testCaseSetRequest);
         PageInfo<TestCaseSetResponse> pageInfo = new PageInfo<>(testCaseSet);
         return pageInfo;
     }
@@ -50,26 +51,26 @@ public class TestCaseSetService {
 
     /**
      * 新增集合
-     * @param testCaseSetResponse
+     * @param testCaseSetRequest
      * @return
      */
     @Transactional
-    public String addTestCaseSet(TestCaseSetResponse testCaseSetResponse){
+    public String addTestCaseSet(TestCaseSetRequest testCaseSetRequest){
         String setId = StringUtil.uuid();
-        testCaseSetResponse.setSetId(setId);
-        testCaseSetMapper.addTestCaseSet(testCaseSetResponse);
+        testCaseSetRequest.setSetId(setId);
+        testCaseSetMapper.addTestCaseSet(testCaseSetRequest);
         return setId;
     }
 
     /**
      * 修改用例集
-     * @param testCaseSetResponse
+     * @param testCaseSetRequest
      * @return
      */
     @Transactional
-    public Boolean updateTestCaseSetById(TestCaseSetResponse testCaseSetResponse){
+    public Boolean updateTestCaseSetById(TestCaseSetRequest testCaseSetRequest){
         boolean result;
-        result = testCaseSetMapper.updateTestCaseSetById(testCaseSetResponse);
+        result = testCaseSetMapper.updateTestCaseSetById(testCaseSetRequest);
         if (result){
             return true;
         }
