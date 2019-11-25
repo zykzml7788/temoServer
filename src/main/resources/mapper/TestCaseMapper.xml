@@ -27,6 +27,7 @@
         order by createTime desc
     </select>
 
+
     <insert id="addTestCase">
         INSERT INTO testcase
         (case_id, sorting, case_desc, env_id, url, method, header, cookies, param, body, file, set_id, sql_script, db_id, case_type)

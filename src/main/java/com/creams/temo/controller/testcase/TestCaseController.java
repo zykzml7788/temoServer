@@ -85,8 +85,14 @@ public class TestCaseController {
     @DeleteMapping("/{id}")
     public JsonResult deleteTestCase(@PathVariable("id") @ApiParam("用例id") String caseId){
         try {
-            testCaseService.deleteTestCase(caseId);
-            return new JsonResult("操作成功", 200, caseId, true);
+            TestCaseResponse testCaseResponse = testCaseService.queryTestCaseById(caseId);
+            if (testCaseResponse == null){
+                return new JsonResult("数据为空", 404, caseId, true);
+            }else {
+                testCaseService.deleteTestCase(caseId);
+                return new JsonResult("操作成功", 200, caseId, true);
+            }
+
         }catch (Exception e){
             e.printStackTrace();
             return new JsonResult("操作失败", 500, null, false);

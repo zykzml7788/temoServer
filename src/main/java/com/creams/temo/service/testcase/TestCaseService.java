@@ -102,8 +102,11 @@ public class TestCaseService {
      */
     @Transactional(rollbackFor = Exception.class)
     public boolean  deleteTestCase(String caseId){
+
         return testCaseMapper.deleteTestCase(caseId) && verifyMapper.deleteVerify(caseId) && savesMapper.deleteSaves(caseId);
+
     }
+
 
     /**
      * 查询用例
@@ -115,12 +118,6 @@ public class TestCaseService {
      * @param dbId
      * @param caseType
      * @return
-     *  PageHelper.startPage(page, 10);
-     *         List<ScriptDbResponse> scriptResponses = scriptMapper.queryScriptDb(dbId, scriptName);
-     *         PageInfo<ScriptDbResponse> pageInfo= new PageInfo<>(scriptResponses);
-     *         pageInfo.getList().forEach(n->n.setDb(databaseMapper.queryDatabaseById(n.getDbId())));
-     *         System.out.println("打印pageinfo---" + pageInfo.getList());
-     *         return new PageInfo<>(scriptResponses);
      */
     @Transactional
     public PageInfo<TestCaseResponse> queryTestCase(Integer page, String caseId, String envId, String setId,
@@ -128,9 +125,19 @@ public class TestCaseService {
         PageHelper.startPage(page, 10);
         List<TestCaseResponse> testCaseResponses = testCaseMapper.queryTestCase(caseId, envId, setId, caseDesc, dbId, caseType);
         PageInfo<TestCaseResponse> pageInfo = new PageInfo<>(testCaseResponses);
-//        return pageInfo;
-        pageInfo.getList().forEach(n->n.setSaves(savesMapper.querySaves("", n.getCaseId())));
-        pageInfo.getList().forEach(n->n.setVerify(verifyMapper.queryVerify(n.getCaseId(),"","")));
+        pageInfo.getList().forEach(n->n.setSaves(savesMapper.querySaves("", caseId)));
+        pageInfo.getList().forEach(n->n.setVerify(verifyMapper.queryVerify(caseId,"","")));
         return new PageInfo<>(testCaseResponses);
+    }
+
+
+    /**
+     * 根据用例id查询用例
+     * @param caseId
+     * @return
+     */
+    public TestCaseResponse queryTestCaseById(String caseId){
+        TestCaseResponse testCaseResponse = testCaseMapper.queryTestCaseById(caseId);
+        return testCaseResponse;
     }
 }

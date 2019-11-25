@@ -5,6 +5,7 @@ import com.creams.temo.entity.testcase.response.TestCaseResponse;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -17,6 +18,9 @@ public interface TestCaseMapper {
                                          @Param("case_desc")  String caseDesc,
                                          @Param("db_id") String dbId,
                                          @Param("case_type") String caseType);
+
+    @Select("select * from testcase where case_id = #{case_id}")
+    TestCaseResponse queryTestCaseById(@Param("case_id") String caseId);
 
     boolean addTestCase(TestCaseRequest testCaseRequest);
 
