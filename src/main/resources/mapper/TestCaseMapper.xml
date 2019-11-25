@@ -5,23 +5,23 @@
     <select id="queryTestCase" resultType="com.creams.temo.entity.testcase.response.TestCaseResponse">
         select * from testcase
         <where>
-            <if test="caseId !=null and caseId !=''" >
-                and case_id = #{caseId}
+            <if test="case_id !=null and case_id !=''" >
+                and case_id = #{case_id}
             </if>
-            <if test="envId !=null and envId !=''">
-                and env_id = #{envId}
+            <if test="env_id !=null and env_id !=''">
+                and env_id = #{env_id}
             </if>
-            <if test="setId !=null and setId !=''">
-                and set_id = #{setId}
+            <if test="set_id !=null and set_id !=''">
+                and set_id = #{set_id}
             </if>
-            <if test="caseDesc !=null and caseDesc !=''">
-                and case_desc like concat('%', #{caseDesc}, '%')
+            <if test="case_desc !=null and case_desc !=''">
+                and case_desc like concat('%', #{case_desc}, '%')
             </if>
-            <if test="dbId !=null and dbId !=''">
-                and db_id = #{dbId}
+            <if test="db_id !=null and db_id !=''">
+                and db_id = #{db_id}
             </if>
-            <if test="caseType !=null and caseType != ''">
-                and case_type = #{caseType}
+            <if test="case_type !=null and case_type != ''">
+                and case_type = #{case_type}
             </if>
         </where>
         order by createTime desc
@@ -49,8 +49,9 @@
         body = #{body},
         file = #{file},
         set_id = #{setId},
-        set_script = #{setScript},
-        db_id = #{dbId}
+        sql_script = #{sqlScript},
+        db_id = #{dbId},
+        case_type = #{caseType}
         where case_id = #{caseId}
     </update>
 

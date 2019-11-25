@@ -70,5 +70,7 @@ public class TestCaseResponse {
     @TableField(value = "case_type")
     private String caseType;
 
+    private List<VerifyResponse> verify;
 
+    private List<SavesResponse> saves;
 }

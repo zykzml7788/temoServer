@@ -5,12 +5,15 @@
     <select id="queryVerify" resultType="com.creams.temo.entity.testcase.response.VerifyResponse">
         select * from verify
         <where>
-            <if test="verifyId !=null and verifyId !=''" >
-                and verify_id = #{verifyId}
+            <if test="case_id !=null and case_id !=''" >
+                and case_id = #{case_id}
             </if>
 
-            <if test="verifyType !=null and verifyType != ''">
-                and verify_type = #{verifyType}
+            <if test="verify_type !=null and verify_type != ''">
+                and verify_type = #{verify_type}
+            </if>
+            <if test="verify_id !=null and verify_id != ''">
+                and verify_id = #{verify_id}
             </if>
         </where>
         order by createTime desc
@@ -18,9 +21,9 @@
 
     <insert id="addVerify">
        INSERT INTO verify
-       (verify_type, jexpression, expect, relationship, rexpression, case_id)
+       (verify_id, verify_type, jexpression, expect, relationship, rexpression, case_id)
        VALUES
-       (#{verifyType}, #{jexpression}, #{expect}, #{relationShip}, #{rexpression}, #{caseId})
+       (#{verifyId}, #{verifyType}, #{jexpression}, #{expect}, #{relationShip}, #{rexpression}, #{caseId})
     </insert>
 
     <update id="updateVerifyById">
@@ -29,10 +32,9 @@
        jexpression = #{jexpression},
        expect = #{expect},
        relationship = #{relationShip},
-       rexpression = #{rexpression},
-       case_id = #{caseId}
+       rexpression = #{rexpression}
        WHERE
-        verify_id = #{verifyId}
+        case_id = #{caseId}
     </update>
 
 </mapper>

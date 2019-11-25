@@ -11,12 +11,12 @@ import java.util.List;
 @Mapper
 public interface SavesMapper {
 
-    List<SavesResponse> querySaves();
+    List<SavesResponse> querySaves(@Param("save_id") String saveId, @Param("case_id") String caseId);
 
     boolean addSaves(SavesRequest savesRequest);
 
     boolean updateSavesById(SavesRequest savesRequest);
 
-    @Delete("delete from saves where save_id = #{save_id}")
-    boolean deleteSaves(@Param("save_id") String saveId);
+    @Delete("delete from saves where case_id = #{case_id}")
+    boolean deleteSaves(@Param("case_id") String caseId);
 }

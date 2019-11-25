@@ -5,31 +5,30 @@
     <select id="querySaves" resultType="com.creams.temo.entity.testcase.response.SavesResponse">
         select * from saves
         <where>
-            <if test="saveId !=null and saveId !=''" >
-                and save_id = #{saveId}
+            <if test="save_id !=null and save_id !=''" >
+                and save_id = #{save_id}
             </if>
 
-            <if test="caseId !=null and caseId != ''">
-                and case_id = #{caseId}
+            <if test="case_id !=null and case_id != ''">
+                and case_id = #{case_id}
             </if>
         </where>
         order by createTime desc
     </select>
 
     <insert id="addSaves">
-       INSERT INTO saves (jexpression, param_key, save_from, case_id)
+       INSERT INTO saves (save_id, jexpression, param_key, save_from, case_id)
        VALUES
-       (#{jexpression}, #{paramKey}, #{saveFrom}, #{caseId})
+       (#{saveId}, #{jexpression}, #{paramKey}, #{saveFrom}, #{caseId})
     </insert>
 
     <update id="updateSavesById">
        UPDATE saves SET
        jexpression = #{jexpression} ,
-       key = #{key},
-       save_from = #{saveFrom},
-       case_id = #{caseId}
+       param_key = #{paramKey},
+       save_from = #{saveFrom}
        WHERE
-       save_id = #{saveId}
+       case_id = #{caseId}
     </update>
 
 </mapper>

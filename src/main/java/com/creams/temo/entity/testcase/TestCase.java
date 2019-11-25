@@ -4,8 +4,12 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.creams.temo.entity.testcase.request.SavesRequest;
+import com.creams.temo.entity.testcase.request.VerifyRequest;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @TableName(value = "testcase")
@@ -72,5 +76,8 @@ public class TestCase {
     @TableField(value = "case_type")
     private String caseType;
 
+    private List<VerifyRequest> verify;
+
+    private List<SavesRequest> saves;
 
 }

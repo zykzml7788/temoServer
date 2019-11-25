@@ -1,8 +1,7 @@
 package com.creams.temo.entity.testcase.request;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.creams.temo.entity.testcase.response.SavesResponse;
-import com.creams.temo.entity.testcase.response.VerifyResponse;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -71,6 +70,7 @@ public class TestCaseRequest {
     @ApiModelProperty("用例类型")
     @TableField(value = "case_type")
     private String caseType;
+
 
     private List<VerifyRequest> verify;
 
