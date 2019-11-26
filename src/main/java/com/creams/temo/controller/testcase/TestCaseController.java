@@ -53,6 +53,18 @@ public class TestCaseController {
 
     }
 
+    @ApiOperation(value = "根据case_id查询用例信息")
+    @GetMapping(value = "/{id}/info")
+    public JsonResult queryTestCaseInfo(@PathVariable("id") String id){
+        try{
+            TestCaseResponse testCaseResponse = testCaseService.queryTestCaseInfo(id);
+            return new JsonResult("操作成功", 200, testCaseResponse, false);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+
+    }
 
     @ApiOperation(value = "新增用例")
     @PostMapping(value = "/")

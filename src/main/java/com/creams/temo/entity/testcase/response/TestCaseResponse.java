@@ -13,9 +13,6 @@ public class TestCaseResponse {
     @TableField(value = "case_id")
     private String caseId;
 
-    @ApiModelProperty("排序")
-    @TableField(value = "sorting")
-    private Integer sorting;
 
     @ApiModelProperty("用例描述")
     @TableField(value = "case_desc")

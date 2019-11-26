@@ -11,7 +11,7 @@ import java.util.List;
 @Mapper
 public interface SavesMapper {
 
-    List<SavesResponse> querySaves(@Param("save_id") String saveId, @Param("case_id") String caseId);
+    List<SavesResponse> querySaves(@Param("case_id") String caseId);
 
     boolean addSaves(SavesRequest savesRequest);
 

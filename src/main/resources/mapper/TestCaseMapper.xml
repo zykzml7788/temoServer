@@ -24,22 +24,20 @@
                 and case_type = #{case_type}
             </if>
         </where>
-        order by createTime desc
     </select>
 
 
     <insert id="addTestCase">
         INSERT INTO testcase
-        (case_id, sorting, case_desc, env_id, url, method, header, cookies, param, body, file, set_id, sql_script, db_id, case_type)
+        (case_id, case_desc, env_id, url, method, header, cookies, param, body, file, set_id, sql_script, db_id, case_type)
          VALUES
-         (#{caseId}, #{sorting}, #{caseDesc}, #{envId}, #{url}, #{method}, #{header}, #{cookies}, #{param}, #{body},
+         (#{caseId}, #{caseDesc}, #{envId}, #{url}, #{method}, #{header}, #{cookies}, #{param}, #{body},
          #{file}, #{setId}, #{sqlScript}, #{dbId}, #{caseType})
 
     </insert>
 
     <update id="updateTestCaseById">
         update  testcase set
-        sorting = #{sorting},
         case_desc = #{caseDesc},
         env_id = #{envId},
         url = #{url},

@@ -1,5 +1,6 @@
 package com.creams.temo.service.testcase;
 
+import com.creams.temo.entity.testcase.TestCase;
 import com.creams.temo.entity.testcase.request.SavesRequest;
 import com.creams.temo.entity.testcase.request.TestCaseRequest;
 import com.creams.temo.entity.testcase.request.VerifyRequest;
@@ -119,15 +120,21 @@ public class TestCaseService {
      * @param caseType
      * @return
      */
-    @Transactional
     public PageInfo<TestCaseResponse> queryTestCase(Integer page, String caseId, String envId, String setId,
                                                     String caseDesc, String dbId, String caseType){
         PageHelper.startPage(page, 10);
         List<TestCaseResponse> testCaseResponses = testCaseMapper.queryTestCase(caseId, envId, setId, caseDesc, dbId, caseType);
         PageInfo<TestCaseResponse> pageInfo = new PageInfo<>(testCaseResponses);
-        pageInfo.getList().forEach(n->n.setSaves(savesMapper.querySaves("", caseId)));
-        pageInfo.getList().forEach(n->n.setVerify(verifyMapper.queryVerify(caseId,"","")));
+        pageInfo.getList().forEach(n->n.setSaves(savesMapper.querySaves( caseId)));
+        pageInfo.getList().forEach(n->n.setVerify(verifyMapper.queryVerify(caseId)));
         return new PageInfo<>(testCaseResponses);
+    }
+
+    public TestCaseResponse queryTestCaseInfo(String id){
+        TestCaseResponse testCaseResponse = testCaseMapper.queryTestCaseById(id);
+        testCaseResponse.setSaves(savesMapper.querySaves(id));
+        testCaseResponse.setVerify(verifyMapper.queryVerify(id));
+        return testCaseResponse;
     }
 
 

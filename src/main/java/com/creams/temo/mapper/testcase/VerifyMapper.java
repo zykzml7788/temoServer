@@ -11,9 +11,7 @@ import java.util.List;
 @Mapper
 public interface VerifyMapper {
 
-    List<VerifyResponse> queryVerify(@Param("case_id") String caseId,
-                                     @Param("verify_type")String verifyType,
-                                     @Param("verify_id")String verifyId);
+    List<VerifyResponse> queryVerify(@Param("case_id") String caseId);
 
     boolean addVerify(VerifyRequest verifyRequest);
 

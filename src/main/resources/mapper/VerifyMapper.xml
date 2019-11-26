@@ -5,18 +5,11 @@
     <select id="queryVerify" resultType="com.creams.temo.entity.testcase.response.VerifyResponse">
         select * from verify
         <where>
+        1=1
             <if test="case_id !=null and case_id !=''" >
                 and case_id = #{case_id}
             </if>
-
-            <if test="verify_type !=null and verify_type != ''">
-                and verify_type = #{verify_type}
-            </if>
-            <if test="verify_id !=null and verify_id != ''">
-                and verify_id = #{verify_id}
-            </if>
         </where>
-        order by createTime desc
     </select>
 
     <insert id="addVerify">
