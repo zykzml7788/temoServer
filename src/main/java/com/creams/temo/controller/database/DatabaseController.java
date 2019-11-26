@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.spring.web.json.Json;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,16 @@ public class DatabaseController {
     @Autowired
     private DatabaseService databaseService;
 
+    @ApiOperation("查询所有数据库信息")
+    @GetMapping(value = "/")
+    public JsonResult queryAllDatabase(){
+        try{
+            List<DatabaseResponse> databaseResponses = databaseService.queryAllDatabase();
+            return new JsonResult("操作成功", 200, databaseResponses, true);
+        }catch (Exception e ){
+            return new JsonResult("操作失败",500,null,false);
+        }
+    }
 
     @ApiOperation("模糊查询数据库列表")
     @GetMapping(value = "/{page}")
