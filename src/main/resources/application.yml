@@ -6,9 +6,9 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT-5
   datasource:
-    url: jdbc:mysql://193.112.136.113:3306/temo-server?characterEncoding=UTF-8
+    url: jdbc:mysql://193.112.136.113:4306/temo-server?characterEncoding=UTF-8
     username: root
-    password: root
+    password: test2019
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     # 初始化大小，最小，最大
