@@ -26,4 +26,15 @@ public class SavesResponse {
     @ApiModelProperty("用例id")
     @TableField(value = "case_id")
     private String caseId;
+
+
+    @ApiModelProperty("关联类型")
+    @TableField(value = "save_type")
+    private String saveType;
+
+
+    @ApiModelProperty("正则表达式")
+    @TableField(value = "regex")
+    private String regex;
+
 }

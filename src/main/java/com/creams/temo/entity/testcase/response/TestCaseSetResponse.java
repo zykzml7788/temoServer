@@ -27,4 +27,8 @@ public class TestCaseSetResponse {
     @TableField(value = "create_time")
     private String createTime;
 
+    @ApiModelProperty("用例集状态")
+    @TableField(value = "set_status")
+    private String setStatus;
+
 }

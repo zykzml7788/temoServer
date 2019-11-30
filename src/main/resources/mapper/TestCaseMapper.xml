@@ -29,10 +29,12 @@
 
     <insert id="addTestCase">
         INSERT INTO testcase
-        (case_id, case_desc, env_id, url, method, header, cookies, param, body, file, set_id, sql_script, db_id, case_type)
+        (case_id, case_desc, env_id, url, method, header, cookies, param, body, file, set_id, sql_script, db_id,
+        case_type, global_headers, global_cookies, delay_time, json_assert, order)
          VALUES
          (#{caseId}, #{caseDesc}, #{envId}, #{url}, #{method}, #{header}, #{cookies}, #{param}, #{body},
-         #{file}, #{setId}, #{sqlScript}, #{dbId}, #{caseType})
+         #{file}, #{setId}, #{sqlScript}, #{dbId}, #{caseType}, #{globalHeaders}, #{globalCookies},
+          #{delayTime}, #{jsonAssert}, #{order})
 
     </insert>
 
@@ -50,7 +52,12 @@
         set_id = #{setId},
         sql_script = #{sqlScript},
         db_id = #{dbId},
-        case_type = #{caseType}
+        case_type = #{caseType},
+        global_headers = #{globalHeaders},
+        global_cookies = #{globalCookies},
+        delayTime = #{delay_time},
+        jsonAssert = #{json_assert},
+        order = #{order}
         where case_id = #{caseId}
     </update>
 

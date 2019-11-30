@@ -13,16 +13,18 @@
     </select>
 
     <insert id="addSaves">
-       INSERT INTO saves (save_id, jexpression, param_key, save_from, case_id)
+       INSERT INTO saves (save_id, jexpression, param_key, save_from, case_id, save_type, regex)
        VALUES
-       (#{saveId}, #{jexpression}, #{paramKey}, #{saveFrom}, #{caseId})
+       (#{saveId}, #{jexpression}, #{paramKey}, #{saveFrom}, #{caseId}, #{saveType}, #{regex})
     </insert>
 
     <update id="updateSavesById">
        UPDATE saves SET
        jexpression = #{jexpression} ,
        param_key = #{paramKey},
-       save_from = #{saveFrom}
+       save_from = #{saveFrom},
+       save_type = #{saveType},
+       regex = #{regex}
        WHERE
        case_id = #{caseId}
     </update>

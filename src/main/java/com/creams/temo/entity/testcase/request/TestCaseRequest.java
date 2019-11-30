@@ -68,6 +68,26 @@ public class TestCaseRequest {
     @TableField(value = "case_type")
     private String caseType;
 
+    @ApiModelProperty("全局请求头")
+    @TableField(value = "global_headers")
+    private String globalHeaders;
+
+    @ApiModelProperty("全局Cookies")
+    @TableField(value = "global_cookies")
+    private String globalCookies;
+
+    @ApiModelProperty("延迟时间")
+    @TableField(value = "delay_time")
+    private String delayTime;
+
+    @ApiModelProperty("JSON断言")
+    @TableField(value = "json_assert")
+    private String  jsonAssert;
+
+    @ApiModelProperty("排序")
+    @TableField(value = "order")
+    private String order;
+
 
     private List<VerifyRequest> verify;
 
