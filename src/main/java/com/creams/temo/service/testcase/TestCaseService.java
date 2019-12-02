@@ -57,6 +57,11 @@ public class TestCaseService {
             v.setVerifyId(verifyId);
             verifyMapper.addVerify(v);
         }
+
+        //获取该用例集下所有用例
+        List<TestCaseResponse>  list= testCaseMapper.queryTestCaseBySetId(testCaseRequest.getSetId());
+
+        testCaseRequest.setSorting(list.size()+1);
         testCaseMapper.addTestCase(testCaseRequest);
 
         return caseId;
