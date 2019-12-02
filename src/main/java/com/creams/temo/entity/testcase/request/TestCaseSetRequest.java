@@ -1,13 +1,11 @@
-package com.creams.temo.entity.testcase.response;
+package com.creams.temo.entity.testcase.request;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class TestCaseSetResponse {
+public class TestCaseSetRequest {
 
     @ApiModelProperty(value = "用例集id")
     @TableField(value = "set_id")
@@ -36,9 +34,5 @@ public class TestCaseSetResponse {
     @ApiModelProperty("是否启用")
     @TableField(value = "valid")
     private String valid;
-
-    private List<TestCaseResponse> testCase;
-
-    private List<StScriptResponse> stScript;
 
 }

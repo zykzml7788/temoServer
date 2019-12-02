@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.creams.temo.mapper.testcase.TestCaseSetMapper">
     <insert id="addTestCaseSet">
-        insert into testcase_set (set_id, set_name, set_desc, project_id)
+        insert into testcase_set (set_id, set_name, set_desc, project_id,set_status, valid)
         values
-        (#{setId}, #{setName}, #{setDesc}, #{projectId})
+        (#{setId}, #{setName}, #{setDesc}, #{projectId},#{setStatus}, #{valid})
     </insert>
 
 
@@ -45,7 +45,9 @@
         update  testcase_set set
         set_name = #{setName},
         set_desc = #{setDesc},
-        project_id = #{projectId}
+        project_id = #{projectId},
+        set_status = #{setStatus},
+        valid = #{valid}
         where set_id = #{setId}
     </update>
 

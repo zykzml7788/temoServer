@@ -1,6 +1,7 @@
 package com.creams.temo.controller.testcase;
 
 import com.creams.temo.entity.JsonResult;
+import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.service.testcase.TestCaseSetService;
 import com.github.pagehelper.PageInfo;
@@ -11,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.spring.web.json.Json;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,12 +48,25 @@ public class TestCaseSetController {
 
     }
 
+    @ApiOperation(value = "根据set_id获取用例集详情")
+    @GetMapping (value = "/{setId}/info")
+    public JsonResult queryTestCaseSet(@PathVariable @ApiParam("集合id") String setId){
+        try {
+            TestCaseSetResponse testCaseSetResponse = testCaseSetService.queryTestCaseSetInfo(setId);
+            return new JsonResult("操作成功", 200, testCaseSetResponse, true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+
+    }
+
     @ApiOperation(value = "查询用例集(已废弃)")
     @PostMapping (value = "/{page}/discard")
     public JsonResult queryTestCaseSet(@PathVariable(value = "page") Integer page,
-                                       @RequestBody (required = false) TestCaseSetResponse testCaseSetResponse){
+                                       @RequestBody (required = false) TestCaseSetRequest testCaseSetRequest){
         try {
-            PageInfo<TestCaseSetResponse> pageInfo = testCaseSetService.queryTestCaseSet(page, testCaseSetResponse);
+            PageInfo<TestCaseSetResponse> pageInfo = testCaseSetService.queryTestCaseSet(page, testCaseSetRequest);
             Map<String, Object> map = new HashMap<>();
             map.put("list", pageInfo.getList());
             map.put("totle", pageInfo.getTotal());
@@ -67,9 +80,9 @@ public class TestCaseSetController {
 
     @ApiOperation(value = "新增用例集")
     @PostMapping(value = "/")
-    public JsonResult addTestCaseSet(@RequestBody TestCaseSetResponse testCaseSetResponse){
+    public JsonResult addTestCaseSet(@RequestBody TestCaseSetRequest testCaseSetRequest){
         try {
-            String setId = testCaseSetService.addTestCaseSet(testCaseSetResponse);
+            String setId = testCaseSetService.addTestCaseSet(testCaseSetRequest);
             return new JsonResult("操作成功", 200, setId, true);
         }catch (Exception e){
             e.printStackTrace();
@@ -79,9 +92,9 @@ public class TestCaseSetController {
 
     @ApiOperation(value = "修改用例集")
     @PutMapping(value = "/{id}")
-    public JsonResult updateTestCaseSet(@RequestBody TestCaseSetResponse testCaseSetResponse){
+    public JsonResult updateTestCaseSet(@RequestBody TestCaseSetRequest testCaseSetRequest){
         try {
-            testCaseSetService.updateTestCaseSetById(testCaseSetResponse);
+            testCaseSetService.updateTestCaseSetById(testCaseSetRequest);
             return new JsonResult("操作成功", 200, null, true);
         }catch (Exception e){
             e.printStackTrace();
