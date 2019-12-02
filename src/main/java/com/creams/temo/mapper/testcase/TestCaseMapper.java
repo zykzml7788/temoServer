@@ -2,6 +2,7 @@ package com.creams.temo.mapper.testcase;
 
 import com.creams.temo.entity.testcase.request.TestCaseRequest;
 import com.creams.temo.entity.testcase.response.TestCaseResponse;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -19,6 +20,9 @@ public interface TestCaseMapper {
                                          @Param("db_id") String dbId,
                                          @Param("case_type") String caseType);
 
+    @Select("select * from testcase where set_id = #{setId} and sorting = #{sorting}")
+    TestCaseResponse queryTestCaseBySorting(String setId, Integer sorting);
+
     @Select("select * from testcase where case_id = #{case_id}")
     TestCaseResponse queryTestCaseById(@Param("case_id") String caseId);
 
@@ -29,7 +33,7 @@ public interface TestCaseMapper {
 
     boolean updateTestCaseById(TestCaseRequest testCaseRequest);
 
-    boolean updateTestCaseOrderById(String caseId, String order);
+    boolean updateTestCaseOrderById(String caseId, Integer sorting);
 
     @Delete("delete from testcase where case_id = #{case_id}")
     boolean deleteTestCase(@Param("case_id") String caseId);

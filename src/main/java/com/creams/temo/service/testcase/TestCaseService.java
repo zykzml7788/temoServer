@@ -130,6 +130,11 @@ public class TestCaseService {
         return new PageInfo<>(testCaseResponses);
     }
 
+    /**
+     * 查询用例详情
+     * @param id
+     * @return
+     */
     public TestCaseResponse queryTestCaseInfo(String id){
         TestCaseResponse testCaseResponse = testCaseMapper.queryTestCaseById(id);
         testCaseResponse.setSaves(savesMapper.querySaves(id));
@@ -146,5 +151,46 @@ public class TestCaseService {
     public TestCaseResponse queryTestCaseById(String caseId){
         TestCaseResponse testCaseResponse = testCaseMapper.queryTestCaseById(caseId);
         return testCaseResponse;
+    }
+
+    /**
+     * 修改用例排序
+     * @param caseId
+     * @param move
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public String updateTestCaseOrderById(String caseId, String move){
+
+        TestCaseResponse testCaseResponse = testCaseMapper.queryTestCaseById(caseId);
+        System.out.println("打印testCaseResponse" + testCaseResponse);
+        System.out.println("打印caseId" + caseId);
+
+
+        if (testCaseResponse != null && "up".equals(move)){
+            Integer sorting = testCaseResponse.getSorting();
+            if (sorting == 1) {
+                return "无法上移，请重试";
+            }else {
+                //获取当前排序上一位的用例信息
+                TestCaseResponse result = testCaseMapper.queryTestCaseBySorting(testCaseResponse.getSetId(), sorting-1);
+                testCaseMapper.updateTestCaseOrderById(result.getCaseId(), sorting);
+                testCaseMapper.updateTestCaseOrderById(caseId, sorting-1);
+            }
+        }else if (testCaseResponse != null && "down".equals(move)){
+            Integer sorting = testCaseResponse.getSorting();
+            List<TestCaseResponse> testCaseResponses = testCaseMapper.queryTestCaseBySetId(testCaseResponse.getSetId());
+            if (testCaseResponses.size() == sorting){
+                return "无法下移，请重试";
+            }else {
+
+                //获取当前排序下一位的用例信息
+                TestCaseResponse result = testCaseMapper.queryTestCaseBySorting(testCaseResponse.getSetId(), sorting+1);
+                testCaseMapper.updateTestCaseOrderById(result.getCaseId(), sorting);
+                testCaseMapper.updateTestCaseOrderById(caseId, sorting+1);
+
+            }
+        }
+        return caseId;
     }
 }
