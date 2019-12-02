@@ -2,10 +2,12 @@ package com.creams.temo.mapper.testcase;
 
 import com.creams.temo.entity.testcase.request.TestCaseRequest;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
+import com.creams.temo.entity.testcase.response.TestCaseResponse;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -16,6 +18,9 @@ public interface TestCaseSetMapper {
                                                           @Param("project_id")String projectId);
 
     List<TestCaseSetResponse> queryTestCaseSet(TestCaseSetRequest testCaseSetRequest);
+
+    @Select("select * from testcase_set where set_id = #{set_id}")
+    TestCaseSetResponse queryTestCaseSetById(@Param("set_id") String setId);
 
     boolean addTestCaseSet(TestCaseSetRequest testCaseSetRequest);
 

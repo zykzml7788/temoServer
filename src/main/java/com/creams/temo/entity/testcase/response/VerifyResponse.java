@@ -11,7 +11,7 @@ public class VerifyResponse {
     @TableField(value = "verify_id")
     private String verifyId;
 
-    @ApiModelProperty("断言类型（正则 or jsonpath")
+    @ApiModelProperty("断言类型（正则 or jsonpath)")
     @TableField(value = "verify_type")
     private String verifyType;
 

@@ -48,6 +48,19 @@ public class TestCaseSetController {
 
     }
 
+    @ApiOperation(value = "根据set_id获取用例集详情")
+    @GetMapping (value = "/{setId}/info")
+    public JsonResult queryTestCaseSet(@PathVariable @ApiParam("集合id") String setId){
+        try {
+            TestCaseSetResponse testCaseSetResponse = testCaseSetService.queryTestCaseSetInfo(setId);
+            return new JsonResult("操作成功", 200, testCaseSetResponse, true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+
+    }
+
     @ApiOperation(value = "查询用例集(已废弃)")
     @PostMapping (value = "/{page}/discard")
     public JsonResult queryTestCaseSet(@PathVariable(value = "page") Integer page,

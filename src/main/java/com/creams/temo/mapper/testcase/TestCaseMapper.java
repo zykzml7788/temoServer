@@ -22,9 +22,14 @@ public interface TestCaseMapper {
     @Select("select * from testcase where case_id = #{case_id}")
     TestCaseResponse queryTestCaseById(@Param("case_id") String caseId);
 
+    @Select("select * from testcase where set_id = #{set_id}")
+    List<TestCaseResponse> queryTestCaseBySetId(@Param("set_id") String setId);
+
     boolean addTestCase(TestCaseRequest testCaseRequest);
 
     boolean updateTestCaseById(TestCaseRequest testCaseRequest);
+
+    boolean updateTestCaseOrderById(String caseId, String order);
 
     @Delete("delete from testcase where case_id = #{case_id}")
     boolean deleteTestCase(@Param("case_id") String caseId);

@@ -5,6 +5,7 @@ import com.creams.temo.entity.testcase.response.StScriptResponse;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -12,6 +13,9 @@ import java.util.List;
 public interface StScriptMapper {
 
     List<StScriptResponse> queryStScript();
+
+    @Select("select * from st_script where set_id = #{set_id}")
+    List<StScriptResponse> queryStScriptBySetId(@Param("set_id") String setId);
 
     boolean addStScript(StScriptRequest stScriptRequest);
 

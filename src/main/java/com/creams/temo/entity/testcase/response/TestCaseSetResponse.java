@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class TestCaseSetResponse {
 
@@ -34,5 +36,9 @@ public class TestCaseSetResponse {
     @ApiModelProperty("是否启用")
     @TableField(value = "valid")
     private String valid;
+
+    private List<TestCaseResponse> testCase;
+
+    private List<StScriptResponse> stScript;
 
 }

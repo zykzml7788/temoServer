@@ -3,6 +3,8 @@ package com.creams.temo.service.testcase;
 
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
+import com.creams.temo.mapper.testcase.StScriptMapper;
+import com.creams.temo.mapper.testcase.TestCaseMapper;
 import com.creams.temo.mapper.testcase.TestCaseSetMapper;
 import com.creams.temo.util.StringUtil;
 import com.github.pagehelper.PageHelper;
@@ -18,6 +20,12 @@ public class TestCaseSetService {
 
     @Autowired
     TestCaseSetMapper testCaseSetMapper;
+
+    @Autowired
+    StScriptMapper stScriptMapper;
+
+    @Autowired
+    TestCaseMapper testCaseMapper;
 
     /**
      * 查询用例集
@@ -92,5 +100,16 @@ public class TestCaseSetService {
         return false;
     }
 
+    /**
+     * 查询用例集详情
+     * @param setId
+     * @return
+     */
+    public TestCaseSetResponse queryTestCaseSetInfo(String setId){
+        TestCaseSetResponse testCaseSetResponse = testCaseSetMapper.queryTestCaseSetById(setId);
+        testCaseSetResponse.setStScript(stScriptMapper.queryStScriptBySetId(setId));
+        testCaseSetResponse.setTestCase(testCaseMapper.queryTestCaseBySetId(setId));
+        return testCaseSetResponse;
+    }
 
 }
