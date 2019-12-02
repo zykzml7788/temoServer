@@ -34,4 +34,6 @@ public class VerifyResponse {
     @ApiModelProperty("用例id")
     @TableField(value = "case_id")
     private String caseId;
+
+
 }

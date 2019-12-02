@@ -38,4 +38,10 @@ public class TestCaseSet {
     @ApiModelProperty("用例集状态")
     @TableField(value = "set_status")
     private String setStatus;
+
+
+    @ApiModelProperty("是否启用")
+    @TableField(value = "valid")
+    private String valid;
+
 }

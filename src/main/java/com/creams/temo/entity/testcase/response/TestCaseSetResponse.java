@@ -31,4 +31,8 @@ public class TestCaseSetResponse {
     @TableField(value = "set_status")
     private String setStatus;
 
+    @ApiModelProperty("是否启用")
+    @TableField(value = "valid")
+    private String valid;
+
 }
