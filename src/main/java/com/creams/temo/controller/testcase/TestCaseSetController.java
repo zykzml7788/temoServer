@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,13 +35,27 @@ public class TestCaseSetController {
                                                   @RequestParam(value = "set_name", required = false)
                                                   @ApiParam(value = "用例集名字") String setName,
                                                   @RequestParam(value = "project_id", required = false)
-                                                  @ApiParam(value = "项目id") String projectId){
+                                                  @ApiParam(value = "项目id") String projectId,
+                                                  @RequestParam(value = "set_status", required = false)
+                                                  @ApiParam(value = "用例集状态")String setStatus){
         try {
-            PageInfo<TestCaseSetResponse> pageInfo = testCaseSetService.queryTestCaseSetByNameAndId(page, setName, projectId);
+            PageInfo<TestCaseSetResponse> pageInfo = testCaseSetService.queryTestCaseSetByNameAndId(page, setName, projectId, setStatus);
             Map<String, Object> map = new HashMap<>();
             map.put("list", pageInfo.getList());
             map.put("total", pageInfo.getTotal());
             return new JsonResult("操作成功", 200, map, true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+
+    }
+
+    @ApiOperation(value = "查询用例集列表")
+    @GetMapping (value = "/list")
+    public JsonResult queryTestCaseSetByStatus(){
+        try {
+            return new JsonResult("操作成功", 200, testCaseSetService.queryAllTestCaseSet(), true);
         }catch (Exception e){
             e.printStackTrace();
             return new JsonResult("操作失败", 500, null, false);
