@@ -55,6 +55,16 @@ public class ProjectService {
     }
 
     /**
+     * 查询项目列表
+     * @return
+     */
+    @Transactional
+    public List<ProjectResponse> queryAllProjects(){
+        List<ProjectResponse> projectResponses = projectMapper.queryAllProject();
+        return projectResponses;
+    }
+
+    /**
      * 模糊查询项目
      * @param name
      * @return

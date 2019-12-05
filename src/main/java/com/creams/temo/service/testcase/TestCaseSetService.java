@@ -41,18 +41,27 @@ public class TestCaseSetService {
         return pageInfo;
     }
 
+    /**
+     * 查询用例集列表
+     * @return
+     */
+    @Transactional
+    public List<TestCaseSetResponse> queryAllTestCaseSet(){
+        List<TestCaseSetResponse> testCaseSetResponses = testCaseSetMapper.queryAllTestCaseSet();
+        return testCaseSetResponses;
+    }
 
     /**
-     * 根据用例集name和项目id查询用例集
+     * 根据用例集name,项目id,状态查询用例集
      * @param page
      * @param setName
      * @param projectId
      * @return
      */
     @Transactional
-    public PageInfo<TestCaseSetResponse> queryTestCaseSetByNameAndId(Integer page, String setName,String projectId){
+    public PageInfo<TestCaseSetResponse> queryTestCaseSetByNameAndId(Integer page, String setName,String projectId,String setStatus){
         PageHelper.startPage(page, 10);
-        List<TestCaseSetResponse> testCaseSet = testCaseSetMapper.queryTestCaseSetByNameandId(setName, projectId);
+        List<TestCaseSetResponse> testCaseSet = testCaseSetMapper.queryTestCaseSetByNameandId(setName, projectId, setStatus);
         PageInfo<TestCaseSetResponse> pageInfo = new PageInfo<>(testCaseSet);
         return pageInfo;
     }
