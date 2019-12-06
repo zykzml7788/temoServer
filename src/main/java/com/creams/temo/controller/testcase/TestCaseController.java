@@ -98,10 +98,10 @@ public class TestCaseController {
                                           @RequestParam @ApiParam(value = "up上移/down下移", required = true) String move){
         try {
             String result = testCaseService.updateTestCaseOrderById(caseId, move);
-            return new JsonResult("操作成功", 200, result, true);
+            return new JsonResult(result, 200, result, true);
         }catch (Exception e){
             e.printStackTrace();
-            return new JsonResult("操作失败", 500, null, false);
+            return new JsonResult("操作失败", 500, e, false);
         }
     }
 
