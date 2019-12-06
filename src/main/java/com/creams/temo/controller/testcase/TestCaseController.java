@@ -92,6 +92,19 @@ public class TestCaseController {
         }
     }
 
+    @ApiOperation(value = "根据用例id修改执行顺序")
+    @PutMapping("/{caseId}/order")
+    public JsonResult updateTestCaseOrder(@PathVariable @ApiParam(value = "用例id", required = true) String caseId,
+                                          @RequestParam @ApiParam(value = "up上移/down下移", required = true) String move){
+        try {
+            String result = testCaseService.updateTestCaseOrderById(caseId, move);
+            return new JsonResult("操作成功", 200, result, true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+    }
+
 
     @ApiOperation(value = "删除用例")
     @DeleteMapping("/{id}")

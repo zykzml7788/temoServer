@@ -56,6 +56,16 @@ public class ProjectController {
 
     }
 
+    @ApiOperation("查询项目列表")
+    @GetMapping("/list")
+    public JsonResult queryDetail(){
+        try{
+            return new JsonResult("操作成功",200, projectService.queryAllProjects(),true);
+        }catch (Exception e){
+            return new JsonResult("系统错误",500,null,false);
+        }
+    }
+
     @ApiOperation("查询项目详情")
     @GetMapping("/{projectId}/info")
     public JsonResult queryDetail(@PathVariable @ApiParam("项目id")String projectId){

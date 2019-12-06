@@ -30,11 +30,11 @@
     <insert id="addTestCase">
         INSERT INTO testcase
         (case_id, case_desc, env_id, url, method, header, cookies, param, body, file, set_id, sql_script, db_id,
-        case_type, global_headers, global_cookies, delay_time, json_assert, order)
+        case_type, global_headers, global_cookies, delay_time, json_assert, sorting)
          VALUES
          (#{caseId}, #{caseDesc}, #{envId}, #{url}, #{method}, #{header}, #{cookies}, #{param}, #{body},
          #{file}, #{setId}, #{sqlScript}, #{dbId}, #{caseType}, #{globalHeaders}, #{globalCookies},
-          #{delayTime}, #{jsonAssert}, #{order})
+          #{delayTime}, #{jsonAssert}, #{sorting})
 
     </insert>
 
@@ -57,8 +57,11 @@
         global_cookies = #{globalCookies},
         delayTime = #{delay_time},
         jsonAssert = #{json_assert},
-        order = #{order}
+        sorting = #{sorting}
         where case_id = #{caseId}
+    </update>
+    <update id="updateTestCaseOrderById">
+        update  testcase set sorting = #{sorting} where case_id = #{caseId}
     </update>
 
 </mapper>

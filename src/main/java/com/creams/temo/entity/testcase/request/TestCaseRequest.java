@@ -85,8 +85,8 @@ public class TestCaseRequest {
     private String  jsonAssert;
 
     @ApiModelProperty("排序")
-    @TableField(value = "order")
-    private String order;
+    @TableField(value = "sorting")
+    private Integer sorting;
 
 
     private List<VerifyRequest> verify;

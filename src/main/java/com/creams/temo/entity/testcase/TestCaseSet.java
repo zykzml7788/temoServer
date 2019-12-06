@@ -35,7 +35,7 @@ public class TestCaseSet {
     @TableField(value = "create_time")
     private String createTime;
 
-    @ApiModelProperty("用例集状态")
+    @ApiModelProperty("用例集状态(0-待完成、1待维护、2-已完成)")
     @TableField(value = "set_status")
     private String setStatus;
 
@@ -43,5 +43,6 @@ public class TestCaseSet {
     @ApiModelProperty("是否启用")
     @TableField(value = "valid")
     private String valid;
+
 
 }

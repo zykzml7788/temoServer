@@ -15,7 +15,12 @@ import java.util.List;
 public interface TestCaseSetMapper {
 
     List<TestCaseSetResponse> queryTestCaseSetByNameandId(@Param("set_name") String setName,
-                                                          @Param("project_id")String projectId);
+                                                          @Param("project_id")String projectId,
+                                                          @Param("set_status")String setStatus);
+
+    @Select("select * from testcase_set")
+    List<TestCaseSetResponse> queryAllTestCaseSet();
+
 
     List<TestCaseSetResponse> queryTestCaseSet(TestCaseSetRequest testCaseSetRequest);
 

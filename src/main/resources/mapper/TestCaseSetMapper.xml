@@ -37,9 +37,14 @@
             <if test="project_id !=null and project_id !=''">
                 and project_id = #{project_id}
             </if>
+
+            <if test="set_status !=null and set_status !=''">
+                and set_status = #{set_status}
+            </if>
         </where>
         order by createTime desc
     </select>
+
 
     <update id="updateTestCaseSetById">
         update  testcase_set set
