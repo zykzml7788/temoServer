@@ -44,19 +44,24 @@ public class TestCaseService {
         testCaseRequest.setCaseId(caseId);
         List<SavesRequest> savesRequests = testCaseRequest.getSaves();
         List<VerifyRequest> verifyRequests = testCaseRequest.getVerify();
-        for (SavesRequest s: savesRequests
-             ) {
-            s.setCaseId(caseId);
-            s.setSaveId(savesId);
-            savesMapper.addSaves(s);
+        if (savesRequests!=null){
+            for (SavesRequest s: savesRequests
+            ) {
+                s.setCaseId(caseId);
+                s.setSaveId(savesId);
+                savesMapper.addSaves(s);
+            }
+
+        }
+        if (verifyRequests!=null){
+            for (VerifyRequest v: verifyRequests
+            ) {
+                v.setCaseId(caseId);
+                v.setVerifyId(verifyId);
+                verifyMapper.addVerify(v);
+            }
         }
 
-        for (VerifyRequest v: verifyRequests
-             ) {
-            v.setCaseId(caseId);
-            v.setVerifyId(verifyId);
-            verifyMapper.addVerify(v);
-        }
         testCaseMapper.addTestCase(testCaseRequest);
 
         return caseId;
