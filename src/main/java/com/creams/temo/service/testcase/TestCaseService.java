@@ -170,7 +170,7 @@ public class TestCaseService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public String updateTestCaseOrderById(String caseId, String move){
+    public boolean updateTestCaseOrderById(String caseId, String move){
 
         TestCaseResponse testCaseResponse = testCaseMapper.queryTestCaseById(caseId);
         System.out.println("打印testCaseResponse" + testCaseResponse);
@@ -179,28 +179,33 @@ public class TestCaseService {
 
         if (testCaseResponse != null && "up".equals(move)){
             Integer sorting = testCaseResponse.getSorting();
-            if (sorting == 1) {
-                return "无法上移，请重试";
+            if (sorting.equals(testCaseMapper.queryMinSorting(testCaseResponse.getSetId()))) {
+                return false;
             }else {
                 //获取当前排序上一位的用例信息
-                TestCaseResponse result = testCaseMapper.queryTestCaseBySorting(testCaseResponse.getSetId(), sorting-1);
+                TestCaseResponse result = testCaseMapper.queryTestCaseUpBySorting(testCaseResponse.getSetId(), sorting);
+                //更新上一位用例排序
                 testCaseMapper.updateTestCaseOrderById(result.getCaseId(), sorting);
-                testCaseMapper.updateTestCaseOrderById(caseId, sorting-1);
+                //更新当前用例排序
+                testCaseMapper.updateTestCaseOrderById(caseId, result.getSorting());
             }
         }else if (testCaseResponse != null && "down".equals(move)){
+            //获取该用例的排序值
             Integer sorting = testCaseResponse.getSorting();
-            List<TestCaseResponse> testCaseResponses = testCaseMapper.queryTestCaseBySetId(testCaseResponse.getSetId());
-            if (testCaseResponses.size() == sorting){
-                return "无法下移，请重试";
+
+            if (sorting.equals(testCaseMapper.queryMaxSorting(testCaseResponse.getSetId()))){
+                return false;
             }else {
 
                 //获取当前排序下一位的用例信息
-                TestCaseResponse result = testCaseMapper.queryTestCaseBySorting(testCaseResponse.getSetId(), sorting+1);
+                TestCaseResponse result = testCaseMapper.queryTestCaseDownBySorting(testCaseResponse.getSetId(), sorting);
+                //更新下一位用例排序
                 testCaseMapper.updateTestCaseOrderById(result.getCaseId(), sorting);
-                testCaseMapper.updateTestCaseOrderById(caseId, sorting+1);
+                //更新当前用例排序
+                testCaseMapper.updateTestCaseOrderById(caseId, result.getSorting());
 
             }
         }
-        return caseId;
+        return true;
     }
 }
