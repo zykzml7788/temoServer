@@ -20,8 +20,17 @@ public interface TestCaseMapper {
                                          @Param("db_id") String dbId,
                                          @Param("case_type") String caseType);
 
-    @Select("select * from testcase where set_id = #{setId} and sorting = #{sorting}")
-    TestCaseResponse queryTestCaseBySorting(String setId, Integer sorting);
+    @Select("SELECT * from testcase WHERE set_id=#{setId} and sorting<#{sorting} ORDER BY sorting DESC LIMIT 1")
+    TestCaseResponse queryTestCaseUpBySorting(String setId, Integer sorting);
+
+    @Select("SELECT * from testcase WHERE set_id=#{setId} and sorting>#{sorting} ORDER BY sorting LIMIT 1")
+    TestCaseResponse queryTestCaseDownBySorting(String setId, Integer sorting);
+
+    @Select("select min(sorting) from testcase where set_id = #{setId}")
+    Integer queryMinSorting(String setId);
+
+    @Select("select max(sorting) from testcase where set_id = #{setId} ")
+    Integer queryMaxSorting(String setId);
 
     @Select("select * from testcase where case_id = #{case_id}")
     TestCaseResponse queryTestCaseById(@Param("case_id") String caseId);
