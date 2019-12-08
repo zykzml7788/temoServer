@@ -62,11 +62,7 @@ public class TestCaseService {
             }
         }
 
-
-        //获取该用例集下所有用例
-        List<TestCaseResponse>  list= testCaseMapper.queryTestCaseBySetId(testCaseRequest.getSetId());
-
-        testCaseRequest.setSorting(list.size()+1);
+        testCaseRequest.setSorting(testCaseMapper.queryMaxSorting(testCaseRequest.getSetId())+1);
         testCaseMapper.addTestCase(testCaseRequest);
 
         return caseId;
