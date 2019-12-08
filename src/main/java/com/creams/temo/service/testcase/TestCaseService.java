@@ -165,7 +165,7 @@ public class TestCaseService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public String updateTestCaseOrderById(String caseId, String move){
+    public boolean updateTestCaseOrderById(String caseId, String move){
 
         TestCaseResponse testCaseResponse = testCaseMapper.queryTestCaseById(caseId);
         System.out.println("打印testCaseResponse" + testCaseResponse);
@@ -175,7 +175,7 @@ public class TestCaseService {
         if (testCaseResponse != null && "up".equals(move)){
             Integer sorting = testCaseResponse.getSorting();
             if (sorting.equals(testCaseMapper.queryMinSorting(testCaseResponse.getSetId()))) {
-                return "无法上移，请重试";
+                return false;
             }else {
                 //获取当前排序上一位的用例信息
                 TestCaseResponse result = testCaseMapper.queryTestCaseUpBySorting(testCaseResponse.getSetId(), sorting);
@@ -189,7 +189,7 @@ public class TestCaseService {
             Integer sorting = testCaseResponse.getSorting();
 
             if (sorting.equals(testCaseMapper.queryMaxSorting(testCaseResponse.getSetId()))){
-                return "无法下移，请重试";
+                return false;
             }else {
 
                 //获取当前排序下一位的用例信息
@@ -201,6 +201,6 @@ public class TestCaseService {
 
             }
         }
-        return caseId;
+        return true;
     }
 }

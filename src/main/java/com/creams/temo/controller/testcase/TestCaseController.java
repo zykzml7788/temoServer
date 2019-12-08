@@ -97,8 +97,13 @@ public class TestCaseController {
     public JsonResult updateTestCaseOrder(@PathVariable @ApiParam(value = "用例id", required = true) String caseId,
                                           @RequestParam @ApiParam(value = "up上移/down下移", required = true) String move){
         try {
-            String result = testCaseService.updateTestCaseOrderById(caseId, move);
-            return new JsonResult("操作成功", 200, result, true);
+            Boolean result = testCaseService.updateTestCaseOrderById(caseId, move);
+            if (move.equals("up") && result == false){
+                return new JsonResult("无法上移，请重试", 500, null, true);
+            }else if (move.equals("down") && result == false){
+                return new JsonResult("无法下移，请重试", 500, null, true);
+            }
+            return new JsonResult("操作成功", 200, caseId, true);
         }catch (Exception e){
             e.printStackTrace();
             return new JsonResult("操作失败", 500, null, false);
