@@ -42,7 +42,7 @@ public class TestCaseSetController {
             PageInfo<TestCaseSetResponse> pageInfo = testCaseSetService.queryTestCaseSetByNameAndId(page, setName, projectId, setStatus);
             Map<String, Object> map = new HashMap<>();
             map.put("list", pageInfo.getList());
-            map.put("totle", pageInfo.getTotal());
+            map.put("total", pageInfo.getTotal());
             return new JsonResult("操作成功", 200, map, true);
         }catch (Exception e){
             e.printStackTrace();
@@ -84,7 +84,7 @@ public class TestCaseSetController {
             PageInfo<TestCaseSetResponse> pageInfo = testCaseSetService.queryTestCaseSet(page, testCaseSetRequest);
             Map<String, Object> map = new HashMap<>();
             map.put("list", pageInfo.getList());
-            map.put("totle", pageInfo.getTotal());
+            map.put("total", pageInfo.getTotal());
             return new JsonResult("操作成功", 200, map, true);
         }catch (Exception e){
             e.printStackTrace();

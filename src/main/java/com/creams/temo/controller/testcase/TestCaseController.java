@@ -44,7 +44,7 @@ public class TestCaseController {
             PageInfo<TestCaseResponse> pageInfo = testCaseService.queryTestCase(page, caseId, envId, setId, caseDesc, dbId, caseType);
             Map<String, Object> map = new HashMap<>();
             map.put("list", pageInfo.getList());
-            map.put("totle", pageInfo.getTotal());
+            map.put("total", pageInfo.getTotal());
             return new JsonResult("操作成功", 200, map, true);
         }catch (Exception e){
             e.printStackTrace();
@@ -106,7 +106,7 @@ public class TestCaseController {
             return new JsonResult("操作成功", 200, caseId, true);
         }catch (Exception e){
             e.printStackTrace();
-            return new JsonResult("操作失败", 500, null, false);
+            return new JsonResult("操作失败", 500, e, false);
         }
     }
 
