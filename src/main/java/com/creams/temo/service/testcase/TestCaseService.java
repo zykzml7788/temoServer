@@ -62,7 +62,12 @@ public class TestCaseService {
             }
         }
 
-        testCaseRequest.setSorting(testCaseMapper.queryMaxSorting(testCaseRequest.getSetId())+1);
+        Integer maxSorting = testCaseMapper.queryMaxSorting(testCaseRequest.getSetId());
+        if (maxSorting!=null){
+            testCaseRequest.setSorting(maxSorting+1);
+        }else{
+            testCaseRequest.setSorting(1);
+        }
         testCaseMapper.addTestCase(testCaseRequest);
 
         return caseId;
