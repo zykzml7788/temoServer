@@ -1,6 +1,5 @@
 package com.creams.temo.controller;
 
-import com.creams.temo.config.MyWebSocketHandler;
 import com.creams.temo.service.WebSocketServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
