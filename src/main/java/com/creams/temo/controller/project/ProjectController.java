@@ -65,6 +65,16 @@ public class ProjectController {
         }
     }
 
+    @ApiOperation("根据项目Id查询所属环境")
+    @GetMapping("/env")
+    public JsonResult queryEnvByProjectId(@RequestParam String projectId){
+        try{
+            return new JsonResult("操作成功",200, projectService.queryEnvByProjectId(projectId),true);
+        }catch (Exception e){
+            return new JsonResult("系统错误",500,null,false);
+        }
+    }
+
     @ApiOperation("查询项目详情")
     @GetMapping("/{projectId}/info")
     public JsonResult queryDetail(@PathVariable @ApiParam("项目id")String projectId){

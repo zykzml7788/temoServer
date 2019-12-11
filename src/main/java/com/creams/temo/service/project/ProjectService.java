@@ -65,6 +65,17 @@ public class ProjectService {
     }
 
     /**
+     * 根据项目id查询所属环境
+     * @param projectId
+     * @return
+     */
+    @Transactional
+    public List<EnvResponse> queryEnvByProjectId(String projectId){
+        List<EnvResponse> envResponses = envMapper.queryEnvByProjectId(projectId);
+        return envResponses;
+    }
+
+    /**
      * 模糊查询项目
      * @param name
      * @return

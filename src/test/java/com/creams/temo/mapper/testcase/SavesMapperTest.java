@@ -53,12 +53,9 @@ public class SavesMapperTest {
 
     @Test
     public void test2(){
-        ScriptRequest scriptRequest = new ScriptRequest();
-        scriptRequest.setScriptId("1234");
-        scriptRequest.setDbId("123");
-        scriptRequest.setScriptName("33");
-        scriptRequest.setSqlScript("1234");
-        scriptMapper.addScript(scriptRequest);
+       String a = "ddsfk23asfk";
+       String b = "sfk";
+        System.out.println(a.indexOf(b));
     }
 
     @Test

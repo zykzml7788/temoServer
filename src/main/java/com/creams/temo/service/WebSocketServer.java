@@ -82,7 +82,7 @@ public class WebSocketServer {
     /**
      * 实现服务器主动推送，这里可能会出现并发报错，在方法上加 synchronized 就可以了
      */
-    public void sendMessage(String message) throws IOException {
+    private void sendMessage(String message) throws IOException {
         this.session.getBasicRemote().sendText(message);
     }
 
