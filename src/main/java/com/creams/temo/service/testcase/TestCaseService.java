@@ -80,25 +80,33 @@ public class TestCaseService {
      */
     @Transactional(rollbackFor=Exception.class)
     public boolean updateTestCase(TestCaseRequest testCaseRequest){
-
+        String savesId = StringUtil.uuid();
+        String verifyId = StringUtil.uuid();
         String caseId = testCaseRequest.getCaseId();
         if (!caseId.isEmpty()){
             //修改用例信息
             testCaseMapper.updateTestCaseById(testCaseRequest);
+            //清除先前的数据，重新插入
+            savesMapper.deleteSaves(caseId);
+            verifyMapper.deleteVerify(caseId);
             //获取关联参数
             List<SavesRequest> savesRequests = testCaseRequest.getSaves();
-            if (savesRequests != null && savesRequests.size()>0){
+            List<VerifyRequest> verifyRequests = testCaseRequest.getVerify();
+            if (savesRequests!=null){
                 for (SavesRequest s: savesRequests
                 ) {
-                    savesMapper.updateSavesById(s);
+                    s.setCaseId(caseId);
+                    s.setSaveId(savesId);
+                    savesMapper.addSaves(s);
                 }
+
             }
-            //获取断言
-            List<VerifyRequest> verifyRequests = testCaseRequest.getVerify();
-            if (verifyRequests != null && verifyRequests.size() > 0){
+            if (verifyRequests!=null){
                 for (VerifyRequest v: verifyRequests
                 ) {
-                    verifyMapper.updateVerifyById(v);
+                    v.setCaseId(caseId);
+                    v.setVerifyId(verifyId);
+                    verifyMapper.addVerify(v);
                 }
             }
             return true;
