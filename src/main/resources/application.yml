@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:mysql://193.112.136.113:3306/temo-server?characterEncoding=UTF-8
     username: root
-    password: root
+    password: temo2019
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     # 初始化大小，最小，最大
