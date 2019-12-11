@@ -55,8 +55,8 @@
         case_type = #{caseType},
         global_headers = #{globalHeaders},
         global_cookies = #{globalCookies},
-        delayTime = #{delay_time},
-        jsonAssert = #{json_assert},
+        delay_time = #{delayTime},
+        json_assert = #{jsonAssert},
         sorting = #{sorting}
         where case_id = #{caseId}
     </update>
