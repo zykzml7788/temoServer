@@ -57,7 +57,6 @@
         global_cookies = #{globalCookies},
         delay_time = #{delayTime},
         json_assert = #{jsonAssert},
-        sorting = #{sorting}
         where case_id = #{caseId}
     </update>
     <update id="updateTestCaseOrderById">
