@@ -58,33 +58,22 @@ public class TestCaseSetService {
      */
     @Transactional(rollbackFor = Exception.class)
     public boolean addTestCaseSetStScript(List<StScriptRequest> stScriptRequests){
-        String setId = null;
-        String exScriptId = null;
+
         if (!stScriptRequests.isEmpty()){
-            //获取集合id和关联id
-            for (StScriptRequest st: stScriptRequests
-            ) {
-                setId = st.getSetId();
-                exScriptId = st.getExScriptId();
-            }
             //清洗原先数据
-            stScriptMapper.deleteStScript(setId);
-            //判断关联id是否为空，如果是则没有关联脚本
-            if (exScriptId == "" || exScriptId == null){
-                System.out.println("打印exScriptId" + exScriptId);
-                return true;
-            }else {
-                for (StScriptRequest st: stScriptRequests
-                ) {
+            stScriptMapper.deleteStScript(stScriptRequests.get(0).getSetId());
+            for (StScriptRequest st: stScriptRequests) {
+                //判断关联id是否为空
+                if (stScriptRequests.get(0).getExScriptId() == null || stScriptRequests.get(0).getExScriptId().equals("")){
+                    return true;
+                }else {
+                    st.setStScriptId(StringUtil.uuid());
                     stScriptMapper.addStScript(st);
                 }
-                return true;
             }
-
-        }else{
-            return false;
+            return true;
         }
-
+        return false;
     }
 
     /**
