@@ -1,0 +1,27 @@
+[2019-11-11 21:15:55] [INFO ] [com.creams.temo.TemoApplication:50] -- Starting TemoApplication on KOTIN-GA365 with PID 8964 (C:\Users\Administrator\IdeaProjects\temoServer\target\classes started by Administrator in C:\Users\Administrator\IdeaProjects\temoServer)
+[2019-11-11 21:15:55] [INFO ] [com.creams.temo.TemoApplication:647] -- No active profile set, falling back to default profiles: default
+[2019-11-11 21:15:55] [INFO ] [org.springframework.boot.devtools.env.DevToolsPropertyDefaultsPostProcessor:225] -- Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+[2019-11-11 21:15:55] [INFO ] [org.springframework.boot.devtools.env.DevToolsPropertyDefaultsPostProcessor:225] -- For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+[2019-11-11 21:15:58] [INFO ] [org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker:330] -- Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration$$EnhancerBySpringCGLIB$$cee5d28c] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+[2019-11-11 21:15:59] [INFO ] [org.springframework.boot.web.embedded.tomcat.TomcatWebServer:90] -- Tomcat initialized with port(s): 8096 (http)
+[2019-11-11 21:15:59] [INFO ] [org.apache.coyote.http11.Http11NioProtocol:173] -- Initializing ProtocolHandler ["http-nio-8096"]
+[2019-11-11 21:15:59] [INFO ] [org.apache.catalina.core.StandardService:173] -- Starting service [Tomcat]
+[2019-11-11 21:15:59] [INFO ] [org.apache.catalina.core.StandardEngine:173] -- Starting Servlet engine: [Apache Tomcat/9.0.22]
+[2019-11-11 21:16:00] [INFO ] [org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]:173] -- Initializing Spring embedded WebApplicationContext
+[2019-11-11 21:16:00] [INFO ] [org.springframework.web.context.ContextLoader:284] -- Root WebApplicationContext: initialization completed in 4696 ms
+[2019-11-11 21:16:05] [INFO ] [springfox.documentation.spring.web.PropertySourcedRequestMappingHandlerMapping:69] -- Mapped URL path [/v2/api-docs] onto method [public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)]
+[2019-11-11 21:16:05] [INFO ] [org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor:171] -- Initializing ExecutorService 'applicationTaskExecutor'
+[2019-11-11 21:16:05] [INFO ] [org.springframework.boot.devtools.autoconfigure.OptionalLiveReloadServer:57] -- LiveReload server is running on port 35729
+[2019-11-11 21:16:07] [INFO ] [springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:160] -- Context refreshed
+[2019-11-11 21:16:07] [INFO ] [springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:163] -- Found 1 custom documentation plugin(s)
+[2019-11-11 21:16:07] [INFO ] [springfox.documentation.spring.web.scanners.ApiListingReferenceScanner:41] -- Scanning for api listing references
+[2019-11-11 21:16:07] [INFO ] [org.apache.coyote.http11.Http11NioProtocol:173] -- Starting ProtocolHandler ["http-nio-8096"]
+[2019-11-11 21:16:07] [INFO ] [org.springframework.boot.web.embedded.tomcat.TomcatWebServer:202] -- Tomcat started on port(s): 8096 (http) with context path ''
+[2019-11-11 21:16:07] [INFO ] [com.creams.temo.TemoApplication:59] -- Started TemoApplication in 14.029 seconds (JVM running for 15.857)
+[2019-11-11 21:22:56] [INFO ] [org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]:173] -- Initializing Spring DispatcherServlet 'dispatcherServlet'
+[2019-11-11 21:22:56] [INFO ] [org.springframework.web.servlet.DispatcherServlet:524] -- Initializing Servlet 'dispatcherServlet'
+[2019-11-11 21:22:56] [INFO ] [org.springframework.web.servlet.DispatcherServlet:546] -- Completed initialization in 19 ms
+[2019-11-11 21:25:35] [INFO ] [fileInfoLog:46] -- 查询出数据：
+Page{count=true, pageNum=1, pageSize=10, startRow=0, endRow=10, total=34, pages=4, reasonable=false, pageSizeZero=false}
+[2019-11-11 21:25:35] [INFO ] [fileInfoLog:50] -- 分页数据：
+{total=34, list=Page{count=true, pageNum=1, pageSize=10, startRow=0, endRow=10, total=34, pages=4, reasonable=false, pageSizeZero=false}}

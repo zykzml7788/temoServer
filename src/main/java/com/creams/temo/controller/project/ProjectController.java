@@ -4,7 +4,6 @@ import com.creams.temo.entity.JsonResult;
 import com.creams.temo.entity.project.Project;
 import com.creams.temo.entity.project.response.ProjectResponse;
 import com.creams.temo.service.project.ProjectService;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,6 +53,26 @@ public class ProjectController {
             return new JsonResult("操作失败",500,null,false);
         }
 
+    }
+
+    @ApiOperation("查询项目列表")
+    @GetMapping("/list")
+    public JsonResult queryDetail(){
+        try{
+            return new JsonResult("操作成功",200, projectService.queryAllProjects(),true);
+        }catch (Exception e){
+            return new JsonResult("系统错误",500,null,false);
+        }
+    }
+
+    @ApiOperation("根据项目Id查询所属环境")
+    @GetMapping("/env")
+    public JsonResult queryEnvByProjectId(@RequestParam String projectId){
+        try{
+            return new JsonResult("操作成功",200, projectService.queryEnvByProjectId(projectId),true);
+        }catch (Exception e){
+            return new JsonResult("系统错误",500,null,false);
+        }
     }
 
     @ApiOperation("查询项目详情")

@@ -33,8 +33,8 @@ public class ScriptController {
     private ScriptService scriptService;
 
 
-    @ApiOperation(value = "查询所有脚本", notes = "查询所有脚本")
-    @GetMapping(value = "/")
+    @ApiOperation(value = "查询脚本列表", notes = "查询所有脚本")
+    @GetMapping(value = "/list")
     public JsonResult queryAllScript(){
         return new JsonResult("操作成功",200,scriptService.queryAllScript(),true);
     }
@@ -127,7 +127,5 @@ public class ScriptController {
         }
 
     }
-
-
 
 }

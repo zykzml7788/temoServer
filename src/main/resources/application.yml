@@ -6,7 +6,7 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT-5
   datasource:
-    url: jdbc:mysql://193.112.136.113:3306/temo-server?characterEncoding=UTF-8
+    url: jdbc:mysql://193.112.136.113:4306/temo-server?characterEncoding=UTF-8
     username: root
     password: temo2019
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -38,7 +38,7 @@ spring:
     open: false  # 是否开启redis缓存  true开启   false关闭
     database: 0
     host: 193.112.136.113
-    prot: 6379
+    port: 7379
     password:    # 密码（默认为空）
     timeout: 6000ms  # 连接超时时长（毫秒）
     jedis:
