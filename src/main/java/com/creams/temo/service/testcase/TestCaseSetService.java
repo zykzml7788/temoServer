@@ -56,16 +56,32 @@ public class TestCaseSetService {
      * 批量新增前后置脚本
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public boolean addTestCaseSetStScript(List<StScriptRequest> stScriptRequests){
+        String setId = null;
+        String exScriptId = null;
         if (!stScriptRequests.isEmpty()){
+            //获取集合id和关联id
             for (StScriptRequest st: stScriptRequests
             ) {
-                stScriptMapper.deleteStScript(st.getStScriptId());
-                st.setStScriptId(StringUtil.uuid());
-                stScriptMapper.addStScript(st);
+                setId = st.getSetId();
+                exScriptId = st.getExScriptId();
             }
-            return true;
-        }else {
+            //清洗原先数据
+            stScriptMapper.deleteStScript(setId);
+            //判断关联id是否为空，如果是则没有关联脚本
+            if (exScriptId == "" || exScriptId == null){
+                System.out.println("打印exScriptId" + exScriptId);
+                return true;
+            }else {
+                for (StScriptRequest st: stScriptRequests
+                ) {
+                    stScriptMapper.addStScript(st);
+                }
+                return true;
+            }
+
+        }else{
             return false;
         }
 
