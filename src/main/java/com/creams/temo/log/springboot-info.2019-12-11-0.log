@@ -1,0 +1,78 @@
+[2019-12-11 20:58:04] [INFO ] [com.creams.temo.TemoApplication:50] -- Starting TemoApplication on KOTIN-GA365 with PID 19224 (C:\Users\Administrator\IdeaProjects\temoServer\target\classes started by Administrator in C:\Users\Administrator\IdeaProjects\temoServer)
+[2019-12-11 20:58:04] [INFO ] [com.creams.temo.TemoApplication:647] -- No active profile set, falling back to default profiles: default
+[2019-12-11 20:58:04] [INFO ] [org.springframework.boot.devtools.env.DevToolsPropertyDefaultsPostProcessor:225] -- Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+[2019-12-11 20:58:04] [INFO ] [org.springframework.boot.devtools.env.DevToolsPropertyDefaultsPostProcessor:225] -- For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+[2019-12-11 20:58:05] [INFO ] [org.springframework.data.repository.config.RepositoryConfigurationDelegate:244] -- Multiple Spring Data modules found, entering strict repository configuration mode!
+[2019-12-11 20:58:05] [INFO ] [org.springframework.data.repository.config.RepositoryConfigurationDelegate:126] -- Bootstrapping Spring Data repositories in DEFAULT mode.
+[2019-12-11 20:58:05] [INFO ] [org.springframework.data.repository.config.RepositoryConfigurationDelegate:182] -- Finished Spring Data repository scanning in 25ms. Found 0 repository interfaces.
+[2019-12-11 20:58:05] [INFO ] [org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker:330] -- Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration$$EnhancerBySpringCGLIB$$9603b245] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+[2019-12-11 20:58:05] [INFO ] [org.springframework.boot.web.embedded.tomcat.TomcatWebServer:90] -- Tomcat initialized with port(s): 8096 (http)
+[2019-12-11 20:58:05] [INFO ] [org.apache.coyote.http11.Http11NioProtocol:173] -- Initializing ProtocolHandler ["http-nio-8096"]
+[2019-12-11 20:58:05] [INFO ] [org.apache.catalina.core.StandardService:173] -- Starting service [Tomcat]
+[2019-12-11 20:58:05] [INFO ] [org.apache.catalina.core.StandardEngine:173] -- Starting Servlet engine: [Apache Tomcat/9.0.22]
+[2019-12-11 20:58:05] [INFO ] [org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]:173] -- Initializing Spring embedded WebApplicationContext
+[2019-12-11 20:58:05] [INFO ] [org.springframework.web.context.ContextLoader:284] -- Root WebApplicationContext: initialization completed in 1468 ms
+[2019-12-11 20:58:08] [INFO ] [springfox.documentation.spring.web.PropertySourcedRequestMappingHandlerMapping:69] -- Mapped URL path [/v2/api-docs] onto method [public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)]
+[2019-12-11 20:58:09] [INFO ] [org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor:171] -- Initializing ExecutorService 'applicationTaskExecutor'
+[2019-12-11 20:58:09] [INFO ] [org.springframework.boot.devtools.autoconfigure.OptionalLiveReloadServer:57] -- LiveReload server is running on port 35729
+[2019-12-11 20:58:09] [INFO ] [springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:160] -- Context refreshed
+[2019-12-11 20:58:09] [INFO ] [springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:163] -- Found 1 custom documentation plugin(s)
+[2019-12-11 20:58:09] [INFO ] [springfox.documentation.spring.web.scanners.ApiListingReferenceScanner:41] -- Scanning for api listing references
+[2019-12-11 20:58:09] [INFO ] [springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:40] -- Generating unique operation named: queryDetailUsingGET_1
+[2019-12-11 20:58:09] [INFO ] [org.apache.coyote.http11.Http11NioProtocol:173] -- Starting ProtocolHandler ["http-nio-8096"]
+[2019-12-11 20:58:09] [INFO ] [org.springframework.boot.web.embedded.tomcat.TomcatWebServer:202] -- Tomcat started on port(s): 8096 (http) with context path ''
+[2019-12-11 20:58:09] [INFO ] [com.creams.temo.TemoApplication:59] -- Started TemoApplication in 5.598 seconds (JVM running for 6.096)
+[2019-12-11 21:01:50] [INFO ] [com.creams.temo.TemoApplication:50] -- Starting TemoApplication on KOTIN-GA365 with PID 13576 (C:\Users\Administrator\IdeaProjects\temoServer\target\classes started by Administrator in C:\Users\Administrator\IdeaProjects\temoServer)
+[2019-12-11 21:01:50] [INFO ] [com.creams.temo.TemoApplication:647] -- No active profile set, falling back to default profiles: default
+[2019-12-11 21:01:50] [INFO ] [org.springframework.boot.devtools.env.DevToolsPropertyDefaultsPostProcessor:225] -- Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+[2019-12-11 21:01:50] [INFO ] [org.springframework.boot.devtools.env.DevToolsPropertyDefaultsPostProcessor:225] -- For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+[2019-12-11 21:01:51] [INFO ] [org.springframework.data.repository.config.RepositoryConfigurationDelegate:244] -- Multiple Spring Data modules found, entering strict repository configuration mode!
+[2019-12-11 21:01:51] [INFO ] [org.springframework.data.repository.config.RepositoryConfigurationDelegate:126] -- Bootstrapping Spring Data repositories in DEFAULT mode.
+[2019-12-11 21:01:51] [INFO ] [org.springframework.data.repository.config.RepositoryConfigurationDelegate:182] -- Finished Spring Data repository scanning in 25ms. Found 0 repository interfaces.
+[2019-12-11 21:01:51] [INFO ] [org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker:330] -- Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration$$EnhancerBySpringCGLIB$$1d0aba33] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+[2019-12-11 21:01:51] [INFO ] [org.springframework.boot.web.embedded.tomcat.TomcatWebServer:90] -- Tomcat initialized with port(s): 8096 (http)
+[2019-12-11 21:01:51] [INFO ] [org.apache.coyote.http11.Http11NioProtocol:173] -- Initializing ProtocolHandler ["http-nio-8096"]
+[2019-12-11 21:01:51] [INFO ] [org.apache.catalina.core.StandardService:173] -- Starting service [Tomcat]
+[2019-12-11 21:01:51] [INFO ] [org.apache.catalina.core.StandardEngine:173] -- Starting Servlet engine: [Apache Tomcat/9.0.22]
+[2019-12-11 21:01:51] [INFO ] [org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]:173] -- Initializing Spring embedded WebApplicationContext
+[2019-12-11 21:01:51] [INFO ] [org.springframework.web.context.ContextLoader:284] -- Root WebApplicationContext: initialization completed in 1468 ms
+[2019-12-11 21:01:54] [INFO ] [springfox.documentation.spring.web.PropertySourcedRequestMappingHandlerMapping:69] -- Mapped URL path [/v2/api-docs] onto method [public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)]
+[2019-12-11 21:01:54] [INFO ] [org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor:171] -- Initializing ExecutorService 'applicationTaskExecutor'
+[2019-12-11 21:01:54] [INFO ] [org.springframework.boot.devtools.autoconfigure.OptionalLiveReloadServer:57] -- LiveReload server is running on port 35729
+[2019-12-11 21:01:54] [INFO ] [springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:160] -- Context refreshed
+[2019-12-11 21:01:54] [INFO ] [springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:163] -- Found 1 custom documentation plugin(s)
+[2019-12-11 21:01:55] [INFO ] [springfox.documentation.spring.web.scanners.ApiListingReferenceScanner:41] -- Scanning for api listing references
+[2019-12-11 21:01:55] [INFO ] [springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:40] -- Generating unique operation named: queryDetailUsingGET_1
+[2019-12-11 21:01:55] [INFO ] [org.apache.coyote.http11.Http11NioProtocol:173] -- Starting ProtocolHandler ["http-nio-8096"]
+[2019-12-11 21:01:55] [INFO ] [org.springframework.boot.web.embedded.tomcat.TomcatWebServer:202] -- Tomcat started on port(s): 8096 (http) with context path ''
+[2019-12-11 21:01:55] [INFO ] [com.creams.temo.TemoApplication:59] -- Started TemoApplication in 5.5 seconds (JVM running for 6.296)
+[2019-12-11 21:49:25] [INFO ] [org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]:173] -- Initializing Spring DispatcherServlet 'dispatcherServlet'
+[2019-12-11 21:49:25] [INFO ] [org.springframework.web.servlet.DispatcherServlet:524] -- Initializing Servlet 'dispatcherServlet'
+[2019-12-11 21:49:25] [INFO ] [org.springframework.web.servlet.DispatcherServlet:546] -- Completed initialization in 7 ms
+[2019-12-11 21:49:36] [INFO ] [com.creams.temo.TemoApplication:50] -- Starting TemoApplication on KOTIN-GA365 with PID 28704 (C:\Users\Administrator\IdeaProjects\temoServer\target\classes started by Administrator in C:\Users\Administrator\IdeaProjects\temoServer)
+[2019-12-11 21:49:36] [INFO ] [com.creams.temo.TemoApplication:647] -- No active profile set, falling back to default profiles: default
+[2019-12-11 21:49:36] [INFO ] [org.springframework.boot.devtools.env.DevToolsPropertyDefaultsPostProcessor:225] -- Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+[2019-12-11 21:49:36] [INFO ] [org.springframework.boot.devtools.env.DevToolsPropertyDefaultsPostProcessor:225] -- For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+[2019-12-11 21:49:37] [INFO ] [org.springframework.data.repository.config.RepositoryConfigurationDelegate:244] -- Multiple Spring Data modules found, entering strict repository configuration mode!
+[2019-12-11 21:49:37] [INFO ] [org.springframework.data.repository.config.RepositoryConfigurationDelegate:126] -- Bootstrapping Spring Data repositories in DEFAULT mode.
+[2019-12-11 21:49:37] [INFO ] [org.springframework.data.repository.config.RepositoryConfigurationDelegate:182] -- Finished Spring Data repository scanning in 25ms. Found 0 repository interfaces.
+[2019-12-11 21:49:37] [INFO ] [org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker:330] -- Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration$$EnhancerBySpringCGLIB$$39e954ed] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+[2019-12-11 21:49:37] [INFO ] [org.springframework.boot.web.embedded.tomcat.TomcatWebServer:90] -- Tomcat initialized with port(s): 8096 (http)
+[2019-12-11 21:49:37] [INFO ] [org.apache.coyote.http11.Http11NioProtocol:173] -- Initializing ProtocolHandler ["http-nio-8096"]
+[2019-12-11 21:49:37] [INFO ] [org.apache.catalina.core.StandardService:173] -- Starting service [Tomcat]
+[2019-12-11 21:49:37] [INFO ] [org.apache.catalina.core.StandardEngine:173] -- Starting Servlet engine: [Apache Tomcat/9.0.22]
+[2019-12-11 21:49:37] [INFO ] [org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]:173] -- Initializing Spring embedded WebApplicationContext
+[2019-12-11 21:49:37] [INFO ] [org.springframework.web.context.ContextLoader:284] -- Root WebApplicationContext: initialization completed in 1451 ms
+[2019-12-11 21:49:40] [INFO ] [springfox.documentation.spring.web.PropertySourcedRequestMappingHandlerMapping:69] -- Mapped URL path [/v2/api-docs] onto method [public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)]
+[2019-12-11 21:49:40] [INFO ] [org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor:171] -- Initializing ExecutorService 'applicationTaskExecutor'
+[2019-12-11 21:49:40] [INFO ] [org.springframework.boot.devtools.autoconfigure.OptionalLiveReloadServer:57] -- LiveReload server is running on port 35729
+[2019-12-11 21:49:40] [INFO ] [springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:160] -- Context refreshed
+[2019-12-11 21:49:40] [INFO ] [springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:163] -- Found 1 custom documentation plugin(s)
+[2019-12-11 21:49:40] [INFO ] [springfox.documentation.spring.web.scanners.ApiListingReferenceScanner:41] -- Scanning for api listing references
+[2019-12-11 21:49:41] [INFO ] [springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:40] -- Generating unique operation named: queryDetailUsingGET_1
+[2019-12-11 21:49:41] [INFO ] [org.apache.coyote.http11.Http11NioProtocol:173] -- Starting ProtocolHandler ["http-nio-8096"]
+[2019-12-11 21:49:41] [INFO ] [org.springframework.boot.web.embedded.tomcat.TomcatWebServer:202] -- Tomcat started on port(s): 8096 (http) with context path ''
+[2019-12-11 21:49:41] [INFO ] [com.creams.temo.TemoApplication:59] -- Started TemoApplication in 5.249 seconds (JVM running for 5.755)
+[2019-12-11 21:50:20] [INFO ] [org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]:173] -- Initializing Spring DispatcherServlet 'dispatcherServlet'
+[2019-12-11 21:50:20] [INFO ] [org.springframework.web.servlet.DispatcherServlet:524] -- Initializing Servlet 'dispatcherServlet'
+[2019-12-11 21:50:20] [INFO ] [org.springframework.web.servlet.DispatcherServlet:546] -- Completed initialization in 4 ms
