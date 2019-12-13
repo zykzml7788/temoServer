@@ -82,7 +82,7 @@ public class TestCaseSetController {
     public JsonResult addTestCaseSetStScript(@RequestBody List<StScriptRequest> stScriptRequests){
         try {
             boolean result = testCaseSetService.addTestCaseSetStScript(stScriptRequests);
-            if (result == true){
+            if (result){
                 return new JsonResult("操作成功", 200, null, true);
             }else {
                 return new JsonResult("操作失败", 500, null, true);
