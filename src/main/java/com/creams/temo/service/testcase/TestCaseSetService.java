@@ -1,6 +1,7 @@
 package com.creams.temo.service.testcase;
 
 
+import com.creams.temo.entity.testcase.request.StScriptRequest;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.mapper.testcase.StScriptMapper;
@@ -49,6 +50,30 @@ public class TestCaseSetService {
     public List<TestCaseSetResponse> queryAllTestCaseSet(){
         List<TestCaseSetResponse> testCaseSetResponses = testCaseSetMapper.queryAllTestCaseSet();
         return testCaseSetResponses;
+    }
+
+    /**
+     * 批量新增前后置脚本
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public boolean addTestCaseSetStScript(List<StScriptRequest> stScriptRequests){
+
+        if (!stScriptRequests.isEmpty()) {
+            //清洗原先数据
+            stScriptMapper.deleteStScript(stScriptRequests.get(0).getSetId());
+        }
+        for (StScriptRequest st: stScriptRequests) {
+            //判断关联id是否为空
+            if (stScriptRequests.get(0).getExScriptId() == null || stScriptRequests.get(0).getExScriptId().equals("")){
+                return true;
+            }else {
+                st.setStScriptId(StringUtil.uuid());
+                stScriptMapper.addStScript(st);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
