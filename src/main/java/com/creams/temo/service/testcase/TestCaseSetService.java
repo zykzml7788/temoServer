@@ -2,6 +2,8 @@ package com.creams.temo.service.testcase;
 
 
 import com.creams.temo.entity.database.response.ScriptResponse;
+import com.creams.temo.entity.testcase.request.StScriptRequest;
+import com.creams.temo.entity.testcase.request.StScriptRequests;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.mapper.database.ScriptMapper;
@@ -62,23 +64,20 @@ public class TestCaseSetService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public boolean addTestCaseSetStScript(List<StScriptRequest> stScriptRequests){
+    public String addTestCaseSetStScript(StScriptRequests stScriptRequests){
 
-        if (!stScriptRequests.isEmpty()) {
-            //清洗原先数据
-            stScriptMapper.deleteStScript(stScriptRequests.get(0).getSetId());
-        }
-        for (StScriptRequest st: stScriptRequests) {
-            //判断关联id是否为空
-            if (stScriptRequests.get(0).getExScriptId() == null || stScriptRequests.get(0).getExScriptId().equals("")){
-                return true;
-            }else {
+        stScriptMapper.deleteStScript(stScriptRequests.getSetId());
+
+        if (!stScriptRequests.getStScriptRequests().isEmpty()){
+            for (StScriptRequest st: stScriptRequests.getStScriptRequests()
+            ) {
                 st.setStScriptId(StringUtil.uuid());
                 stScriptMapper.addStScript(st);
             }
-            return true;
+
         }
-        return false;
+        return stScriptRequests.getSetId();
+
     }
 
     /**

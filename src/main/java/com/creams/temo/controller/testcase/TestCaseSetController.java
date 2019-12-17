@@ -2,6 +2,7 @@ package com.creams.temo.controller.testcase;
 
 import com.creams.temo.entity.JsonResult;
 import com.creams.temo.entity.testcase.request.StScriptRequest;
+import com.creams.temo.entity.testcase.request.StScriptRequests;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.service.testcase.TestCaseSetService;
@@ -79,17 +80,14 @@ public class TestCaseSetController {
 
     @ApiOperation(value = "批量新增关联脚本")
     @PostMapping("/stScript")
-    public JsonResult addTestCaseSetStScript(@RequestBody List<StScriptRequest> stScriptRequests){
+    public JsonResult addTestCaseSetStScript(@RequestBody StScriptRequests stScriptRequests){
         try {
-            boolean result = testCaseSetService.addTestCaseSetStScript(stScriptRequests);
-            if (result){
-                return new JsonResult("操作成功", 200, null, true);
-            }else {
-                return new JsonResult("操作失败", 500, null, true);
-            }
+            String result = testCaseSetService.addTestCaseSetStScript(stScriptRequests);
+            return new JsonResult("操作成功", 200, result, true);
+
         }catch (Exception e){
             e.printStackTrace();
-            return new JsonResult("操作失败", 500, null, true);
+            return new JsonResult("操作失败", 500, null, false);
         }
     }
 
