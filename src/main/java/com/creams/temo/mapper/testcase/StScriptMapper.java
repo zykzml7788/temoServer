@@ -21,6 +21,7 @@ public interface StScriptMapper {
 
     boolean updateStScriptById(StScriptRequest stScriptRequest);
 
+    
     @Delete("delete from st_script where set_id = #{set_id}")
     boolean deleteStScript(@Param("set_id") String set_id);
 }
