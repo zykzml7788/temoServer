@@ -84,11 +84,13 @@ public class TestCaseRequest {
     @TableField(value = "json_assert")
     private String  jsonAssert;
 
+    @ApiModelProperty("排序")
+    @TableField(value = "sorting")
+    private Integer sorting;
+
     @ApiModelProperty("正文类型")
     @TableField(value = "content_type")
     private Integer contentType;
-
-
 
 
     private List<VerifyRequest> verify;
