@@ -20,9 +20,15 @@ import com.creams.temo.util.WebClientUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.List;
@@ -233,9 +239,9 @@ public class TestCaseSetService {
             if (body != null &&  !"".equals(body)){
                 bodyKV = (HashMap<String,String>) JSON.parse(body);
             }
-
+            ClientResponse response = null;
             if ("get".equals(method.toLowerCase())){
-                webClientUtil.get(url,headersKV, cookiesKV);
+                response = webClientUtil.get(url,headersKV, cookiesKV);
             }else if ("post".equals(method.toLowerCase())){
                 // 判断表单提交 or JSON
                 if ("1".equals(contentType)){
@@ -243,23 +249,27 @@ public class TestCaseSetService {
                     for (Map.Entry<String,String> kvs : bodyKV.entrySet()){
                         linkedMultiValueMap.add(kvs.getKey(),kvs.getValue());
                     }
-                    webClientUtil.postByFormData(url,linkedMultiValueMap,headersKV,cookiesKV);
+                    response = webClientUtil.postByFormData(url,linkedMultiValueMap,headersKV,cookiesKV);
                 }else if ("2".equals(contentType)){
                     LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
-                    webClientUtil.postByFormData(url,linkedMultiValueMap,headersKV,cookiesKV);
+                    response = webClientUtil.postByFormData(url,linkedMultiValueMap,headersKV,cookiesKV);
                 }else if ("3".equals(contentType)){
-                    webClientUtil.postByJson(url,body,headersKV,cookiesKV);
+                    response = webClientUtil.postByJson(url,body,headersKV,cookiesKV);
                 }else {
                     return "暂不支持该POST请求格式";
                 }
             }else if ("put".equals(method.toLowerCase())){
-                webClientUtil.put(url,body,headersKV, cookiesKV);
+                response = webClientUtil.put(url,body,headersKV, cookiesKV);
             }else if ("delete".equals(method.toLowerCase())){
-                webClientUtil.delete(url,headersKV, cookiesKV);
+                response = webClientUtil.delete(url,headersKV, cookiesKV);
             }else {
                 return "暂不支持该请求方式";
             }
-
+            // 获取响应相关信息
+            HttpStatus statusCode = response.statusCode();
+            String responseHeaders =  response.headers().asHttpHeaders().toString();
+            String responseCookies = response.cookies().toString();
+            String responseBody = response.bodyToMono(String.class).block();
         }
         return null;
     }
