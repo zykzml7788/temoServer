@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -73,7 +74,7 @@ public class WebClientUtil {
      * @param url 请求地址
      * @return
      */
-    public Map get(String url,Map<String,String> headers,Map<String,String> cookies){
+    public ClientResponse get(String url,Map<String,String> headers,Map<String,String> cookies){
         // 函数式编程，遍历请求头构造参数
         Consumer<HttpHeaders> headersConsumer = null ;
         Consumer<MultiValueMap<String, String>> cookiesConsumer = null;
@@ -89,26 +90,8 @@ public class WebClientUtil {
             }
         };
         cookiesConsumer.accept(new LinkedMultiValueMap<>());
-        Mono<Map> response = webClient.get().uri(url).headers(headersConsumer).cookies(cookiesConsumer).retrieve()
-                .onStatus(HttpStatus::isError, res -> Mono.error(new RuntimeException(res.statusCode().value() + ":" + res.statusCode().getReasonPhrase())))
-                .bodyToMono(Map.class).timeout(Duration.of(10, ChronoUnit.SECONDS))
-                .doAfterSuccessOrError((obj, ex) -> {
-
-                    if(ex != null){
-                        logger.info("请求方式：GET" +"\n"
-                                +"请求地址："+url+"\n"
-                                +"请求头："+headers.toString()+"\n"
-                                +"Cookies:"+cookies.toString()+"\n"
-                                +",响应异常为:"+ex);
-                    }else{
-                        logger.info("请求方式：GET" +"\n"
-                                +"请求地址："+url+"\n"
-                                +"请求头："+headers.toString()+"\n"
-                                +"Cookies:"+cookies.toString()+"\n"
-                                +",响应结果为:"+obj);
-                    }
-                });
-        return response.block();
+        Mono<ClientResponse> mono  = webClient.get().uri(url).headers(headersConsumer).cookies(cookiesConsumer).exchange();
+        return mono.block();
     }
 
     /**
@@ -117,7 +100,7 @@ public class WebClientUtil {
      * @param formData  表单参数
      * @return
      */
-    public Map postByFormData(String url, MultiValueMap<String,String> formData,Map<String,String> headers,Map<String,String> cookies){
+    public ClientResponse postByFormData(String url, MultiValueMap<String,String> formData,Map<String,String> headers,Map<String,String> cookies){
 
         // 函数式编程，遍历请求头构造参数
         Consumer<HttpHeaders> headersConsumer = null ;
@@ -134,33 +117,13 @@ public class WebClientUtil {
             }
         };
         cookiesConsumer.accept(new LinkedMultiValueMap<>());
-        Mono<Map> response = webClient.post().uri(url)
+        Mono<ClientResponse> mono = webClient.post().uri(url)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData(formData))
                 .headers(headersConsumer)
                 .cookies(cookiesConsumer)
-                .retrieve()
-                .bodyToMono(Map.class).timeout(Duration.of(10, ChronoUnit.SECONDS))
-                .doAfterSuccessOrError((obj, ex) -> {
-
-                    if(ex != null){
-                        logger.info("请求方式：POST" +"\n"
-                                +"请求地址："+url+"\n"
-                                +"请求头："+headers.toString()+"\n"
-                                +"Cookies:"+cookies.toString()+"\n"
-                                +"FormData:"+formData.toString()+"\n"
-                                +",响应异常为:"+ex);
-                    }else{
-                        logger.info("请求方式：POST" +"\n"
-                                +"请求地址："+url+"\n"
-                                +"请求头："+headers.toString()+"\n"
-                                +"Cookies:"+cookies.toString()+"\n"
-                                +"FormData:"+formData.toString()+"\n"
-                                +",响应结果为:"+obj);
-                    }
-                });;
-
-        return response.block();
+                .exchange();
+        return mono.block();
     }
 
     /**
@@ -169,7 +132,7 @@ public class WebClientUtil {
      * @param json  json字符串
      * @return
      */
-    public Map postByJson(String url, String json,Map<String,String> headers,Map<String,String> cookies){
+    public ClientResponse postByJson(String url, String json,Map<String,String> headers,Map<String,String> cookies){
         // 函数式编程，遍历请求头构造参数
         Consumer<HttpHeaders> headersConsumer = null ;
         Consumer<MultiValueMap<String, String>> cookiesConsumer = null;
@@ -185,31 +148,13 @@ public class WebClientUtil {
             }
         };
         cookiesConsumer.accept(new LinkedMultiValueMap<>());
-        Mono<Map> response = webClient.post().uri(url)
+        Mono<ClientResponse> mono = webClient.post().uri(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(BodyInserters.fromObject(json))
                 .headers(headersConsumer)
                 .cookies(cookiesConsumer)
-                .retrieve()
-                .bodyToMono(Map.class).timeout(Duration.of(10, ChronoUnit.SECONDS))
-                .doAfterSuccessOrError((obj, ex) -> {
-                    if(ex != null){
-                        logger.info("请求方式：POST" +"\n"
-                                +"请求地址："+url+"\n"
-                                +"请求头："+headers.toString()+"\n"
-                                +"Cookies:"+cookies.toString()+"\n"
-                                +"Body:"+json.toString()+"\n"
-                                +",响应异常为:"+ex);
-                    }else{
-                        logger.info("请求方式：POST" +"\n"
-                                +"请求地址："+url+"\n"
-                                +"请求头："+headers.toString()+"\n"
-                                +"Cookies:"+cookies.toString()+"\n"
-                                +"Body:"+json.toString()+"\n"
-                                +",响应结果为:"+obj);
-                    }
-                });
-        return response.block();
+                .exchange();
+        return mono.block();
     }
 
     /**
@@ -218,7 +163,7 @@ public class WebClientUtil {
      * @param json  json字符串
      * @return
      */
-    public Map put(String url, String json,Map<String,String> headers,Map<String,String> cookies){
+    public ClientResponse put(String url, String json,Map<String,String> headers,Map<String,String> cookies){
         // 函数式编程，遍历请求头构造参数
         Consumer<HttpHeaders> headersConsumer = null ;
         Consumer<MultiValueMap<String, String>> cookiesConsumer = null;
@@ -234,31 +179,14 @@ public class WebClientUtil {
             }
         };
         cookiesConsumer.accept(new LinkedMultiValueMap<>());
-        Mono<Map> response = webClient.put().uri(url)
+        Mono<ClientResponse> mono = webClient.put().uri(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(BodyInserters.fromObject(json))
                 .cookies(cookiesConsumer)
                 .headers(headersConsumer)
-                .retrieve()
-                .bodyToMono(Map.class).timeout(Duration.of(10, ChronoUnit.SECONDS))
-                .doAfterSuccessOrError((obj, ex) -> {
-                    if(ex != null){
-                        logger.info("请求方式：PUT" +"\n"
-                                +"请求地址："+url+"\n"
-                                +"请求头："+headers.toString()+"\n"
-                                +"Cookies:"+cookies.toString()+"\n"
-                                +"Body:"+json.toString()+"\n"
-                                +",响应异常为:"+ex);
-                    }else{
-                        logger.info("请求方式：PUT" +"\n"
-                                +"请求地址："+url+"\n"
-                                +"请求头："+headers.toString()+"\n"
-                                +"Cookies:"+cookies.toString()+"\n"
-                                +"Body:"+json+"\n"
-                                +",响应结果为:"+obj);
-                    }
-                });
-        return response.block();
+                .exchange();
+
+        return mono.block();
     }
 
     /**
@@ -266,7 +194,7 @@ public class WebClientUtil {
      * @param url 请求地址
      * @return
      */
-    public Map delete(String url,Map<String,String> headers,Map<String,String> cookies){
+    public ClientResponse delete(String url,Map<String,String> headers,Map<String,String> cookies){
         // 函数式编程，遍历请求头构造参数
         Consumer<HttpHeaders> headersConsumer = null ;
         Consumer<MultiValueMap<String, String>> cookiesConsumer = null;
@@ -282,38 +210,22 @@ public class WebClientUtil {
             }
         };
         cookiesConsumer.accept(new LinkedMultiValueMap<>());
-        Mono<Map> response = webClient.delete().uri(url)
+        Mono<ClientResponse> mono = webClient.delete().uri(url)
                 .headers(headersConsumer)
                 .cookies(cookiesConsumer)
-                .retrieve()
-                .bodyToMono(Map.class)
-                .timeout(Duration.of(10, ChronoUnit.SECONDS))
-                .doAfterSuccessOrError((obj, ex) -> {
-                    if(ex != null){
-                        logger.info("请求方式：DELETE" +"\n"
-                                +"请求地址："+url+"\n"
-                                +"请求头："+headers.toString()+"\n"
-                                +"Cookies:"+cookies.toString()+"\n"
-                                +",响应异常为:"+ex);
-                    }else{
-                        logger.info("请求方式：DELETE" +"\n"
-                                +"请求地址："+url+"\n"
-                                +"请求头："+headers.toString()+"\n"
-                                +"Cookies:"+cookies.toString()+"\n"
-                                +",响应结果为:"+obj);
-                    }
-                });;
-        return response.block();
+                .exchange();
+
+        return mono.block();
     }
 
     public static void main(String[] args) {
         WebClientUtil webClientUtil = new WebClientUtil("http://129.204.148.24:8080/temo",new HashMap<>(),new HashMap<>());
         System.out.println(webClientUtil.get("/project/1?filter=",new HashMap<>(),new HashMap<>()));
-       webClientUtil.put("/project/a3c948f2-bd99-4315-8e7c-1c1dd9991a8b", "{\n" +
-               "\t\"pid\": \"a3c948f2-bd99-4315-8e7c-1c1dd9991a8b\",\n" +
-               "\t\"envs\": [],\n" +
-               "\t\"pname\": \"测试webClientAAA\"\n" +
-               "}",new HashMap<>(),new HashMap<>());
-        webClientUtil.delete("/prject/69cce7db-7b7f-4fbc-b1f8-d0f8e5dea6f4",new HashMap<>(),new HashMap<>());
+//       webClientUtil.put("/project/a3c948f2-bd99-4315-8e7c-1c1dd9991a8b", "{\n" +
+//               "\t\"pid\": \"a3c948f2-bd99-4315-8e7c-1c1dd9991a8b\",\n" +
+//               "\t\"envs\": [],\n" +
+//               "\t\"pname\": \"测试webClientAAA\"\n" +
+//               "}",new HashMap<>(),new HashMap<>());
+//        webClientUtil.delete("/prject/69cce7db-7b7f-4fbc-b1f8-d0f8e5dea6f4",new HashMap<>(),new HashMap<>());
     }
 }
