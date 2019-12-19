@@ -145,4 +145,22 @@ public class TestCaseSetController {
         }
     }
 
+    @ApiOperation("删除用例集")
+    @PostMapping(value = "/{id}")
+    public JsonResult executeTestCaseSet(@PathVariable("id") @ApiParam("用例集id")  String setId,
+                                         @RequestParam(value = "envId") String envId){
+        String vaild = testCaseSetService.queryTestCaseSetInfo(setId).getValid();
+        if ("0".equals(vaild)){
+            return new JsonResult("该用例集被禁用，禁止调试", 500, null, false);
+        }
+        try {
+            testCaseSetService.executeSet(setId,envId);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+
+
+        return null;
+    }
 }

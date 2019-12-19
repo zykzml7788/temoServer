@@ -1,24 +1,32 @@
 package com.creams.temo.service.testcase;
 
 
-import com.creams.temo.entity.database.response.ScriptResponse;
+import com.alibaba.fastjson.JSON;
+import com.creams.temo.entity.project.response.EnvResponse;
 import com.creams.temo.entity.testcase.request.StScriptRequest;
 import com.creams.temo.entity.testcase.request.StScriptRequests;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
+import com.creams.temo.entity.testcase.response.SavesResponse;
+import com.creams.temo.entity.testcase.response.TestCaseResponse;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
+import com.creams.temo.entity.testcase.response.VerifyResponse;
 import com.creams.temo.mapper.database.ScriptMapper;
+import com.creams.temo.mapper.project.EnvMapper;
 import com.creams.temo.mapper.testcase.StScriptMapper;
 import com.creams.temo.mapper.testcase.TestCaseMapper;
 import com.creams.temo.mapper.testcase.TestCaseSetMapper;
 import com.creams.temo.util.StringUtil;
+import com.creams.temo.util.WebClientUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TestCaseSetService {
@@ -34,6 +42,9 @@ public class TestCaseSetService {
 
     @Autowired
     ScriptMapper scriptMapper;
+
+    @Autowired
+    EnvMapper envMapper;
 
     /**
      * 查询用例集
@@ -150,4 +161,106 @@ public class TestCaseSetService {
         return testCaseSetResponse;
     }
 
+    /**
+     * 执行用例集
+     * @param setId
+     * @param envId
+     */
+    public Object executeSet(String setId, String envId) {
+        TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
+        EnvResponse env = envMapper.queryEnvById(envId);
+        // 获取用例集下全部的用例
+        List<TestCaseResponse> testCases = testCaseSet.getTestCase();
+        Map<String,String> globalCookies = new HashMap<>();
+        Map<String,String> globalHeaders = new HashMap<>();
+        WebClientUtil webClientUtil = null;
+        if (env.getPort()==null){
+            webClientUtil  = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
+        }else {
+            webClientUtil  = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
+        }
+
+        for (TestCaseResponse testCase:testCases){
+            String url = testCase.getUrl();
+            String method = testCase.getMethod();
+            String body = testCase.getBody();
+            String gCookies = testCase.getGlobalCookies();
+            String gHeaders = testCase.getGlobalHeaders();
+            String delayTime = testCase.getDelayTime();
+            String jsonAssert = testCase.getJsonAssert();
+            String caseType = testCase.getCaseType();
+            String cookies = testCase.getCookies();
+            String headers = testCase.getHeader();
+            String sqlScript = testCase.getSqlScript();
+            String param = testCase.getParam();
+            String dbId = testCase.getDbId();
+            String contentType = testCase.getContentType();
+            List<SavesResponse> saves = testCase.getSaves();
+            List<VerifyResponse> verifys = testCase.getVerify();
+
+            // 判断是否有全局Cookie或者全局Header，如果有则重新生成webclient实例
+            if (gCookies != null &&  !"".equals(gCookies)){
+                Map<String,String> maps = (HashMap<String,String>) JSON.parse(gCookies);
+                for (Map.Entry<String,String> kvs : maps.entrySet()){
+                    String key = kvs.getKey();
+                    String value = kvs.getValue();
+                    globalCookies.put(key,value);
+                }
+                webClientUtil = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
+            }
+            if (gHeaders != null &&  !"".equals(gHeaders)){
+                Map<String,String> maps = (HashMap<String,String>) JSON.parse(gHeaders);
+                for (Map.Entry<String,String> kvs : maps.entrySet()){
+                    String key = kvs.getKey();
+                    String value = kvs.getValue();
+                    globalHeaders.put(key,value);
+                }
+                webClientUtil = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
+            }
+
+            // 判断是否有附带请求头或者cookie
+            Map<String,String> cookiesKV = new HashMap<>();
+            Map<String,String> headersKV = new HashMap<>();
+
+            if (cookies != null &&  !"".equals(cookies)){
+                cookiesKV = (HashMap<String,String>) JSON.parse(cookies);
+            }
+            if (headers != null &&  !"".equals(headers)){
+                headersKV = (HashMap<String,String>) JSON.parse(cookies);
+            }
+            // 判断请求体是否为空，进行转换
+            Map<String,String> bodyKV = new HashMap<>();
+            if (body != null &&  !"".equals(body)){
+                bodyKV = (HashMap<String,String>) JSON.parse(body);
+            }
+
+            if ("get".equals(method.toLowerCase())){
+                webClientUtil.get(url,headersKV, cookiesKV);
+            }else if ("post".equals(method.toLowerCase())){
+                // 判断表单提交 or JSON
+                if ("1".equals(contentType)){
+                    LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
+                    for (Map.Entry<String,String> kvs : bodyKV.entrySet()){
+                        linkedMultiValueMap.add(kvs.getKey(),kvs.getValue());
+                    }
+                    webClientUtil.postByFormData(url,linkedMultiValueMap,headersKV,cookiesKV);
+                }else if ("2".equals(contentType)){
+                    LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
+                    webClientUtil.postByFormData(url,linkedMultiValueMap,headersKV,cookiesKV);
+                }else if ("3".equals(contentType)){
+                    webClientUtil.postByJson(url,body,headersKV,cookiesKV);
+                }else {
+                    return "暂不支持该POST请求格式";
+                }
+            }else if ("put".equals(method.toLowerCase())){
+                webClientUtil.put(url,body,headersKV, cookiesKV);
+            }else if ("delete".equals(method.toLowerCase())){
+                webClientUtil.delete(url,headersKV, cookiesKV);
+            }else {
+                return "暂不支持该请求方式";
+            }
+
+        }
+        return null;
+    }
 }
