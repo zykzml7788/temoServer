@@ -26,6 +26,8 @@ public class WebClientUtil {
     private static Logger logger = LoggerFactory.getLogger("fileInfoLog");
 
     public WebClientUtil(String baseUrl, Map<String, String> headers, Map<String, String> cookies){
+        logger.info(String.format("开始创建webclient实例。。，设置default headers:%s,default cookies:%s",
+                headers.toString(),cookies.toString()));
         // 函数式编程，遍历请求头构造参数
         Consumer<HttpHeaders> headersConsumer = null;
         Consumer<MultiValueMap<String, String>> cookiesConsumer = null;
@@ -75,6 +77,11 @@ public class WebClientUtil {
      * @return
      */
     public ClientResponse get(String url,Map<String,String> headers,Map<String,String> cookies){
+        logger.info("开始调用接口。。");
+        logger.info("========================================");
+        logger.info("GET "+url);
+        logger.info("Headers  "+headers);
+        logger.info("Cookies "+cookies);
         // 函数式编程，遍历请求头构造参数
         Consumer<HttpHeaders> headersConsumer = null ;
         Consumer<MultiValueMap<String, String>> cookiesConsumer = null;
@@ -102,6 +109,12 @@ public class WebClientUtil {
      */
     public ClientResponse postByFormData(String url, MultiValueMap<String,String> formData,Map<String,String> headers,Map<String,String> cookies){
 
+        logger.info("开始调用接口。。");
+        logger.info("========================================");
+        logger.info("POST "+url);
+        logger.info("FormData "+formData);
+        logger.info("Headers  "+headers);
+        logger.info("Cookies "+cookies);
         // 函数式编程，遍历请求头构造参数
         Consumer<HttpHeaders> headersConsumer = null ;
         Consumer<MultiValueMap<String, String>> cookiesConsumer = null;
@@ -133,6 +146,12 @@ public class WebClientUtil {
      * @return
      */
     public ClientResponse postByJson(String url, String json,Map<String,String> headers,Map<String,String> cookies){
+        logger.info("开始调用接口。。");
+        logger.info("========================================");
+        logger.info("POST "+url);
+        logger.info("Body "+json);
+        logger.info("Headers  "+headers);
+        logger.info("Cookies "+cookies);
         // 函数式编程，遍历请求头构造参数
         Consumer<HttpHeaders> headersConsumer = null ;
         Consumer<MultiValueMap<String, String>> cookiesConsumer = null;
@@ -164,6 +183,12 @@ public class WebClientUtil {
      * @return
      */
     public ClientResponse put(String url, String json,Map<String,String> headers,Map<String,String> cookies){
+        logger.info("开始调用接口。。");
+        logger.info("========================================");
+        logger.info("PUT "+url);
+        logger.info("Body "+json);
+        logger.info("Headers  "+headers);
+        logger.info("Cookies "+cookies);
         // 函数式编程，遍历请求头构造参数
         Consumer<HttpHeaders> headersConsumer = null ;
         Consumer<MultiValueMap<String, String>> cookiesConsumer = null;
@@ -195,6 +220,11 @@ public class WebClientUtil {
      * @return
      */
     public ClientResponse delete(String url,Map<String,String> headers,Map<String,String> cookies){
+        logger.info("开始调用接口。。");
+        logger.info("========================================");
+        logger.info("DELETE "+url);
+        logger.info("Headers  "+headers);
+        logger.info("Cookies "+cookies);
         // 函数式编程，遍历请求头构造参数
         Consumer<HttpHeaders> headersConsumer = null ;
         Consumer<MultiValueMap<String, String>> cookiesConsumer = null;
@@ -221,11 +251,11 @@ public class WebClientUtil {
     public static void main(String[] args) {
         WebClientUtil webClientUtil = new WebClientUtil("http://129.204.148.24:8080/temo",new HashMap<>(),new HashMap<>());
         System.out.println(webClientUtil.get("/project/1?filter=",new HashMap<>(),new HashMap<>()));
-//       webClientUtil.put("/project/a3c948f2-bd99-4315-8e7c-1c1dd9991a8b", "{\n" +
-//               "\t\"pid\": \"a3c948f2-bd99-4315-8e7c-1c1dd9991a8b\",\n" +
-//               "\t\"envs\": [],\n" +
-//               "\t\"pname\": \"测试webClientAAA\"\n" +
-//               "}",new HashMap<>(),new HashMap<>());
-//        webClientUtil.delete("/prject/69cce7db-7b7f-4fbc-b1f8-d0f8e5dea6f4",new HashMap<>(),new HashMap<>());
+       webClientUtil.put("/project/a3c948f2-bd99-4315-8e7c-1c1dd9991a8b", "{\n" +
+               "\t\"pid\": \"a3c948f2-bd99-4315-8e7c-1c1dd9991a8b\",\n" +
+               "\t\"envs\": [],\n" +
+               "\t\"pname\": \"测试webClientAAA\"\n" +
+               "}",new HashMap<>(),new HashMap<>());
+        webClientUtil.delete("/prject/69cce7db-7b7f-4fbc-b1f8-d0f8e5dea6f4",new HashMap<>(),new HashMap<>());
     }
 }

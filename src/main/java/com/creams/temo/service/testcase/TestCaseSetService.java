@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @Service
 public class TestCaseSetService {
 
@@ -180,7 +182,7 @@ public class TestCaseSetService {
      * @param setId
      * @param envId
      */
-    public Object executeSet(String setId, String envId) {
+    public Object executeSet(String setId, String envId) throws Exception {
         TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
         EnvResponse env = envMapper.queryEnvById(envId);
         // 获取用例集下全部的用例
@@ -311,6 +313,27 @@ public class TestCaseSetService {
                     return "不支持从该响应类型取值";
                 }
             }
+            for (VerifyResponse verify:verifys){
+                String verifyType = verify.getVerifyType();
+                String expect = verify.getExpect();
+                String jsonpath = verify.getJexpression();
+                String regex = verify.getRexpression();
+                String relationShip = verify.getRelationShip();
+                if ("1".equals(verifyType)){
+                    String value = (String)JSONPath.read(responseBody,jsonpath);
+                    superAssert(relationShip,responseBody,expect);
+                }else if ("2".equals(verifyType)){
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(responseBody);
+                    String value = "";
+                    if(matcher.find()) {
+                        value = matcher.group(0);
+                    }
+                    superAssert(relationShip,responseBody,value);
+                }else {
+                    return "不支持该断言方式";
+                }
+            }
 
 
         }
@@ -322,13 +345,63 @@ public class TestCaseSetService {
      * @param target
      * @param regex
      */
-    private void saveRegexParamToRedis(String target,String key,String regex){
+    private void saveRegexParamToRedis(String target, String key, String regex){
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(target);
         String value = "";
         if(matcher.find()) {
             value = matcher.group(0);
         }
-        redisUtil.set(key,value);
+        redisUtil.set(key,value,3600);
     }
+
+    /**
+     * 超级断言
+     * @param type  断言方式
+     * @param target  目标字符串
+     * @param expect  期待字符串
+     * @throws Exception
+     */
+    private void superAssert(String type,String target,String expect) throws Exception {
+        switch (type){
+            case "1":
+                assertThat(target).isEqualTo(expect);
+                break;
+            case "2":
+                assertThat(target).isNotEqualTo(expect);
+                break;
+            case "3":
+                assertThat(target).contains(expect);
+                break;
+            case "4":
+                assertThat(target).doesNotContain(expect);
+                break;
+            case "5":
+                assertThat(target).isSubstringOf(expect);
+                break;
+            case "6":
+                assertThat(target).isNotIn(expect);
+                break;
+            case "7":
+                assertThat(target).isNull();
+                break;
+            case "8":
+                assertThat(target).isNotNull();
+                break;
+            case "9":
+                assertThat(Double.parseDouble(target)).isGreaterThan(Double.parseDouble(expect));
+                break;
+            case "10":
+                assertThat(Double.parseDouble(target)).isLessThan(Double.parseDouble(expect));
+                break;
+            case "11":
+                assertThat(Double.parseDouble(target)).isGreaterThanOrEqualTo(Double.parseDouble(expect));
+                break;
+            case "12":
+                assertThat(Double.parseDouble(target)).isLessThanOrEqualTo(Double.parseDouble(expect));
+            default:
+                throw new Exception("不支持该种关系断言");
+        }
+    }
+
 }
