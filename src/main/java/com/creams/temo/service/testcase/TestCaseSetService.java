@@ -2,6 +2,7 @@ package com.creams.temo.service.testcase;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONPath;
 import com.creams.temo.entity.project.response.EnvResponse;
 import com.creams.temo.entity.testcase.request.StScriptRequest;
 import com.creams.temo.entity.testcase.request.StScriptRequests;
@@ -15,10 +16,12 @@ import com.creams.temo.mapper.project.EnvMapper;
 import com.creams.temo.mapper.testcase.StScriptMapper;
 import com.creams.temo.mapper.testcase.TestCaseMapper;
 import com.creams.temo.mapper.testcase.TestCaseSetMapper;
+import com.creams.temo.util.RedisUtil;
 import com.creams.temo.util.StringUtil;
 import com.creams.temo.util.WebClientUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jayway.jsonpath.JsonPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -33,6 +36,8 @@ import reactor.core.publisher.Mono;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class TestCaseSetService {
@@ -51,6 +56,9 @@ public class TestCaseSetService {
 
     @Autowired
     EnvMapper envMapper;
+
+    @Autowired
+    RedisUtil redisUtil;
 
     /**
      * 查询用例集
@@ -270,7 +278,57 @@ public class TestCaseSetService {
             String responseHeaders =  response.headers().asHttpHeaders().toString();
             String responseCookies = response.cookies().toString();
             String responseBody = response.bodyToMono(String.class).block();
+
+            // 处理关联参数
+            for (SavesResponse save:saves){
+                String paramKey = save.getParamKey();
+                String jsonpath = save.getJexpression();
+                String regex = save.getRegex();
+                String saveFrom = save.getSaveFrom();
+                String saveType = save.getSaveType();
+                if ("1".equals(saveFrom)){
+                    if ("1".equals(saveType)){
+                        String value = (String)JSONPath.read(responseBody,jsonpath);
+                        redisUtil.set(paramKey,value);
+                    }else {
+                        saveRegexParamToRedis(responseBody,paramKey,regex);
+                    }
+                }else if ("2".equals(saveFrom)){
+                    if ("1".equals(saveType)){
+                        String value = (String)JSONPath.read(responseHeaders,jsonpath);
+                        redisUtil.set(paramKey,value);
+                    }else {
+                        saveRegexParamToRedis(responseHeaders,paramKey,regex);
+                    }
+                }else if ("3".equals(saveFrom)){
+                    if ("1".equals(saveType)){
+                        String value = (String)JSONPath.read(responseCookies,jsonpath);
+                        redisUtil.set(paramKey,value);
+                    }else {
+                        saveRegexParamToRedis(responseCookies,paramKey,regex);
+                    }
+                }else{
+                    return "不支持从该响应类型取值";
+                }
+            }
+
+
         }
         return null;
+    }
+
+    /**
+     * 正则匹配，保存参数到redis（默认取到第一个匹配项）
+     * @param target
+     * @param regex
+     */
+    private void saveRegexParamToRedis(String target,String key,String regex){
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(target);
+        String value = "";
+        if(matcher.find()) {
+            value = matcher.group(0);
+        }
+        redisUtil.set(key,value);
     }
 }
