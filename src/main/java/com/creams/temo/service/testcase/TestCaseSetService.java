@@ -399,6 +399,7 @@ public class TestCaseSetService {
                 break;
             case "12":
                 assertThat(Double.parseDouble(target)).isLessThanOrEqualTo(Double.parseDouble(expect));
+                break;
             default:
                 throw new Exception("不支持该种关系断言");
         }
