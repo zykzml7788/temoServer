@@ -71,9 +71,16 @@ public class WebClientUtil {
         logger.info("Headers  "+headers);
         logger.info("Cookies "+cookies);
 
+        MultiValueMap<String,String> paramsKv = new LinkedMultiValueMap<>();
+        for (Map.Entry<String,String> entry:params.entrySet()){
+            paramsKv.add(entry.getKey(),entry.getValue());
+        }
         Mono<ClientResponse> mono  = webClient.get()
-                .uri(url)
-                .attributes(n-> n.putAll(params))
+                .uri(u->u
+                        .path(url)
+                        .queryParams(paramsKv)
+                        .build()
+                )
                 .headers(n->{
                     for (Map.Entry<String,String> entry: headers.entrySet()){
                         n.add(entry.getKey(),entry.getValue());
@@ -222,13 +229,13 @@ public class WebClientUtil {
         WebClientUtil webClientUtil = new WebClientUtil("http://129.204.148.24:8080/temo",new HashMap<>(),new HashMap<>());
         Map<String,String> param = new HashMap<>();
         Map<String,String> headers = new HashMap<>();
-        param.put("filter","123");
+        param.put("filter","123456");
         System.out.println(new JSONObject(webClientUtil.get("/project/1",param,headers,new HashMap<>()).bodyToMono(Map.class).block()));
-//       webClientUtil.put("/project/a3c948f2-bd99-4315-8e7c-1c1dd9991a8b", "{\n" +
-//               "\t\"pid\": \"a3c948f2-bd99-4315-8e7c-1c1dd9991a8b\",\n" +
-//               "\t\"envs\": [],\n" +
-//               "\t\"pname\": \"测试webClientAAA\"\n" +
-//               "}",new HashMap<>(),new HashMap<>());
-//        webClientUtil.delete("/prject/69cce7db-7b7f-4fbc-b1f8-d0f8e5dea6f4",new HashMap<>(),new HashMap<>());
+       webClientUtil.put("/project/a3c948f2-bd99-4315-8e7c-1c1dd9991a8b", "{\n" +
+               "\t\"pid\": \"a3c948f2-bd99-4315-8e7c-1c1dd9991a8b\",\n" +
+               "\t\"envs\": [],\n" +
+               "\t\"pname\": \"测试webClientAAA\"\n" +
+               "}",new HashMap<>(),new HashMap<>());
+        webClientUtil.delete("/prject/69cce7db-7b7f-4fbc-b1f8-d0f8e5dea6f4",new HashMap<>(),new HashMap<>());
     }
 }
