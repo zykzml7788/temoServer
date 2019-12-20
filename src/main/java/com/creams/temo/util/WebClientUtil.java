@@ -73,9 +73,7 @@ public class WebClientUtil {
 
         Mono<ClientResponse> mono  = webClient.get()
                 .uri(url)
-                .attributes(n->{
-                    n.putAll(params);
-                })
+                .attributes(n-> n.putAll(params))
                 .headers(n->{
                     for (Map.Entry<String,String> entry: headers.entrySet()){
                         n.add(entry.getKey(),entry.getValue());
