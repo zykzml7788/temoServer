@@ -2,6 +2,7 @@ package com.creams.temo.service.testcase;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.creams.temo.entity.project.response.EnvResponse;
 import com.creams.temo.entity.testcase.request.StScriptRequest;
@@ -179,8 +180,8 @@ public class TestCaseSetService {
 
     /**
      * 执行用例集
-     * @param setId
-     * @param envId
+     * @param setId 用例集ID
+     * @param envId 调试环境ID
      */
     public Object executeSet(String setId, String envId) throws Exception {
         TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
@@ -238,6 +239,11 @@ public class TestCaseSetService {
             Map<String,String> cookiesKV = new HashMap<>();
             Map<String,String> headersKV = new HashMap<>();
 
+            // 判断请求体是否为空，进行转换
+            Map<String,String> paramKV = new HashMap<>();
+            if (param != null &&  !"".equals(param)){
+                paramKV = (HashMap<String,String>) JSON.parse(param);
+            }
             if (cookies != null &&  !"".equals(cookies)){
                 cookiesKV = (HashMap<String,String>) JSON.parse(cookies);
             }
@@ -251,7 +257,7 @@ public class TestCaseSetService {
             }
             ClientResponse response = null;
             if ("get".equals(method.toLowerCase())){
-                response = webClientUtil.get(url,headersKV, cookiesKV);
+                response = webClientUtil.get(url,paramKV,headersKV, cookiesKV);
             }else if ("post".equals(method.toLowerCase())){
                 // 判断表单提交 or JSON
                 if ("1".equals(contentType)){
@@ -277,9 +283,10 @@ public class TestCaseSetService {
             }
             // 获取响应相关信息
             HttpStatus statusCode = response.statusCode();
+            String responseBody = new JSONObject(response.bodyToMono(Map.class).block()).toString();
             String responseHeaders =  response.headers().asHttpHeaders().toString();
             String responseCookies = response.cookies().toString();
-            String responseBody = response.bodyToMono(String.class).block();
+
 
             // 处理关联参数
             for (SavesResponse save:saves){
