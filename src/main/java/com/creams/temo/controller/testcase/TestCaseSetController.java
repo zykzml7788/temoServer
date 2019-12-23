@@ -155,12 +155,10 @@ public class TestCaseSetController {
         }
         try {
             testCaseSetService.executeSet(setId,envId);
+            return new JsonResult("已发起调试，请等待执行结果...", 200, null, true);
         }catch (Exception e){
             e.printStackTrace();
             return new JsonResult("操作失败", 500, e, false);
         }
-
-
-        return null;
     }
 }

@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -196,6 +197,7 @@ public class TestCaseSetService {
      * @param setId 用例集ID
      * @param envId 调试环境ID
      */
+    @Async
     public Object executeSet(String setId, String envId) throws Exception {
         TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
         EnvResponse env = envMapper.queryEnvById(envId);
