@@ -87,6 +87,10 @@ public class TestCaseResponse {
     @TableField(value = "sorting")
     private Integer sorting;
 
+    @ApiModelProperty("排序")
+    @TableField(value = "content-type")
+    private String contentType;
+
     private List<VerifyResponse> verify;
 
     private List<SavesResponse> saves;

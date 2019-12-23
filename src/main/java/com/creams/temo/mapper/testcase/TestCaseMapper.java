@@ -35,7 +35,7 @@ public interface TestCaseMapper {
     @Select("select * from testcase where case_id = #{case_id}")
     TestCaseResponse queryTestCaseById(@Param("case_id") String caseId);
 
-    @Select("select * from testcase where set_id = #{set_id}")
+    @Select("select * from testcase where set_id = #{set_id} order by sorting asc")
     List<TestCaseResponse> queryTestCaseBySetId(@Param("set_id") String setId);
 
     boolean addTestCase(TestCaseRequest testCaseRequest);
