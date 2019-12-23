@@ -506,7 +506,7 @@ public class TestCaseSetService {
      * @return  替换${key}后的字符串参数
      */
     private String getCommonParam(String param) {
-        if (StringUtil.isEmpty(param)) {
+        if (StringUtil.isEmptyOrNull(param)) {
             return "";
         }
         // 取公共参数正则

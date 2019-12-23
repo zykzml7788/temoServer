@@ -16,8 +16,8 @@ public class StringUtil {
         return UUID.randomUUID().toString();
     }
 
-    public static boolean isEmpty(String str){
-        return "".equals(str);
+    public static boolean isEmptyOrNull(String str){
+        return "".equals(str) || str == null;
     }
 
 }
