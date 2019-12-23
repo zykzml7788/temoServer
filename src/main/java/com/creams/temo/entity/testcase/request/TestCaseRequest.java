@@ -90,7 +90,7 @@ public class TestCaseRequest {
 
     @ApiModelProperty("正文类型")
     @TableField(value = "content_type")
-    private Integer contentType;
+    private String contentType;
 
 
     private List<VerifyRequest> verify;
