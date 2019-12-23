@@ -353,7 +353,7 @@ public class TestCaseSetService {
                 DecimalFormat df = new DecimalFormat("0.00");
                 // 计算百分比
                 String num = df.format(((float)index/casesNum)*100);
-                WebSocketServer.sendInfo(String.format("已执行用例数:%d,成功数:%d,失败数:%d,已执行用例数百分比：%d %%,总用例数:%d"
+                WebSocketServer.sendInfo(String.format("已执行用例数:%d,成功数:%d,失败数:%d,已执行用例数百分比：%s %%,总用例数:%d"
                         ,index,index-error,error,num,casesNum),"123");
                 continue;
             }
