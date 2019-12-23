@@ -157,7 +157,7 @@ public class TestCaseSetController {
             testCaseSetService.executeSet(setId,envId);
         }catch (Exception e){
             e.printStackTrace();
-            return new JsonResult("操作失败", 500, null, false);
+            return new JsonResult("操作失败", 500, e, false);
         }
 
 

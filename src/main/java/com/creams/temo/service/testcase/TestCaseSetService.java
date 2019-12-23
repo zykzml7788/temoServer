@@ -17,26 +17,23 @@ import com.creams.temo.mapper.project.EnvMapper;
 import com.creams.temo.mapper.testcase.StScriptMapper;
 import com.creams.temo.mapper.testcase.TestCaseMapper;
 import com.creams.temo.mapper.testcase.TestCaseSetMapper;
+import com.creams.temo.service.WebSocketServer;
 import com.creams.temo.util.RedisUtil;
 import com.creams.temo.util.StringUtil;
 import com.creams.temo.util.WebClientUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jayway.jsonpath.JsonPath;
 import org.assertj.core.api.Assertions;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
-import org.springframework.web.socket.server.HandshakeHandler;
-import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +63,9 @@ public class TestCaseSetService {
 
     @Autowired
     RedisUtil redisUtil;
+
+    @Autowired
+    WebSocketServer webSocketServer;
 
     private static Logger logger = LoggerFactory.getLogger("fileInfoLog");
 
@@ -199,6 +199,12 @@ public class TestCaseSetService {
         EnvResponse env = envMapper.queryEnvById(envId);
         // 获取用例集下全部的用例
         List<TestCaseResponse> testCases = testCaseSet.getTestCase();
+        // 获取用例数量
+        int casesNum = testCases.size();
+        // 设置初始成功用例数为 0
+        int success = 0;
+        // 设置初始失败用例数为 0
+        int error = 0;
         Map<String,String> globalCookies = new HashMap<>();
         Map<String,String> globalHeaders = new HashMap<>();
         WebClientUtil webClientUtil;
@@ -209,6 +215,8 @@ public class TestCaseSetService {
         }
         // 遍历所有用例集合
         for (TestCaseResponse testCase:testCases){
+            int index = testCases.indexOf(testCase)+1;
+            logger.info(String.format("正在执行第%s条用例...",index));
             // 取到用例相关信息，并处理${key}的关联部分
             String url = getCommonParam(testCase.getUrl());
             String method = getCommonParam(testCase.getMethod());
@@ -226,10 +234,13 @@ public class TestCaseSetService {
             String contentType = testCase.getContentType();
             List<SavesResponse> saves = testCase.getSaves();
             List<VerifyResponse> verifys = testCase.getVerify();
-
+            if (delayTime!=null){
+                logger.info("正在等待"+delayTime+"秒...");
+                Thread.sleep(Integer.valueOf(delayTime)*1000);
+            }
             // 判断是否有全局Cookie或者全局Header，如果有则重新生成webclient实例
             if (gCookies != null &&  !"".equals(gCookies)){
-                Map<String,String> maps = (HashMap<String,String>) JSON.parse(gCookies);
+                Map<String,String> maps = (Map<String, String>) JSON.parse(gCookies);
                 for (Map.Entry<String,String> kvs : maps.entrySet()){
                     String key = getCommonParam(kvs.getKey());
                     String value = getCommonParam(kvs.getValue());
@@ -248,19 +259,19 @@ public class TestCaseSetService {
             }
 
             // 判断是否有附带请求头或者cookie
-            Map<String,String> cookiesKV = new HashMap<>();
-            Map<String,String> headersKV = new HashMap<>();
+            Map cookiesKv = new HashMap<>();
+            Map headersKv = new HashMap<>();
 
             // 判断请求体是否为空，进行转换
-            Map<String,String> paramKV = new HashMap<>();
+            Map paramKv = new HashMap<>();
             if (param != null &&  !"".equals(param)){
-                paramKV = (HashMap<String,String>) JSON.parse(param);
+                paramKv = (Map) JSON.parse(param);
             }
             if (cookies != null &&  !"".equals(cookies)){
-                cookiesKV = (HashMap<String,String>) JSON.parse(cookies);
+                cookiesKv = (Map) JSON.parse(cookies);
             }
             if (headers != null &&  !"".equals(headers)){
-                headersKV = (HashMap<String,String>) JSON.parse(cookies);
+                headersKv = (Map) JSON.parse(cookies);
             }
             // 判断请求体是否为空，进行转换
             Map<String,String> bodyKV = new HashMap<>();
@@ -268,53 +279,68 @@ public class TestCaseSetService {
                 bodyKV = (HashMap<String,String>) JSON.parse(body);
             }
             ClientResponse response;
-            if ("get".equals(method.toLowerCase())){
-                response = webClientUtil.get(url,paramKV,headersKV, cookiesKV);
-            }else if ("post".equals(method.toLowerCase())){
-                // 判断表单提交 or JSON
-                if ("1".equals(contentType)){
-                    LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
-                    for (Map.Entry<String,String> kvs : bodyKV.entrySet()){
-                        linkedMultiValueMap.add(kvs.getKey(),kvs.getValue());
+            switch (method.toLowerCase()) {
+                case "get":
+                    response = webClientUtil.get(url, paramKv, headersKv, cookiesKv);
+                    break;
+                case "post":
+                    // 判断表单提交 or JSON
+                    if ("1".equals(contentType)) {
+                        LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
+                        for (Map.Entry<String, String> kvs : bodyKV.entrySet()) {
+                            linkedMultiValueMap.add(kvs.getKey(), kvs.getValue());
+                        }
+                        response = webClientUtil.postByFormData(url, linkedMultiValueMap, headersKv, cookiesKv);
+                    } else if ("2".equals(contentType)) {
+                        LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
+                        response = webClientUtil.postByFormData(url, linkedMultiValueMap, headersKv, cookiesKv);
+                    } else if ("3".equals(contentType)) {
+                        response = webClientUtil.postByJson(url, body, headersKv, cookiesKv);
+                    } else {
+                        logger.error("暂不支持该POST请求格式");
+                        return "暂不支持该POST请求格式";
                     }
-                    response = webClientUtil.postByFormData(url,linkedMultiValueMap,headersKV,cookiesKV);
-                }else if ("2".equals(contentType)){
-                    LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
-                    response = webClientUtil.postByFormData(url,linkedMultiValueMap,headersKV,cookiesKV);
-                }else if ("3".equals(contentType)){
-                    response = webClientUtil.postByJson(url,body,headersKV,cookiesKV);
-                }else {
-                    logger.error("暂不支持该POST请求格式");
-                    return "暂不支持该POST请求格式";
-                }
-            }else if ("put".equals(method.toLowerCase())){
-                response = webClientUtil.put(url,body,headersKV, cookiesKV);
-            }else if ("delete".equals(method.toLowerCase())){
-                response = webClientUtil.delete(url,headersKV, cookiesKV);
-            }else {
-                logger.error("暂不支持该请求方式");
-                return "暂不支持该请求方式";
+                    break;
+                case "put":
+                    response = webClientUtil.put(url, body, headersKv, cookiesKv);
+                    break;
+                case "delete":
+                    response = webClientUtil.delete(url, headersKv, cookiesKv);
+                    break;
+                default:
+                    logger.error("暂不支持该请求方式");
+                    return "暂不支持该请求方式";
             }
-            // 获取响应相关信息
+            // 获取响应状态码
             HttpStatus statusCode = response.statusCode();
-
             // 处理响应体，转换为JSON字符串
-            String responseBody = new JSONObject(response.bodyToMono(Map.class).block()).toString();
-            logger.info("Response Body : " +responseBody);
-            Map<String,Object> rHeaders = new HashMap<>();
-            // 处理响应头，转换为JSON字符串
-            for (Map.Entry entry:response.headers().asHttpHeaders().entrySet()){
-                rHeaders.put((String) entry.getKey(),entry.getValue());
+            String responseBody;
+            String responseHeaders;
+            String responseCookies;
+            try{
+                responseBody = new JSONObject(response.bodyToMono(Map.class).block()).toString();
+                logger.info("Response Body : " +responseBody);
+                Map<String,Object> rHeaders = new HashMap<>();
+                // 处理响应头，转换为JSON字符串
+                for (Map.Entry<String, List<String>> entry:response.headers().asHttpHeaders().entrySet()){
+                    rHeaders.put(entry.getKey(),entry.getValue());
+                }
+                responseHeaders = new JSONObject(rHeaders).toString();
+                logger.info("Response Header : "+responseHeaders);
+                // 处理响应Cookie,转换为JSON字符串
+                Map<String,Object> rCookies = new HashMap<>();
+                for (Map.Entry<String, List<ResponseCookie>> entry:response.cookies().entrySet()){
+                    rCookies.put(entry.getKey(),entry.getValue());
+                }
+                responseCookies = new JSONObject(rCookies).toString();
+                logger.info("Response Cookie : "+ responseCookies);
+            }catch (Exception e){
+                logger.error("响应JSON转换失败,请确认响应结构是否为JSON!");
+                error++;
+                WebSocketServer.sendInfo(String.format("已执行用例数:%d,成功数:%d,失败数:%d,已执行用例数百分比：%d %%,总用例数:%d"
+                        ,index,index-error,error,(index/casesNum)*100,casesNum),"123");
+                continue;
             }
-            String responseHeaders = new JSONObject(rHeaders).toString();
-            logger.info("Response Header : "+responseHeaders);
-            // 处理响应Cookie,转换为JSON字符串
-            Map<String,Object> rCookies = new HashMap<>();
-            for (Map.Entry entry:response.cookies().entrySet()){
-                rCookies.put((String) entry.getKey(),entry.getValue());
-            }
-            String responseCookies = new JSONObject(rCookies).toString();
-            logger.info("Response Cookie : "+ responseCookies);
 
             // 处理关联参数
             for (SavesResponse save:saves){
@@ -349,6 +375,8 @@ public class TestCaseSetService {
                     return "不支持从该响应类型取值";
                 }
             }
+            // 设置默认总体断言结果为真
+            boolean verifyResult = true;
             // 遍历断言集合，进行断言
             for (VerifyResponse verify:verifys){
                 String verifyType = verify.getVerifyType();
@@ -359,7 +387,13 @@ public class TestCaseSetService {
                 // 判断断言类型是 JsonPath 还是 正则
                 if ("1".equals(verifyType)){
                     String value = (String)JSONPath.read(responseBody,jsonpath);
-                    superAssert(relationShip,value,expect);
+                    try{
+                        superAssert(relationShip,value,expect);
+                        logger.info("断言成功！");
+                    }catch (Exception e){
+                        logger.error("断言失败："+e);
+                        verifyResult = false;
+                    }
                 }else if ("2".equals(verifyType)){
                     Pattern pattern = Pattern.compile(regex);
                     Matcher matcher = pattern.matcher(responseBody);
@@ -367,12 +401,34 @@ public class TestCaseSetService {
                     if(matcher.find()) {
                         value = matcher.group(0);
                     }
-                    superAssert(relationShip,value,expect);
+                    try{
+                        superAssert(relationShip,value,expect);
+                        logger.info("断言成功！");
+                    }catch (Exception e){
+                        logger.error("断言失败："+e);
+                        verifyResult = false;
+                    }
                 }else {
                     return "不支持该断言方式";
                 }
             }
-
+            if (jsonAssert!=null && !"".equals(jsonAssert)){
+                // false代表非严格校验，只比较部分字段
+                try{
+                    JSONAssert.assertEquals(jsonAssert,responseBody,false);
+                    logger.info("JSON断言成功！");
+                }catch (Exception e){
+                    logger.error("JSON断言失败："+e);
+                    verifyResult = false;
+                }
+            }
+            if (verifyResult){
+                success++;
+            }else {
+                error++;
+            }
+            WebSocketServer.sendInfo(String.format("已执行用例数:%d,成功数:%d,失败数:%d,已执行用例数百分比：%d %%,总用例数:%d"
+            ,index,index-error,error,(index/casesNum)*100,casesNum),"123");
 
         }
         return null;
