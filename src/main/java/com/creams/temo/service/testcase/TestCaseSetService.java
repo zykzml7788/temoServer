@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -438,8 +439,12 @@ public class TestCaseSetService {
             }else {
                 error++;
             }
-            WebSocketServer.sendInfo(String.format("已执行用例数:%d,成功数:%d,失败数:%d,已执行用例数百分比：%d %%,总用例数:%d"
-            ,index,index-error,error,(index/casesNum)*100,casesNum),"123");
+            //格式化小数
+            DecimalFormat df = new DecimalFormat("0.00");
+            // 计算百分比
+            String num = df.format(((float)index/casesNum)*100);
+            WebSocketServer.sendInfo(String.format("已执行用例数:%d,成功数:%d,失败数:%d,已执行用例数百分比：%s %%,总用例数:%d"
+            ,index,index-error,error,num,casesNum),"123");
 
         }
         return null;

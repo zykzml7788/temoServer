@@ -40,7 +40,20 @@ public class WebClientUtil {
         HttpClient secure = HttpClient.create()
                 .secure(t -> t.sslContext(SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE)));
         if ("".equals(baseUrl)){
-            webClient = WebClient.create();
+            webClient = WebClient
+                    .builder()
+                    .clientConnector(new ReactorClientHttpConnector(secure))
+                    .defaultHeaders(n->{
+                        for (Map.Entry<String,String> entry:headers.entrySet()){
+                            n.add(entry.getKey(), entry.getValue());
+                        }
+                    })
+                    .defaultCookies(n->{
+                        for (Map.Entry<String,String> entry:cookies.entrySet()){
+                            n.add(entry.getKey(), entry.getValue());
+                        }
+                    })
+                    .build();
         }else {
             webClient = WebClient
                     .builder()
@@ -229,16 +242,19 @@ public class WebClientUtil {
     }
 
     public static void main(String[] args) throws SSLException {
-        WebClientUtil webClientUtil = new WebClientUtil("http://129.204.148.24:8080/temo",new HashMap<>(),new HashMap<>());
-        Map<String,String> param = new HashMap<>();
-        Map<String,String> headers = new HashMap<>();
-        param.put("filter","123456");
-        System.out.println(new JSONObject(webClientUtil.get("/project/1",param,headers,new HashMap<>()).bodyToMono(Map.class).block()));
-       webClientUtil.put("/project/a3c948f2-bd99-4315-8e7c-1c1dd9991a8b", "{\n" +
-               "\t\"pid\": \"a3c948f2-bd99-4315-8e7c-1c1dd9991a8b\",\n" +
-               "\t\"envs\": [],\n" +
-               "\t\"pname\": \"测试webClientAAA\"\n" +
-               "}",new HashMap<>(),new HashMap<>());
-        webClientUtil.delete("/prject/69cce7db-7b7f-4fbc-b1f8-d0f8e5dea6f4",new HashMap<>(),new HashMap<>());
+//        WebClientUtil webClientUtil = new WebClientUtil("http://129.204.148.24:8080/temo",new HashMap<>(),new HashMap<>());
+//        Map<String,String> param = new HashMap<>();
+//        Map<String,String> headers = new HashMap<>();
+//        param.put("filter","123456");
+//        System.out.println(new JSONObject(webClientUtil.get("/project/1",param,headers,new HashMap<>()).bodyToMono(Map.class).block()));
+//       webClientUtil.put("/project/a3c948f2-bd99-4315-8e7c-1c1dd9991a8b", "{\n" +
+//               "\t\"pid\": \"a3c948f2-bd99-4315-8e7c-1c1dd9991a8b\",\n" +
+//               "\t\"envs\": [],\n" +
+//               "\t\"pname\": \"测试webClientAAA\"\n" +
+//               "}",new HashMap<>(),new HashMap<>());
+//        webClientUtil.delete("/prject/69cce7db-7b7f-4fbc-b1f8-d0f8e5dea6f4",new HashMap<>(),new HashMap<>());
+        WebClientUtil webClientUtil = new WebClientUtil("",new HashMap<>(),new HashMap<>() );
+        System.out.println(webClientUtil.get("https://www.baidu.com",new HashMap<>(),new HashMap<>(),new HashMap<>()));
+
     }
 }
