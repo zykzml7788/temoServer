@@ -145,8 +145,8 @@ public class TestCaseSetController {
         }
     }
 
-    @ApiOperation("删除用例集")
-    @PostMapping(value = "/{id}")
+    @ApiOperation("调试用例集")
+    @PostMapping(value = "/execute/{id}")
     public JsonResult executeTestCaseSet(@PathVariable("id") @ApiParam("用例集id")  String setId,
                                          @RequestParam(value = "envId") String envId){
         String vaild = testCaseSetService.queryTestCaseSetInfo(setId).getValid();
