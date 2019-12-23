@@ -225,7 +225,7 @@ public class TestCaseSetService {
                 logger.info("url是http or https开头，重新生成webclient实例");
                 webClientUtil = new WebClientUtil("",globalHeaders,globalCookies);
             }else{
-                if (env.getPort()==null){
+                if (env.getPort()!=null){
                     webClientUtil  = new WebClientUtil(env.getHost()+":"+env.getPort(),globalHeaders,globalCookies);
                 }else {
                     webClientUtil  = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
