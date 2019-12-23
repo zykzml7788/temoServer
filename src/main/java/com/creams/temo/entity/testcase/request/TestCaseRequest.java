@@ -92,7 +92,6 @@ public class TestCaseRequest {
     @TableField(value = "content_type")
     private String contentType;
 
-
     private List<VerifyRequest> verify;
 
     private List<SavesRequest> saves;

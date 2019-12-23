@@ -209,7 +209,7 @@ public class TestCaseSetService {
         Map<String,String> globalHeaders = new HashMap<>();
         WebClientUtil webClientUtil;
         if (env.getPort()==null){
-            webClientUtil  = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
+            webClientUtil  = new WebClientUtil(env.getHost()+":"+env.getPort(),globalHeaders,globalCookies);
         }else {
             webClientUtil  = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
         }
@@ -219,6 +219,11 @@ public class TestCaseSetService {
             logger.info(String.format("正在执行第%s条用例...",index));
             // 取到用例相关信息，并处理${key}的关联部分
             String url = getCommonParam(testCase.getUrl());
+            // 判断是否是http或者https开头，如果是则重新生成webclient实例
+            if (!url.startsWith("http") && !url.startsWith("https")){
+                logger.info("url是http or https开头，重新生成webclient实例");
+                webClientUtil = new WebClientUtil("",globalHeaders,globalCookies);
+            }
             String method = getCommonParam(testCase.getMethod());
             String body = getCommonParam(testCase.getBody());
             String gCookies = getCommonParam(testCase.getGlobalCookies());

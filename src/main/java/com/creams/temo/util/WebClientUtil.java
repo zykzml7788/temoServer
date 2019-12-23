@@ -39,22 +39,38 @@ public class WebClientUtil {
         // 设置SSL
         HttpClient secure = HttpClient.create()
                 .secure(t -> t.sslContext(SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE)));
-
-        webClient = WebClient
-                .builder()
-                .clientConnector(new ReactorClientHttpConnector(secure))
-                .baseUrl(baseUrl)
-                .defaultHeaders(n->{
-                    for (Map.Entry<String,String> entry:headers.entrySet()){
-                        n.add(entry.getKey(), entry.getValue());
-                    }
-                })
-                .defaultCookies(n->{
-                    for (Map.Entry<String,String> entry:cookies.entrySet()){
-                        n.add(entry.getKey(), entry.getValue());
-                    }
-                })
-                .build();
+        if ("".equals(baseUrl)){
+            webClient = WebClient
+                    .builder()
+                    .clientConnector(new ReactorClientHttpConnector(secure))
+                    .defaultHeaders(n->{
+                        for (Map.Entry<String,String> entry:headers.entrySet()){
+                            n.add(entry.getKey(), entry.getValue());
+                        }
+                    })
+                    .defaultCookies(n->{
+                        for (Map.Entry<String,String> entry:cookies.entrySet()){
+                            n.add(entry.getKey(), entry.getValue());
+                        }
+                    })
+                    .build();
+        }else {
+            webClient = WebClient
+                    .builder()
+                    .clientConnector(new ReactorClientHttpConnector(secure))
+                    .baseUrl(baseUrl)
+                    .defaultHeaders(n->{
+                        for (Map.Entry<String,String> entry:headers.entrySet()){
+                            n.add(entry.getKey(), entry.getValue());
+                        }
+                    })
+                    .defaultCookies(n->{
+                        for (Map.Entry<String,String> entry:cookies.entrySet()){
+                            n.add(entry.getKey(), entry.getValue());
+                        }
+                    })
+                    .build();
+        }
 
     }
 
