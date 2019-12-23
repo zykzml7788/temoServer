@@ -23,6 +23,9 @@ import com.creams.temo.util.WebClientUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jayway.jsonpath.JsonPath;
+import org.assertj.core.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.socket.server.HandshakeHandler;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
@@ -62,6 +66,13 @@ public class TestCaseSetService {
 
     @Autowired
     RedisUtil redisUtil;
+
+    private static Logger logger = LoggerFactory.getLogger("fileInfoLog");
+
+    /**
+     * 替换符，如果数据中包含“${}”则会被替换成公共参数中存储的数据
+     */
+    private Pattern replaceParamPattern = Pattern.compile("\\$\\{(.*?)\\}");
 
     /**
      * 查询用例集
@@ -190,26 +201,27 @@ public class TestCaseSetService {
         List<TestCaseResponse> testCases = testCaseSet.getTestCase();
         Map<String,String> globalCookies = new HashMap<>();
         Map<String,String> globalHeaders = new HashMap<>();
-        WebClientUtil webClientUtil = null;
+        WebClientUtil webClientUtil;
         if (env.getPort()==null){
             webClientUtil  = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
         }else {
             webClientUtil  = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
         }
-
+        // 遍历所有用例集合
         for (TestCaseResponse testCase:testCases){
-            String url = testCase.getUrl();
-            String method = testCase.getMethod();
-            String body = testCase.getBody();
-            String gCookies = testCase.getGlobalCookies();
-            String gHeaders = testCase.getGlobalHeaders();
+            // 取到用例相关信息，并处理${key}的关联部分
+            String url = getCommonParam(testCase.getUrl());
+            String method = getCommonParam(testCase.getMethod());
+            String body = getCommonParam(testCase.getBody());
+            String gCookies = getCommonParam(testCase.getGlobalCookies());
+            String gHeaders = getCommonParam(testCase.getGlobalHeaders());
             String delayTime = testCase.getDelayTime();
-            String jsonAssert = testCase.getJsonAssert();
+            String jsonAssert = getCommonParam(testCase.getJsonAssert());
             String caseType = testCase.getCaseType();
-            String cookies = testCase.getCookies();
-            String headers = testCase.getHeader();
-            String sqlScript = testCase.getSqlScript();
-            String param = testCase.getParam();
+            String cookies = getCommonParam(testCase.getCookies());
+            String headers = getCommonParam(testCase.getHeader());
+            String sqlScript = getCommonParam(testCase.getSqlScript());
+            String param = getCommonParam(testCase.getParam());
             String dbId = testCase.getDbId();
             String contentType = testCase.getContentType();
             List<SavesResponse> saves = testCase.getSaves();
@@ -219,8 +231,8 @@ public class TestCaseSetService {
             if (gCookies != null &&  !"".equals(gCookies)){
                 Map<String,String> maps = (HashMap<String,String>) JSON.parse(gCookies);
                 for (Map.Entry<String,String> kvs : maps.entrySet()){
-                    String key = kvs.getKey();
-                    String value = kvs.getValue();
+                    String key = getCommonParam(kvs.getKey());
+                    String value = getCommonParam(kvs.getValue());
                     globalCookies.put(key,value);
                 }
                 webClientUtil = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
@@ -228,8 +240,8 @@ public class TestCaseSetService {
             if (gHeaders != null &&  !"".equals(gHeaders)){
                 Map<String,String> maps = (HashMap<String,String>) JSON.parse(gHeaders);
                 for (Map.Entry<String,String> kvs : maps.entrySet()){
-                    String key = kvs.getKey();
-                    String value = kvs.getValue();
+                    String key = getCommonParam(kvs.getKey());
+                    String value = getCommonParam(kvs.getValue());
                     globalHeaders.put(key,value);
                 }
                 webClientUtil = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
@@ -255,7 +267,7 @@ public class TestCaseSetService {
             if (body != null &&  !"".equals(body)){
                 bodyKV = (HashMap<String,String>) JSON.parse(body);
             }
-            ClientResponse response = null;
+            ClientResponse response;
             if ("get".equals(method.toLowerCase())){
                 response = webClientUtil.get(url,paramKV,headersKV, cookiesKV);
             }else if ("post".equals(method.toLowerCase())){
@@ -272,6 +284,7 @@ public class TestCaseSetService {
                 }else if ("3".equals(contentType)){
                     response = webClientUtil.postByJson(url,body,headersKV,cookiesKV);
                 }else {
+                    logger.error("暂不支持该POST请求格式");
                     return "暂不支持该POST请求格式";
                 }
             }else if ("put".equals(method.toLowerCase())){
@@ -279,14 +292,29 @@ public class TestCaseSetService {
             }else if ("delete".equals(method.toLowerCase())){
                 response = webClientUtil.delete(url,headersKV, cookiesKV);
             }else {
+                logger.error("暂不支持该请求方式");
                 return "暂不支持该请求方式";
             }
             // 获取响应相关信息
             HttpStatus statusCode = response.statusCode();
-            String responseBody = new JSONObject(response.bodyToMono(Map.class).block()).toString();
-            String responseHeaders =  response.headers().asHttpHeaders().toString();
-            String responseCookies = response.cookies().toString();
 
+            // 处理响应体，转换为JSON字符串
+            String responseBody = new JSONObject(response.bodyToMono(Map.class).block()).toString();
+            logger.info("Response Body : " +responseBody);
+            Map<String,Object> rHeaders = new HashMap<>();
+            // 处理响应头，转换为JSON字符串
+            for (Map.Entry entry:response.headers().asHttpHeaders().entrySet()){
+                rHeaders.put((String) entry.getKey(),entry.getValue());
+            }
+            String responseHeaders = new JSONObject(rHeaders).toString();
+            logger.info("Response Header : "+responseHeaders);
+            // 处理响应Cookie,转换为JSON字符串
+            Map<String,Object> rCookies = new HashMap<>();
+            for (Map.Entry entry:response.cookies().entrySet()){
+                rCookies.put((String) entry.getKey(),entry.getValue());
+            }
+            String responseCookies = new JSONObject(rCookies).toString();
+            logger.info("Response Cookie : "+ responseCookies);
 
             // 处理关联参数
             for (SavesResponse save:saves){
@@ -317,18 +345,21 @@ public class TestCaseSetService {
                         saveRegexParamToRedis(responseCookies,paramKey,regex);
                     }
                 }else{
+                    logger.error("不支持从该响应类型取值");
                     return "不支持从该响应类型取值";
                 }
             }
+            // 遍历断言集合，进行断言
             for (VerifyResponse verify:verifys){
                 String verifyType = verify.getVerifyType();
                 String expect = verify.getExpect();
                 String jsonpath = verify.getJexpression();
                 String regex = verify.getRexpression();
                 String relationShip = verify.getRelationShip();
+                // 判断断言类型是 JsonPath 还是 正则
                 if ("1".equals(verifyType)){
                     String value = (String)JSONPath.read(responseBody,jsonpath);
-                    superAssert(relationShip,responseBody,expect);
+                    superAssert(relationShip,value,expect);
                 }else if ("2".equals(verifyType)){
                     Pattern pattern = Pattern.compile(regex);
                     Matcher matcher = pattern.matcher(responseBody);
@@ -336,7 +367,7 @@ public class TestCaseSetService {
                     if(matcher.find()) {
                         value = matcher.group(0);
                     }
-                    superAssert(relationShip,responseBody,value);
+                    superAssert(relationShip,value,expect);
                 }else {
                     return "不支持该断言方式";
                 }
@@ -359,6 +390,7 @@ public class TestCaseSetService {
         if(matcher.find()) {
             value = matcher.group(0);
         }
+        // 往redis存值，设置默认过期时间为一小时
         redisUtil.set(key,value,3600);
     }
 
@@ -410,6 +442,38 @@ public class TestCaseSetService {
             default:
                 throw new Exception("不支持该种关系断言");
         }
+    }
+
+    /**
+     * 处理${key}，从redis查询key
+     * @param param 需要匹配的字符串参数
+     * @return  替换${key}后的字符串参数
+     */
+    private String getCommonParam(String param) {
+        if (StringUtil.isEmpty(param)) {
+            return "";
+        }
+        // 取公共参数正则
+        Matcher m = replaceParamPattern.matcher(param);
+        while (m.find()) {
+            String replaceKey = m.group(1);
+            String value;
+            // 从redis中获取值
+            value = (String)redisUtil.get(replaceKey);
+            // 如果redis中未能找到对应的值，该用例失败。
+            Assertions.assertThat(value).isNotNull();
+            param = param.replace(m.group(), value);
+        }
+        return param;
+    }
+
+    /**
+     * 函数助手处理，匹配 {{func}}
+     * @param param
+     * @return
+     */
+    private String buildParam(String param) {
+        return null;
     }
 
 }
