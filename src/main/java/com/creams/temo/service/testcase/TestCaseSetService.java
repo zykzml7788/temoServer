@@ -220,7 +220,7 @@ public class TestCaseSetService {
             // 取到用例相关信息，并处理${key}的关联部分
             String url = getCommonParam(testCase.getUrl());
             // 判断是否是http或者https开头，如果是则重新生成webclient实例
-            if (!url.startsWith("http") && !url.startsWith("https")){
+            if (url.startsWith("http") || url.startsWith("https")){
                 logger.info("url是http or https开头，重新生成webclient实例");
                 webClientUtil = new WebClientUtil("",globalHeaders,globalCookies);
             }
