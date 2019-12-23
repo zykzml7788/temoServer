@@ -223,6 +223,12 @@ public class TestCaseSetService {
             if (url.startsWith("http") || url.startsWith("https")){
                 logger.info("url是http or https开头，重新生成webclient实例");
                 webClientUtil = new WebClientUtil("",globalHeaders,globalCookies);
+            }else{
+                if (env.getPort()==null){
+                    webClientUtil  = new WebClientUtil(env.getHost()+":"+env.getPort(),globalHeaders,globalCookies);
+                }else {
+                    webClientUtil  = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
+                }
             }
             String method = getCommonParam(testCase.getMethod());
             String body = getCommonParam(testCase.getBody());

@@ -40,20 +40,7 @@ public class WebClientUtil {
         HttpClient secure = HttpClient.create()
                 .secure(t -> t.sslContext(SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE)));
         if ("".equals(baseUrl)){
-            webClient = WebClient
-                    .builder()
-                    .clientConnector(new ReactorClientHttpConnector(secure))
-                    .defaultHeaders(n->{
-                        for (Map.Entry<String,String> entry:headers.entrySet()){
-                            n.add(entry.getKey(), entry.getValue());
-                        }
-                    })
-                    .defaultCookies(n->{
-                        for (Map.Entry<String,String> entry:cookies.entrySet()){
-                            n.add(entry.getKey(), entry.getValue());
-                        }
-                    })
-                    .build();
+            webClient = WebClient.create();
         }else {
             webClient = WebClient
                     .builder()
