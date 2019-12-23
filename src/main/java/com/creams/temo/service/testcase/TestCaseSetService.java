@@ -349,8 +349,12 @@ public class TestCaseSetService {
             }catch (Exception e){
                 logger.error("响应JSON转换失败,请确认响应结构是否为JSON!");
                 error++;
+                //格式化小数
+                DecimalFormat df = new DecimalFormat("0.00");
+                // 计算百分比
+                String num = df.format(((float)index/casesNum)*100);
                 WebSocketServer.sendInfo(String.format("已执行用例数:%d,成功数:%d,失败数:%d,已执行用例数百分比：%d %%,总用例数:%d"
-                        ,index,index-error,error,(index/casesNum)*100,casesNum),"123");
+                        ,index,index-error,error,num,casesNum),"123");
                 continue;
             }
 
