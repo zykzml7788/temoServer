@@ -57,8 +57,8 @@
         global_cookies = #{globalCookies},
         delay_time = #{delayTime},
         json_assert = #{jsonAssert}
-        delay_time = #{delay_time},
-        json_assert = #{json_assert},
+        delay_time = #{delayTime},
+        json_assert = #{jsonAssert},
         content_type = #{contentType}
         where case_id = #{caseId}
     </update>
