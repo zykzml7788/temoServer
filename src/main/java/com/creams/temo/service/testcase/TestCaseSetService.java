@@ -36,6 +36,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -245,7 +246,13 @@ public class TestCaseSetService {
             String dbId = testCase.getDbId();
             String contentType = testCase.getContentType();
             List<SavesResponse> saves = testCase.getSaves();
+            if (saves==null){
+                saves = new ArrayList<>();
+            }
             List<VerifyResponse> verifys = testCase.getVerify();
+            if (verifys==null){
+                verifys = new ArrayList<>();
+            }
             if (delayTime!=null){
                 logger.info("正在等待"+delayTime+"秒...");
                 Thread.sleep(Integer.valueOf(delayTime)*1000);
