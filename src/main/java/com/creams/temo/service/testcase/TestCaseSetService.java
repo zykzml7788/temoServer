@@ -377,6 +377,7 @@ public class TestCaseSetService {
                     if ("1".equals(saveType)){
                         String value = (String)JSONPath.read(responseBody,jsonpath);
                         redisUtil.set(paramKey,value);
+                        logger.info(String.format("储存关联参数到redis=> %s:%s",paramKey,value));
                     }else {
                         saveRegexParamToRedis(responseBody,paramKey,regex);
                     }
@@ -384,6 +385,7 @@ public class TestCaseSetService {
                     if ("1".equals(saveType)){
                         String value = (String)JSONPath.read(responseHeaders,jsonpath);
                         redisUtil.set(paramKey,value);
+                        logger.info(String.format("储存关联参数到redis=> %s:%s",paramKey,value));
                     }else {
                         saveRegexParamToRedis(responseHeaders,paramKey,regex);
                     }
@@ -413,7 +415,7 @@ public class TestCaseSetService {
                 if ("1".equals(verifyType)){
                     Object value = JSONPath.read(responseBody,jsonpath);
                     if (value == null){
-                        logger.error("JsonPath为匹配到结果，请确认！");
+                        logger.error("JsonPath未匹配到结果，请确认！");
                         verifyResult = false;
                         continue;
                     }
