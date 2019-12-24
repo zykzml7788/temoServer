@@ -20,11 +20,6 @@ public class StScript {
     private String stScriptId;
 
 
-    @ApiModelProperty("前后置脚本名称")
-    @TableField(value = "st_script_name")
-    private String stScriptName;
-
-
     @ApiModelProperty("前后置脚本类别")
     @TableField(value = "st_script_type")
     private String stScriptType;
@@ -36,4 +31,8 @@ public class StScript {
     @ApiModelProperty("关联脚本id")
     @TableField(value = "ex_script_id")
     private String exScriptId;
+
+    @ApiModelProperty("关联脚本类型(脚本0，集合1)")
+    @TableField(value = "ex_script_type")
+    private  String exScriptType;
 }

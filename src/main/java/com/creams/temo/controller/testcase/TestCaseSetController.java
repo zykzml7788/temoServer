@@ -1,6 +1,8 @@
 package com.creams.temo.controller.testcase;
 
 import com.creams.temo.entity.JsonResult;
+import com.creams.temo.entity.testcase.request.StScriptRequest;
+import com.creams.temo.entity.testcase.request.StScriptRequests;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.service.testcase.TestCaseSetService;
@@ -76,6 +78,20 @@ public class TestCaseSetController {
 
     }
 
+    @ApiOperation(value = "批量新增关联脚本")
+    @PostMapping("/stScript")
+    public JsonResult addTestCaseSetStScript(@RequestBody StScriptRequests stScriptRequests){
+        try {
+            String result = testCaseSetService.addTestCaseSetStScript(stScriptRequests);
+            return new JsonResult("操作成功", 200, result, true);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+    }
+
+
     @ApiOperation(value = "查询用例集(已废弃)")
     @PostMapping (value = "/{page}/discard")
     public JsonResult queryTestCaseSet(@PathVariable(value = "page") Integer page,
@@ -129,4 +145,20 @@ public class TestCaseSetController {
         }
     }
 
+    @ApiOperation("调试用例集")
+    @PostMapping(value = "/execute/{id}")
+    public JsonResult executeTestCaseSet(@PathVariable("id") @ApiParam("用例集id")  String setId,
+                                         @RequestParam(value = "envId") String envId){
+        String vaild = testCaseSetService.queryTestCaseSetInfo(setId).getValid();
+        if ("0".equals(vaild)){
+            return new JsonResult("该用例集被禁用，禁止调试", 500, null, false);
+        }
+        try {
+            testCaseSetService.executeSet(setId,envId);
+            return new JsonResult("已发起调试，请等待执行结果...", 200, null, true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, e, false);
+        }
+    }
 }

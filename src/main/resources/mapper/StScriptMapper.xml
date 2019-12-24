@@ -8,9 +8,7 @@
             <if test="scriptId !=null and scriptId !=''" >
                 and script_id = #{scriptId}
             </if>
-            <if test="scriptName !=null and scriptName != ''">
-                and script_name = #{scriptName}
-            </if>
+
             <if test="dbId !=null and dbId != ''">
                 and db_id = #{dbId}
             </if>
@@ -21,17 +19,18 @@
 
     <insert id="addStScript">
        INSERT INTO st_script
-       (st_script_name, st_script_type, set_id, ex_script_id)
+       (st_script_id, st_script_type, set_id,ex_script_type, ex_script_id,sorting)
        VALUES
-       (#{stScriptName}, #{stScriptType}, #{setId}, #{exScriptId})
+       (#{stScriptId}, #{stScriptType}, #{setId}, #{exScriptType},#{exScriptId}, #{sorting})
     </insert>
 
     <update id="updateStScriptById">
        UPDATE st_script SET
-       st_script_name = #{stScriptName},
        st_script_type = #{stScriptType},
        set_id = #{setId},
-       ex_script_id = #{exScriptId}
+       ex_script_type = #{exScriptType},
+       ex_script_id = #{exScriptId},
+       sorting = #{sorting}
        WHERE
        st_script_id = #{stScriptId},
     </update>

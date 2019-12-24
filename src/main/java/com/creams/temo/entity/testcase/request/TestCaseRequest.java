@@ -88,6 +88,9 @@ public class TestCaseRequest {
     @TableField(value = "sorting")
     private Integer sorting;
 
+    @ApiModelProperty("正文类型")
+    @TableField(value = "content_type")
+    private String contentType;
 
     private List<VerifyRequest> verify;
 
