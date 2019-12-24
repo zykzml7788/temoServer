@@ -390,6 +390,7 @@ public class TestCaseSetService {
             boolean verifyResult = true;
             // 遍历断言集合，进行断言
             for (VerifyResponse verify:verifys){
+                logger.info("正在进行第"+(verifys.indexOf(verify)+1)+"断言...");
                 String verifyType = verify.getVerifyType();
                 String expect = verify.getExpect();
                 String jsonpath = verify.getJexpression();
@@ -425,6 +426,7 @@ public class TestCaseSetService {
             }
             if (jsonAssert!=null && !"".equals(jsonAssert)){
                 // false代表非严格校验，只比较部分字段
+                logger.info("正在进行json断言...");
                 try{
                     JSONAssert.assertEquals(jsonAssert,responseBody,false);
                     logger.info("JSON断言成功！");
