@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
 import com.creams.temo.entity.project.response.EnvResponse;
+import com.creams.temo.entity.testcase.Verify;
 import com.creams.temo.entity.testcase.request.StScriptRequest;
 import com.creams.temo.entity.testcase.request.StScriptRequests;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
@@ -15,9 +16,7 @@ import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.entity.testcase.response.VerifyResponse;
 import com.creams.temo.mapper.database.ScriptMapper;
 import com.creams.temo.mapper.project.EnvMapper;
-import com.creams.temo.mapper.testcase.StScriptMapper;
-import com.creams.temo.mapper.testcase.TestCaseMapper;
-import com.creams.temo.mapper.testcase.TestCaseSetMapper;
+import com.creams.temo.mapper.testcase.*;
 import com.creams.temo.service.WebSocketServer;
 import com.creams.temo.util.RedisUtil;
 import com.creams.temo.util.StringUtil;
@@ -50,6 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Service
 public class TestCaseSetService {
 
+
     @Autowired
     TestCaseSetMapper testCaseSetMapper;
 
@@ -61,6 +61,12 @@ public class TestCaseSetService {
 
     @Autowired
     ScriptMapper scriptMapper;
+
+    @Autowired
+    SavesMapper savesMapper;
+
+    @Autowired
+    VerifyMapper verifyMapper;
 
     @Autowired
     EnvMapper envMapper;
@@ -189,7 +195,13 @@ public class TestCaseSetService {
     public TestCaseSetResponse queryTestCaseSetInfo(String setId){
         TestCaseSetResponse testCaseSetResponse = testCaseSetMapper.queryTestCaseSetById(setId);
         testCaseSetResponse.setStScript(stScriptMapper.queryStScriptBySetId(setId));
-        testCaseSetResponse.setTestCase(testCaseMapper.queryTestCaseBySetId(setId));
+        List<TestCaseResponse> testCaseResponses = testCaseMapper.queryTestCaseBySetId(setId);
+        testCaseResponses.forEach(n->{
+            n.setSaves(savesMapper.querySaves(n.getCaseId()));
+            n.setVerify(verifyMapper.queryVerify(n.getCaseId()));
+        }
+        );
+        testCaseSetResponse.setTestCase(testCaseResponses);
         return testCaseSetResponse;
     }
 
