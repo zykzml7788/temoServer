@@ -33,13 +33,14 @@ public class WebClientUtil {
     private WebClient webClient;
     private static Logger logger = LoggerFactory.getLogger("fileInfoLog");
 
-    public WebClientUtil(String baseUrl, Map<String, String> headers, Map<String, String> cookies) throws SSLException {
-        logger.info(String.format("开始创建webclient实例。。，设置host: %s,default headers:%s,default cookies:%s",baseUrl,
-                headers.toString(),cookies.toString()));
+    public WebClientUtil(String host,String port,Map<String, String> headers, Map<String, String> cookies) throws SSLException {
         // 设置SSL
         HttpClient secure = HttpClient.create()
                 .secure(t -> t.sslContext(SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE)));
+        String baseUrl = port == null?host:host+":"+port;
         if ("".equals(baseUrl)){
+            logger.info(String.format("开始创建webclient实例。。，设置host: %s,default headers:%s,default cookies:%s",baseUrl,
+                    headers.toString(),cookies.toString()));
             webClient = WebClient
                     .builder()
                     .clientConnector(new ReactorClientHttpConnector(secure))
@@ -55,6 +56,8 @@ public class WebClientUtil {
                     })
                     .build();
         }else {
+            logger.info(String.format("开始创建webclient实例。。，设置host: %s,default headers:%s,default cookies:%s",baseUrl,
+                    headers.toString(),cookies.toString()));
             webClient = WebClient
                     .builder()
                     .clientConnector(new ReactorClientHttpConnector(secure))
@@ -253,8 +256,8 @@ public class WebClientUtil {
 //               "\t\"pname\": \"测试webClientAAA\"\n" +
 //               "}",new HashMap<>(),new HashMap<>());
 //        webClientUtil.delete("/prject/69cce7db-7b7f-4fbc-b1f8-d0f8e5dea6f4",new HashMap<>(),new HashMap<>());
-        WebClientUtil webClientUtil = new WebClientUtil("",new HashMap<>(),new HashMap<>() );
-        System.out.println(webClientUtil.get("https://www.baidu.com",new HashMap<>(),new HashMap<>(),new HashMap<>()).bodyToMono(String.class));
+//        WebClientUtil webClientUtil = new WebClientUtil("",new HashMap<>(),new HashMap<>() );
+//        System.out.println(webClientUtil.get("https://www.baidu.com",new HashMap<>(),new HashMap<>(),new HashMap<>()).bodyToMono(String.class));
 
     }
 }

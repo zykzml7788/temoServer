@@ -212,12 +212,7 @@ public class TestCaseSetService {
         int error = 0;
         Map<String,String> globalCookies = new HashMap<>();
         Map<String,String> globalHeaders = new HashMap<>();
-        WebClientUtil webClientUtil;
-        if (env.getPort()==null){
-            webClientUtil  = new WebClientUtil(env.getHost()+":"+env.getPort(),globalHeaders,globalCookies);
-        }else {
-            webClientUtil  = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
-        }
+        WebClientUtil webClientUtil  = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
         // 遍历所有用例集合
         for (TestCaseResponse testCase:testCases){
             int index = testCases.indexOf(testCase)+1;
@@ -227,13 +222,9 @@ public class TestCaseSetService {
             // 判断是否是http或者https开头，如果是则重新生成webclient实例
             if (url.startsWith("http") || url.startsWith("https")){
                 logger.info("url是http or https开头，重新生成webclient实例");
-                webClientUtil = new WebClientUtil("",globalHeaders,globalCookies);
+                webClientUtil = new WebClientUtil("","",globalHeaders,globalCookies);
             }else{
-                if (env.getPort()!=null){
-                    webClientUtil  = new WebClientUtil(env.getHost()+":"+env.getPort(),globalHeaders,globalCookies);
-                }else {
-                    webClientUtil  = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
-                }
+                webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             }
             String method = getCommonParam(testCase.getMethod());
             String body = getCommonParam(testCase.getBody());
@@ -268,7 +259,7 @@ public class TestCaseSetService {
                     String value = getCommonParam(kvs.getValue());
                     globalCookies.put(key,value);
                 }
-                webClientUtil = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
+                webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             }
             if (gHeaders != null &&  !"".equals(gHeaders)){
                 Map<String,String> maps = JSON.parseObject(gHeaders,new TypeReference<Map<String, String>>(){});
@@ -277,7 +268,7 @@ public class TestCaseSetService {
                     String value = getCommonParam(kvs.getValue());
                     globalHeaders.put(key,value);
                 }
-                webClientUtil = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
+                webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             }
 
             // 判断是否有附带请求头或者cookie
