@@ -235,8 +235,6 @@ public class TestCaseSetService {
             webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             String method = getCommonParam(testCase.getMethod());
             String body = getCommonParam(testCase.getBody());
-            String gCookies = getCommonParam(testCase.getGlobalCookies());
-            String gHeaders = getCommonParam(testCase.getGlobalHeaders());
             String delayTime = testCase.getDelayTime();
             String jsonAssert = getCommonParam(testCase.getJsonAssert());
             String caseType = testCase.getCaseType();
@@ -258,25 +256,7 @@ public class TestCaseSetService {
                 logger.info("正在等待"+delayTime+"秒...");
                 Thread.sleep(Integer.valueOf(delayTime)*1000);
             }
-            // 判断是否有全局Cookie或者全局Header，如果有则重新生成webclient实例
-            if (gCookies != null &&  !"".equals(gCookies)){
-                Map<String,String> maps = JSON.parseObject(gCookies,new TypeReference<Map<String, String>>(){});
-                for (Map.Entry<String,String> kvs : maps.entrySet()){
-                    String key = getCommonParam(kvs.getKey());
-                    String value = getCommonParam(kvs.getValue());
-                    globalCookies.put(key,value);
-                }
-                webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
-            }
-            if (gHeaders != null &&  !"".equals(gHeaders)){
-                Map<String,String> maps = JSON.parseObject(gHeaders,new TypeReference<Map<String, String>>(){});
-                for (Map.Entry<String,String> kvs : maps.entrySet()){
-                    String key = getCommonParam(kvs.getKey());
-                    String value = getCommonParam(kvs.getValue());
-                    globalHeaders.put(key,value);
-                }
-                webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
-            }
+
 
             // 判断是否有附带请求头或者cookie
             Map cookiesKv = new HashMap<>();
@@ -473,6 +453,28 @@ public class TestCaseSetService {
             WebSocketServer.sendInfo(String.format("已执行用例数:%d,成功数:%d,失败数:%d,已执行用例数百分比：%s %%,总用例数:%d"
             ,index,index-error,error,num,casesNum),"123");
 
+            // 最后生成全局cookie和header
+            String gCookies = getCommonParam(testCase.getGlobalCookies());
+            String gHeaders = getCommonParam(testCase.getGlobalHeaders());
+            // 判断是否有全局Cookie或者全局Header，如果有则重新生成webclient实例
+            if (gCookies != null &&  !"".equals(gCookies)){
+                Map<String,String> maps = JSON.parseObject(gCookies,new TypeReference<Map<String, String>>(){});
+                for (Map.Entry<String,String> kvs : maps.entrySet()){
+                    String key = getCommonParam(kvs.getKey());
+                    String value = getCommonParam(kvs.getValue());
+                    globalCookies.put(key,value);
+                }
+                webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
+            }
+            if (gHeaders != null &&  !"".equals(gHeaders)){
+                Map<String,String> maps = JSON.parseObject(gHeaders,new TypeReference<Map<String, String>>(){});
+                for (Map.Entry<String,String> kvs : maps.entrySet()){
+                    String key = getCommonParam(kvs.getKey());
+                    String value = getCommonParam(kvs.getValue());
+                    globalHeaders.put(key,value);
+                }
+                webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
+            }
         }
         return null;
     }
@@ -561,8 +563,11 @@ public class TestCaseSetService {
             // 从redis中获取值
             value = (String)redisUtil.get(replaceKey);
             // 如果redis中未能找到对应的值，该用例失败。
-            Assertions.assertThat(value).isNotNull();
-            param = param.replace(m.group(), value);
+            if (value==null){
+                logger.error("从redis中未能查询到相关参数,请确认！");
+            }else{
+                param = param.replace(m.group(), value);
+            }
         }
         return param;
     }
