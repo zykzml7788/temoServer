@@ -400,6 +400,7 @@ public class TestCaseSetService {
                 if ("1".equals(verifyType)){
                     String value = (String)JSONPath.read(responseBody,jsonpath);
                     try{
+                        logger.info(String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect()));
                         superAssert(relationShip,value,expect);
                         logger.info("断言成功！");
                     }catch (Exception e){
@@ -414,6 +415,7 @@ public class TestCaseSetService {
                         value = matcher.group(0);
                     }
                     try{
+                        logger.info(String.format("表达式：%s,预期结果：%s,断言类型:regex",verify.getRexpression(),verify.getExpect()));
                         superAssert(relationShip,value,expect);
                         logger.info("断言成功！");
                     }catch (Exception e){
@@ -463,6 +465,7 @@ public class TestCaseSetService {
         if(matcher.find()) {
             value = matcher.group(0);
         }
+        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
         // 往redis存值，设置默认过期时间为一小时
         redisUtil.set(key,value,3600);
     }
