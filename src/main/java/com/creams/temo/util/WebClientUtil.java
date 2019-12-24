@@ -34,7 +34,7 @@ public class WebClientUtil {
     private static Logger logger = LoggerFactory.getLogger("fileInfoLog");
 
     public WebClientUtil(String baseUrl, Map<String, String> headers, Map<String, String> cookies) throws SSLException {
-        logger.info(String.format("开始创建webclient实例。。，设置default headers:%s,default cookies:%s",
+        logger.info(String.format("开始创建webclient实例。。，设置host: %s,default headers:%s,default cookies:%s",baseUrl,
                 headers.toString(),cookies.toString()));
         // 设置SSL
         HttpClient secure = HttpClient.create()
@@ -254,7 +254,7 @@ public class WebClientUtil {
 //               "}",new HashMap<>(),new HashMap<>());
 //        webClientUtil.delete("/prject/69cce7db-7b7f-4fbc-b1f8-d0f8e5dea6f4",new HashMap<>(),new HashMap<>());
         WebClientUtil webClientUtil = new WebClientUtil("",new HashMap<>(),new HashMap<>() );
-        System.out.println(webClientUtil.get("https://www.baidu.com",new HashMap<>(),new HashMap<>(),new HashMap<>()));
+        System.out.println(webClientUtil.get("https://www.baidu.com",new HashMap<>(),new HashMap<>(),new HashMap<>()).bodyToMono(String.class));
 
     }
 }
