@@ -402,7 +402,7 @@ public class TestCaseSetService {
             boolean verifyResult = true;
             // 遍历断言集合，进行断言
             for (VerifyResponse verify:verifys){
-                logger.info("正在进行第"+(verifys.indexOf(verify)+1)+"断言...");
+                logger.info("正在进行第"+(verifys.indexOf(verify)+1)+"次断言...");
                 String verifyType = verify.getVerifyType();
                 String expect = verify.getExpect();
                 String jsonpath = verify.getJexpression();
@@ -415,7 +415,7 @@ public class TestCaseSetService {
                         logger.info(String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect()));
                         superAssert(relationShip,value,expect);
                         logger.info("断言成功！");
-                    }catch (Exception e){
+                    }catch (AssertionError e){
                         logger.error("断言失败："+e);
                         verifyResult = false;
                     }
@@ -430,12 +430,12 @@ public class TestCaseSetService {
                         logger.info(String.format("表达式：%s,预期结果：%s,断言类型:regex",verify.getRexpression(),verify.getExpect()));
                         superAssert(relationShip,value,expect);
                         logger.info("断言成功！");
-                    }catch (Exception e){
+                    }catch (AssertionError e){
                         logger.error("断言失败："+e);
                         verifyResult = false;
                     }
                 }else {
-                    return "不支持该断言方式";
+                    logger.error("不支持该断言方式");
                 }
             }
             if (jsonAssert!=null && !"".equals(jsonAssert)){
@@ -444,7 +444,7 @@ public class TestCaseSetService {
                 try{
                     JSONAssert.assertEquals(jsonAssert,responseBody,false);
                     logger.info("JSON断言成功！");
-                }catch (Exception e){
+                }catch (AssertionError e){
                     logger.error("JSON断言失败："+e);
                     verifyResult = false;
                 }
@@ -489,7 +489,7 @@ public class TestCaseSetService {
      * @param expect  期待字符串
      * @throws Exception
      */
-    private void superAssert(String type,String target,String expect) throws Exception {
+    private void superAssert(String type,String expect,String target) throws Exception {
         switch (type){
             case "1":
                 assertThat(target).isEqualTo(expect);
