@@ -4,6 +4,7 @@ package com.creams.temo.service.testcase;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
+import com.alibaba.fastjson.TypeReference;
 import com.creams.temo.entity.project.response.EnvResponse;
 import com.creams.temo.entity.testcase.request.StScriptRequest;
 import com.creams.temo.entity.testcase.request.StScriptRequests;
@@ -261,7 +262,7 @@ public class TestCaseSetService {
             }
             // 判断是否有全局Cookie或者全局Header，如果有则重新生成webclient实例
             if (gCookies != null &&  !"".equals(gCookies)){
-                Map<String,String> maps = (Map<String, String>) JSON.parse(gCookies);
+                Map<String,String> maps = JSON.parseObject(gCookies,new TypeReference<Map<String, String>>(){});
                 for (Map.Entry<String,String> kvs : maps.entrySet()){
                     String key = getCommonParam(kvs.getKey());
                     String value = getCommonParam(kvs.getValue());
@@ -270,7 +271,7 @@ public class TestCaseSetService {
                 webClientUtil = new WebClientUtil(env.getHost(),globalHeaders,globalCookies);
             }
             if (gHeaders != null &&  !"".equals(gHeaders)){
-                Map<String,String> maps = (HashMap<String,String>) JSON.parse(gHeaders);
+                Map<String,String> maps = JSON.parseObject(gHeaders,new TypeReference<Map<String, String>>(){});
                 for (Map.Entry<String,String> kvs : maps.entrySet()){
                     String key = getCommonParam(kvs.getKey());
                     String value = getCommonParam(kvs.getValue());
@@ -297,7 +298,7 @@ public class TestCaseSetService {
             // 判断请求体是否为空，进行转换
             Map<String,String> bodyKV = new HashMap<>();
             if (body != null &&  !"".equals(body)){
-                bodyKV = (HashMap<String,String>) JSON.parse(body);
+                bodyKV = JSON.parseObject(body,new TypeReference<Map<String, String>>(){});
             }
             ClientResponse response;
             switch (method.toLowerCase()) {
