@@ -455,7 +455,9 @@ public class TestCaseSetService {
             String executedRate = df.format(((float)index/casesNum)*100);
             // 计算成功率
             String successRate = df.format(((float)success/index)*100);
-            WebSocketServer.sendInfo(new TestResult(index,index-error,error,casesNum,successRate,executedRate),"123");
+            TestResult testResult = new TestResult(index,index-error,error,casesNum,successRate,executedRate);
+            String result = JSON.toJSONString(testResult);
+            WebSocketServer.sendInfo(result,"123");
 
             // 最后生成全局cookie和header
             String gCookies = getCommonParam(testCase.getGlobalCookies(),uuid);
