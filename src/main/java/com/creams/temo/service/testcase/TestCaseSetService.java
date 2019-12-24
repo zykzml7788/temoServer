@@ -215,6 +215,7 @@ public class TestCaseSetService {
     public Object executeSet(String setId, String envId) throws Exception {
         TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
         EnvResponse env = envMapper.queryEnvById(envId);
+        String uuid = StringUtil.uuid();
         // 获取用例集下全部的用例
         List<TestCaseResponse> testCases = testCaseSet.getTestCase();
         // 获取用例数量
@@ -231,17 +232,17 @@ public class TestCaseSetService {
             int index = testCases.indexOf(testCase)+1;
             logger.info(String.format("正在执行第%s条用例...",index));
             // 取到用例相关信息，并处理${key}的关联部分
-            String url = getCommonParam(testCase.getUrl());
+            String url = getCommonParam(testCase.getUrl(),uuid);
             webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
-            String method = getCommonParam(testCase.getMethod());
-            String body = getCommonParam(testCase.getBody());
+            String method = getCommonParam(testCase.getMethod(),uuid);
+            String body = getCommonParam(testCase.getBody(),uuid);
             String delayTime = testCase.getDelayTime();
-            String jsonAssert = getCommonParam(testCase.getJsonAssert());
+            String jsonAssert = getCommonParam(testCase.getJsonAssert(),uuid);
             String caseType = testCase.getCaseType();
-            String cookies = getCommonParam(testCase.getCookies());
-            String headers = getCommonParam(testCase.getHeader());
-            String sqlScript = getCommonParam(testCase.getSqlScript());
-            String param = getCommonParam(testCase.getParam());
+            String cookies = getCommonParam(testCase.getCookies(),uuid);
+            String headers = getCommonParam(testCase.getHeader(),uuid);
+            String sqlScript = getCommonParam(testCase.getSqlScript(),uuid);
+            String param = getCommonParam(testCase.getParam(),uuid);
             String dbId = testCase.getDbId();
             String contentType = testCase.getContentType();
             List<SavesResponse> saves = testCase.getSaves();
@@ -348,7 +349,8 @@ public class TestCaseSetService {
 
             // 处理关联参数
             for (SavesResponse save:saves){
-                String paramKey = save.getParamKey();
+                // 拼接uuid生成唯一key
+                String paramKey = save.getParamKey()+":"+uuid;
                 String jsonpath = save.getJexpression();
                 String regex = save.getRegex();
                 String saveFrom = save.getSaveFrom();
@@ -454,14 +456,14 @@ public class TestCaseSetService {
             ,index,index-error,error,num,casesNum),"123");
 
             // 最后生成全局cookie和header
-            String gCookies = getCommonParam(testCase.getGlobalCookies());
-            String gHeaders = getCommonParam(testCase.getGlobalHeaders());
+            String gCookies = getCommonParam(testCase.getGlobalCookies(),uuid);
+            String gHeaders = getCommonParam(testCase.getGlobalHeaders(),uuid);
             // 判断是否有全局Cookie或者全局Header，如果有则重新生成webclient实例
             if (gCookies != null &&  !"".equals(gCookies)){
                 Map<String,String> maps = JSON.parseObject(gCookies,new TypeReference<Map<String, String>>(){});
                 for (Map.Entry<String,String> kvs : maps.entrySet()){
-                    String key = getCommonParam(kvs.getKey());
-                    String value = getCommonParam(kvs.getValue());
+                    String key = getCommonParam(kvs.getKey(),uuid);
+                    String value = getCommonParam(kvs.getValue(),uuid);
                     globalCookies.put(key,value);
                 }
                 webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
@@ -469,8 +471,8 @@ public class TestCaseSetService {
             if (gHeaders != null &&  !"".equals(gHeaders)){
                 Map<String,String> maps = JSON.parseObject(gHeaders,new TypeReference<Map<String, String>>(){});
                 for (Map.Entry<String,String> kvs : maps.entrySet()){
-                    String key = getCommonParam(kvs.getKey());
-                    String value = getCommonParam(kvs.getValue());
+                    String key = getCommonParam(kvs.getKey(),uuid);
+                    String value = getCommonParam(kvs.getValue(),uuid);
                     globalHeaders.put(key,value);
                 }
                 webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
@@ -549,9 +551,10 @@ public class TestCaseSetService {
     /**
      * 处理${key}，从redis查询key
      * @param param 需要匹配的字符串参数
+     * @param uuid 唯一标识
      * @return  替换${key}后的字符串参数
      */
-    private String getCommonParam(String param) {
+    private String getCommonParam(String param,String uuid) {
         if (StringUtil.isEmptyOrNull(param)) {
             return "";
         }
@@ -561,7 +564,7 @@ public class TestCaseSetService {
             String replaceKey = m.group(1);
             String value;
             // 从redis中获取值
-            value = (String)redisUtil.get(replaceKey);
+            value = (String)redisUtil.get(replaceKey+":"+uuid);
             // 如果redis中未能找到对应的值，该用例失败。
             if (value==null){
                 logger.error("从redis中未能查询到相关参数,请确认！");
