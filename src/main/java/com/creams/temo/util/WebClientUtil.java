@@ -38,42 +38,23 @@ public class WebClientUtil {
         HttpClient secure = HttpClient.create()
                 .secure(t -> t.sslContext(SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE)));
         String baseUrl = port == null?host:host+":"+port;
-        if ("".equals(baseUrl)){
-            logger.info(String.format("开始创建webclient实例。。，设置host: %s,default headers:%s,default cookies:%s",baseUrl,
-                    headers.toString(),cookies.toString()));
-            webClient = WebClient
-                    .builder()
-                    .clientConnector(new ReactorClientHttpConnector(secure))
-                    .defaultHeaders(n->{
-                        for (Map.Entry<String,String> entry:headers.entrySet()){
-                            n.add(entry.getKey(), entry.getValue());
-                        }
-                    })
-                    .defaultCookies(n->{
-                        for (Map.Entry<String,String> entry:cookies.entrySet()){
-                            n.add(entry.getKey(), entry.getValue());
-                        }
-                    })
-                    .build();
-        }else {
-            logger.info(String.format("开始创建webclient实例。。，设置host: %s,default headers:%s,default cookies:%s",baseUrl,
-                    headers.toString(),cookies.toString()));
-            webClient = WebClient
-                    .builder()
-                    .clientConnector(new ReactorClientHttpConnector(secure))
-                    .baseUrl(baseUrl)
-                    .defaultHeaders(n->{
-                        for (Map.Entry<String,String> entry:headers.entrySet()){
-                            n.add(entry.getKey(), entry.getValue());
-                        }
-                    })
-                    .defaultCookies(n->{
-                        for (Map.Entry<String,String> entry:cookies.entrySet()){
-                            n.add(entry.getKey(), entry.getValue());
-                        }
-                    })
-                    .build();
-        }
+        logger.info(String.format("开始创建webclient实例。。，设置host: %s,default headers:%s,default cookies:%s",baseUrl,
+                headers.toString(),cookies.toString()));
+        webClient = WebClient
+                .builder()
+                .clientConnector(new ReactorClientHttpConnector(secure))
+                .baseUrl(baseUrl)
+                .defaultHeaders(n->{
+                    for (Map.Entry<String,String> entry:headers.entrySet()){
+                        n.add(entry.getKey(), entry.getValue());
+                    }
+                })
+                .defaultCookies(n->{
+                    for (Map.Entry<String,String> entry:cookies.entrySet()){
+                        n.add(entry.getKey(), entry.getValue());
+                    }
+                })
+                .build();
 
     }
 
@@ -256,8 +237,13 @@ public class WebClientUtil {
 //               "\t\"pname\": \"测试webClientAAA\"\n" +
 //               "}",new HashMap<>(),new HashMap<>());
 //        webClientUtil.delete("/prject/69cce7db-7b7f-4fbc-b1f8-d0f8e5dea6f4",new HashMap<>(),new HashMap<>());
-//        WebClientUtil webClientUtil = new WebClientUtil("",new HashMap<>(),new HashMap<>() );
+//        WebClientUtil webClientUtil = new WebClientUtil("","",new HashMap<>(),new HashMap<>() );
 //        System.out.println(webClientUtil.get("https://www.baidu.com",new HashMap<>(),new HashMap<>(),new HashMap<>()).bodyToMono(String.class));
+        WebClient webClient = WebClient.create();
 
+        String url = "https://www.baidu.com";
+        String  str1= webClient.get().uri(url).exchange().block().bodyToMono(String.class).block();
+//        String str1 = mono.block();
+        System.out.println(str1);
     }
 }
