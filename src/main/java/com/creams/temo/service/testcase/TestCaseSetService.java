@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
+import com.creams.temo.entity.TestResult;
 import com.creams.temo.entity.project.response.EnvResponse;
 import com.creams.temo.entity.testcase.Verify;
 import com.creams.temo.entity.testcase.request.StScriptRequest;
@@ -450,10 +451,11 @@ public class TestCaseSetService {
             }
             //格式化小数
             DecimalFormat df = new DecimalFormat("0.00");
-            // 计算百分比
-            String num = df.format(((float)index/casesNum)*100);
-            WebSocketServer.sendInfo(String.format("已执行用例数:%d,成功数:%d,失败数:%d,已执行用例数百分比：%s %%,总用例数:%d"
-            ,index,index-error,error,num,casesNum),"123");
+            // 计算执行进度百分比
+            String executedRate = df.format(((float)index/casesNum)*100);
+            // 计算成功率
+            String successRate = df.format(((float)success/index)*100);
+            WebSocketServer.sendInfo(new TestResult(index,index-error,error,casesNum,successRate,executedRate),"123");
 
             // 最后生成全局cookie和header
             String gCookies = getCommonParam(testCase.getGlobalCookies(),uuid);

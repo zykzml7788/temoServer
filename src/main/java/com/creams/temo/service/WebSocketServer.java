@@ -37,7 +37,7 @@ public class WebSocketServer {
         this.sid=sid;
         try {
             sendMessage("连接成功");
-        } catch (IOException e) {
+        } catch (IOException | EncodeException e) {
             logger.error("websocket IO异常");
         }
     }
@@ -63,7 +63,7 @@ public class WebSocketServer {
         for (WebSocketServer item : webSocketSet) {
             try {
                 item.sendMessage(message);
-            } catch (IOException e) {
+            } catch (IOException | EncodeException e) {
                 e.printStackTrace();
             }
         }
@@ -82,15 +82,15 @@ public class WebSocketServer {
     /**
      * 实现服务器主动推送，这里可能会出现并发报错，在方法上加 synchronized 就可以了
      */
-    private void sendMessage(String message) throws IOException {
-        this.session.getBasicRemote().sendText(message);
+    private void sendMessage(Object message) throws IOException, EncodeException {
+        this.session.getBasicRemote().sendObject(message);
     }
 
 
     /**
      * 群发自定义消息
      * */
-    public static void sendInfo(String message,@PathParam("sid") String sid) throws IOException {
+    public static void sendInfo(Object message,@PathParam("sid") String sid) throws IOException {
         logger.info("推送消息到窗口"+sid+"，推送内容:"+message);
         for (WebSocketServer item : webSocketSet) {
             try {
@@ -101,7 +101,7 @@ public class WebSocketServer {
                 }else if(item.sid.equals(sid)){
                     item.sendMessage(message);
                 }
-            } catch (IOException e) {
+            } catch (IOException | EncodeException e) {
                 continue;
             }
         }
