@@ -45,6 +45,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 @Service
 public class TestCaseSetService {
@@ -410,10 +411,15 @@ public class TestCaseSetService {
                 String relationShip = verify.getRelationShip();
                 // 判断断言类型是 JsonPath 还是 正则
                 if ("1".equals(verifyType)){
-                    String value = (String)JSONPath.read(responseBody,jsonpath);
+                    Object value = JSONPath.read(responseBody,jsonpath);
+                    if (value == null){
+                        logger.error("JsonPath为匹配到结果，请确认！");
+                        verifyResult = false;
+                        continue;
+                    }
                     try{
                         logger.info(String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect()));
-                        superAssert(relationShip,value,expect);
+                        superAssert(relationShip,(String)value,expect);
                         logger.info("断言成功！");
                     }catch (AssertionError e){
                         logger.error("断言失败："+e);
@@ -425,6 +431,10 @@ public class TestCaseSetService {
                     String value = "";
                     if(matcher.find()) {
                         value = matcher.group(0);
+                    }else {
+                        logger.error("正则表达式未匹配到任何值,请确认！");
+                        verifyResult = false;
+                        continue;
                     }
                     try{
                         logger.info(String.format("表达式：%s,预期结果：%s,断言类型:regex",verify.getRexpression(),verify.getExpect()));
