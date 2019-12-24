@@ -291,7 +291,7 @@ public class TestCaseSetService {
                 cookiesKv = (Map) JSON.parse(cookies);
             }
             if (headers != null &&  !"".equals(headers)){
-                headersKv = (Map) JSON.parse(cookies);
+                headersKv = JSON.parseObject(headers,new TypeReference<Map<String, String>>(){});
             }
             // 判断请求体是否为空，进行转换
             Map<String,String> bodyKV = new HashMap<>();
