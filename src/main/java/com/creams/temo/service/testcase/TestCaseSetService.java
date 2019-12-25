@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
+import com.creams.temo.entity.ExecutedRow;
 import com.creams.temo.entity.TestResult;
 import com.creams.temo.entity.project.response.EnvResponse;
 import com.creams.temo.entity.testcase.Verify;
@@ -45,6 +46,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.creams.temo.util.StringUtil.log;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -225,16 +227,21 @@ public class TestCaseSetService {
         int success = 0;
         // 设置初始失败用例数为 0
         int error = 0;
+        // 设置初始的执行记录
+        String executedRow = null;
         Map<String,String> globalCookies = new HashMap<>();
         Map<String,String> globalHeaders = new HashMap<>();
         WebClientUtil webClientUtil  = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
         // 遍历所有用例集合
         for (TestCaseResponse testCase:testCases){
             int index = testCases.indexOf(testCase)+1;
+            StringBuilder logs = new StringBuilder();
+            logs.append(log("INFO",String.format("正在执行第%s条用例...",index)));
             logger.info(String.format("正在执行第%s条用例...",index));
             // 取到用例相关信息，并处理${key}的关联部分
             String url = getCommonParam(testCase.getUrl(),uuid);
             webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
+            String caseName = testCase.getCaseDesc();
             String method = getCommonParam(testCase.getMethod(),uuid);
             String body = getCommonParam(testCase.getBody(),uuid);
             String delayTime = testCase.getDelayTime();
@@ -255,7 +262,8 @@ public class TestCaseSetService {
                 verifys = new ArrayList<>();
             }
             if (delayTime!=null){
-                logger.info("正在等待"+delayTime+"秒...");
+                logs.append(log("INFO","正在等待"+delayTime+"秒..."));
+                logger.info(log("INFO","正在等待"+delayTime+"秒..."));
                 Thread.sleep(Integer.valueOf(delayTime)*1000);
             }
 
@@ -280,9 +288,14 @@ public class TestCaseSetService {
             if (body != null &&  !"".equals(body)){
                 bodyKV = JSON.parseObject(body,new TypeReference<Map<String, String>>(){});
             }
-            ClientResponse response;
+            ClientResponse response = null;
+            logs.append("开始调用接口...");
             switch (method.toLowerCase()) {
                 case "get":
+                    logs.append(log("INFO","=====> GET "+url));
+                    logs.append(log("INFO","=====> Param "+param));
+                    logs.append(log("INFO","=====> Header "+headers));
+                    logs.append(log("INFO","=====> Cookie "+cookies));
                     response = webClientUtil.get(url, paramKv, headersKv, cookiesKv);
                     break;
                 case "post":
@@ -292,15 +305,27 @@ public class TestCaseSetService {
                         for (Map.Entry<String, String> kvs : bodyKV.entrySet()) {
                             linkedMultiValueMap.add(kvs.getKey(), kvs.getValue());
                         }
+                        logs.append(log("INFO","=====> POST "+url));
+                        logs.append(log("INFO","=====> FormData "+bodyKV));
+                        logs.append(log("INFO","=====> Header "+headers));
+                        logs.append(log("INFO","=====> Cookie "+cookies));
                         response = webClientUtil.postByFormData(url, linkedMultiValueMap, headersKv, cookiesKv);
                     } else if ("2".equals(contentType)) {
+                        logs.append(log("INFO","=====> POST "+url));
+                        logs.append(log("INFO","=====> Param "+param));
+                        logs.append(log("INFO","=====> Header "+headers));
+                        logs.append(log("INFO","=====> Cookie "+cookies));
                         LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
                         response = webClientUtil.postByFormData(url, linkedMultiValueMap, headersKv, cookiesKv);
                     } else if ("3".equals(contentType)) {
+                        logs.append(log("INFO","=====> POST "+url));
+                        logs.append(log("INFO","=====> Body "+body));
+                        logs.append(log("INFO","=====> Header "+headers));
+                        logs.append(log("INFO","=====> Cookie "+cookies));
                         response = webClientUtil.postByJson(url, body, headersKv, cookiesKv);
                     } else {
+                        logs.append(log("ERROR","暂不支持该POST请求格式"));
                         logger.error("暂不支持该POST请求格式");
-                        return "暂不支持该POST请求格式";
                     }
                     break;
                 case "put":
@@ -310,21 +335,21 @@ public class TestCaseSetService {
                     response = webClientUtil.delete(url, headersKv, cookiesKv);
                     break;
                 default:
+                    logs.append(log("ERROR","暂不支持该请求方式"));
                     logger.error("暂不支持该请求方式");
-                    return "暂不支持该请求方式";
             }
-            // 获取响应状态码
-            HttpStatus statusCode = response.statusCode();
             // 处理响应体，转换为JSON字符串
-            String responseBody;
-            String responseHeaders;
-            String responseCookies;
+            String responseBody = "";
+            String responseHeaders = "";
+            String responseCookies = "";
             try {
                 responseBody = new JSONObject(response.bodyToMono(Map.class).block()).toString();
             } catch (Exception e){
+                logs.append(log("INFO","响应体JSON转换失败,请确认响应结构是否为JSON!默认直接转为字符串"));
                 logger.info("响应体JSON转换失败,请确认响应结构是否为JSON!默认直接转为字符串");
                 responseBody = response.bodyToMono(String.class).block();
             }
+            logs.append(log("INFO","<===== Response Body : " +responseBody));
             logger.info("Response Body : " +responseBody);
             Map<String,Object> rHeaders = new HashMap<>();
             // 处理响应头，转换为JSON字符串
@@ -332,6 +357,7 @@ public class TestCaseSetService {
                 rHeaders.put(entry.getKey(),entry.getValue());
             }
             responseHeaders = new JSONObject(rHeaders).toString();
+            logs.append(log("INFO","<===== Response Header : "+responseHeaders));
             logger.info("Response Header : "+responseHeaders);
             // 处理响应Cookie,转换为JSON字符串
             Map<String,Object> rCookies = new HashMap<>();
@@ -339,6 +365,7 @@ public class TestCaseSetService {
                 rCookies.put(entry.getKey(),entry.getValue());
             }
             responseCookies = new JSONObject(rCookies).toString();
+            logs.append(log("INFO","<===== Response Cookie : "+ responseCookies));
             logger.info("Response Cookie : "+ responseCookies);
 
             // 处理关联参数
@@ -354,35 +381,66 @@ public class TestCaseSetService {
                     if ("1".equals(saveType)){
                         String value = String.valueOf(JSONPath.read(responseBody,jsonpath));
                         redisUtil.set(paramKey,value);
+                        logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
                         logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
                     }else {
-                        saveRegexParamToRedis(responseBody,paramKey,uuid,regex);
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(responseBody);
+                        String value = "";
+                        if(matcher.find()) {
+                            value = matcher.group(0);
+                        }
+                        logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
+                        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                        // 往redis存值，设置默认过期时间为一小时
+                        redisUtil.set(paramKey,value,3600);
                     }
                 }else if ("2".equals(saveFrom)){
                     if ("1".equals(saveType)){
                         String value = String.valueOf(JSONPath.read(responseHeaders,jsonpath));
                         redisUtil.set(paramKey,value);
+                        logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
                         logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
                     }else {
-                        saveRegexParamToRedis(responseHeaders,paramKey,uuid,regex);
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(responseHeaders);
+                        String value = "";
+                        if(matcher.find()) {
+                            value = matcher.group(0);
+                        }
+                        logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
+                        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                        // 往redis存值，设置默认过期时间为一小时
+                        redisUtil.set(paramKey,value,3600);
                     }
                 }else if ("3".equals(saveFrom)){
                     if ("1".equals(saveType)){
                         String value = String.valueOf(JSONPath.read(responseCookies,jsonpath));
                         redisUtil.set(paramKey,value);
+                        logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
                         logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
                     }else {
-                        saveRegexParamToRedis(responseCookies,paramKey,uuid,regex);
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(responseCookies);
+                        String value = "";
+                        if(matcher.find()) {
+                            value = matcher.group(0);
+                        }
+                        logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
+                        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                        // 往redis存值，设置默认过期时间为一小时
+                        redisUtil.set(paramKey,value,3600);
                     }
                 }else{
+                    logs.append(log("ERROR","不支持从该响应类型取值"));
                     logger.error("不支持从该响应类型取值");
-                    return "不支持从该响应类型取值";
                 }
             }
             // 设置默认总体断言结果为真
             boolean verifyResult = true;
             // 遍历断言集合，进行断言
             for (VerifyResponse verify:verifys){
+                logs.append(log("INFO","正在进行第"+(verifys.indexOf(verify)+1)+"次断言..."));
                 logger.info("正在进行第"+(verifys.indexOf(verify)+1)+"次断言...");
                 String verifyType = verify.getVerifyType();
                 String expect = verify.getExpect();
@@ -393,15 +451,19 @@ public class TestCaseSetService {
                 if ("1".equals(verifyType)){
                     Object value = JSONPath.read(responseBody,jsonpath);
                     if (value == null){
+                        logs.append(log("ERROR","JsonPath未匹配到结果，请确认！"));
                         logger.error("JsonPath未匹配到结果，请确认！");
                         verifyResult = false;
                         continue;
                     }
                     try{
+                        logs.append(log("INFO",String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect())));
                         logger.info(String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect()));
                         superAssert(relationShip,(String)value,expect);
+                        logs.append(log("INFO","断言成功！"));
                         logger.info("断言成功！");
                     }catch (AssertionError e){
+                        logs.append(log("ERROR","断言失败："+e));
                         logger.error("断言失败："+e);
                         verifyResult = false;
                     }
@@ -412,37 +474,40 @@ public class TestCaseSetService {
                     if(matcher.find()) {
                         value = matcher.group(0);
                     }else {
+                        logs.append(log("ERROR","正则表达式未匹配到任何值,请确认！"));
                         logger.error("正则表达式未匹配到任何值,请确认！");
                         verifyResult = false;
                         continue;
                     }
                     try{
+                        logs.append(log("INFO",String.format("表达式：%s,预期结果：%s,断言类型:regex",verify.getRexpression(),verify.getExpect())));
                         logger.info(String.format("表达式：%s,预期结果：%s,断言类型:regex",verify.getRexpression(),verify.getExpect()));
                         superAssert(relationShip,value,expect);
+                        logs.append(log("INFO","断言成功！"));
                         logger.info("断言成功！");
                     }catch (AssertionError e){
+                        logs.append(log("ERROR","断言失败："+e));
                         logger.error("断言失败："+e);
                         verifyResult = false;
                     }
                 }else {
+                    logs.append(log("ERROR","不支持该断言方式"));
                     logger.error("不支持该断言方式");
                 }
             }
             if (jsonAssert!=null && !"".equals(jsonAssert)){
                 // false代表非严格校验，只比较部分字段
+                logs.append(log("INFO","正在进行json断言..."));
                 logger.info("正在进行json断言...");
                 try{
                     JSONAssert.assertEquals(jsonAssert,responseBody,false);
+                    logs.append(log("INFO","JSON断言成功！"));
                     logger.info("JSON断言成功！");
                 }catch (AssertionError e){
+                    logs.append(log("ERROR","JSON断言失败："+e));
                     logger.error("JSON断言失败："+e);
                     verifyResult = false;
                 }
-            }
-            if (verifyResult){
-                success++;
-            }else {
-                error++;
             }
             //格式化小数
             DecimalFormat df = new DecimalFormat("0.00");
@@ -459,6 +524,8 @@ public class TestCaseSetService {
             String gHeaders = getCommonParam(testCase.getGlobalHeaders(),uuid);
             // 判断是否有全局Cookie或者全局Header，如果有则重新生成webclient实例
             if (gCookies != null &&  !"".equals(gCookies)){
+                logs.append(log("INFO","Set Golbal Cookie : "+gCookies));
+                logs.append(log("INFO","Set Golbal Header : "+gHeaders));
                 Map<String,String> maps = JSON.parseObject(gCookies,new TypeReference<Map<String, String>>(){});
                 for (Map.Entry<String,String> kvs : maps.entrySet()){
                     String key = getCommonParam(kvs.getKey(),uuid);
@@ -476,26 +543,34 @@ public class TestCaseSetService {
                 }
                 webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             }
+            if (verifyResult){
+                success++;
+                executedRow = JSON.toJSONString(new ExecutedRow(index,caseName,1,logs.toString()));
+            }else {
+                error++;
+                executedRow = JSON.toJSONString(new ExecutedRow(index,caseName,0,logs.toString()));
+            }
+            WebSocketServer.sendInfo(executedRow,"101");
         }
         return null;
     }
 
-    /**
-     * 正则匹配，保存参数到redis（默认取到第一个匹配项）
-     * @param target
-     * @param regex
-     */
-    private void saveRegexParamToRedis(String target, String key,String uuid, String regex){
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(target);
-        String value = "";
-        if(matcher.find()) {
-            value = matcher.group(0);
-        }
-        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
-        // 往redis存值，设置默认过期时间为一小时
-        redisUtil.set(key+":"+uuid,value,3600);
-    }
+//    /**
+//     * 正则匹配，保存参数到redis（默认取到第一个匹配项）
+//     * @param target
+//     * @param regex
+//     */
+//    private void saveRegexParamToRedis(String target, String key,String uuid, String regex){
+//        Pattern pattern = Pattern.compile(regex);
+//        Matcher matcher = pattern.matcher(target);
+//        String value = "";
+//        if(matcher.find()) {
+//            value = matcher.group(0);
+//        }
+//        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+//        // 往redis存值，设置默认过期时间为一小时
+//        redisUtil.set(key+":"+uuid,value,3600);
+//    }
 
     /**
      * 超级断言
