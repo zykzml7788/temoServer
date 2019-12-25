@@ -361,7 +361,7 @@ public class TestCaseSetService {
                 String saveType = save.getSaveType();
                 if ("1".equals(saveFrom)){
                     if ("1".equals(saveType)){
-                        String value = (String)JSONPath.read(responseBody,jsonpath);
+                        String value = String.valueOf(JSONPath.read(responseBody,jsonpath));
                         redisUtil.set(paramKey,value);
                         logger.info(String.format("储存关联参数到redis=> %s:%s",paramKey,value));
                     }else {
@@ -369,7 +369,7 @@ public class TestCaseSetService {
                     }
                 }else if ("2".equals(saveFrom)){
                     if ("1".equals(saveType)){
-                        String value = (String)JSONPath.read(responseHeaders,jsonpath);
+                        String value = String.valueOf(JSONPath.read(responseHeaders,jsonpath));
                         redisUtil.set(paramKey,value);
                         logger.info(String.format("储存关联参数到redis=> %s:%s",paramKey,value));
                     }else {
@@ -377,7 +377,7 @@ public class TestCaseSetService {
                     }
                 }else if ("3".equals(saveFrom)){
                     if ("1".equals(saveType)){
-                        String value = (String)JSONPath.read(responseCookies,jsonpath);
+                        String value = String.valueOf(JSONPath.read(responseCookies,jsonpath));
                         redisUtil.set(paramKey,value);
                     }else {
                         saveRegexParamToRedis(responseCookies,paramKey,regex);
