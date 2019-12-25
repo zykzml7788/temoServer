@@ -521,7 +521,7 @@ public class TestCaseSetService {
             // 计算执行进度百分比
             String executedRate = df.format(((float)index/casesNum)*100);
             // 计算成功率
-            String successRate = df.format(((float)success/casesNum)*100);
+            String successRate = df.format(((float)(index-error)/casesNum)*100);
             TestResult testResult = new TestResult(index,index-error,error,casesNum,successRate,executedRate);
             String result = JSON.toJSONString(testResult);
             WebSocketServer.sendInfo(result,"123");
