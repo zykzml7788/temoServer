@@ -319,37 +319,27 @@ public class TestCaseSetService {
             String responseBody;
             String responseHeaders;
             String responseCookies;
-            try{
+            try {
                 responseBody = new JSONObject(response.bodyToMono(Map.class).block()).toString();
-                logger.info("Response Body : " +responseBody);
-                Map<String,Object> rHeaders = new HashMap<>();
-                // 处理响应头，转换为JSON字符串
-                for (Map.Entry<String, List<String>> entry:response.headers().asHttpHeaders().entrySet()){
-                    rHeaders.put(entry.getKey(),entry.getValue());
-                }
-                responseHeaders = new JSONObject(rHeaders).toString();
-                logger.info("Response Header : "+responseHeaders);
-                // 处理响应Cookie,转换为JSON字符串
-                Map<String,Object> rCookies = new HashMap<>();
-                for (Map.Entry<String, List<ResponseCookie>> entry:response.cookies().entrySet()){
-                    rCookies.put(entry.getKey(),entry.getValue());
-                }
-                responseCookies = new JSONObject(rCookies).toString();
-                logger.info("Response Cookie : "+ responseCookies);
-            }catch (Exception e){
-                logger.error("响应JSON转换失败,请确认响应结构是否为JSON!");
-                error++;
-                //格式化小数
-                DecimalFormat df = new DecimalFormat("0.00");
-                // 计算执行进度百分比
-                String executedRate = df.format(((float)index/casesNum)*100);
-                // 计算成功率
-                String successRate = df.format(((float)success/index)*100);
-                TestResult testResult = new TestResult(index,index-error,error,casesNum,successRate,executedRate);
-                String result = JSON.toJSONString(testResult);
-                WebSocketServer.sendInfo(result,"123");
-                continue;
+            } catch (Exception e){
+                logger.info("响应体JSON转换失败,请确认响应结构是否为JSON!默认直接转为字符串");
+                responseBody = response.bodyToMono(String.class).block();
             }
+            logger.info("Response Body : " +responseBody);
+            Map<String,Object> rHeaders = new HashMap<>();
+            // 处理响应头，转换为JSON字符串
+            for (Map.Entry<String, List<String>> entry:response.headers().asHttpHeaders().entrySet()){
+                rHeaders.put(entry.getKey(),entry.getValue());
+            }
+            responseHeaders = new JSONObject(rHeaders).toString();
+            logger.info("Response Header : "+responseHeaders);
+            // 处理响应Cookie,转换为JSON字符串
+            Map<String,Object> rCookies = new HashMap<>();
+            for (Map.Entry<String, List<ResponseCookie>> entry:response.cookies().entrySet()){
+                rCookies.put(entry.getKey(),entry.getValue());
+            }
+            responseCookies = new JSONObject(rCookies).toString();
+            logger.info("Response Cookie : "+ responseCookies);
 
             // 处理关联参数
             for (SavesResponse save:saves){
