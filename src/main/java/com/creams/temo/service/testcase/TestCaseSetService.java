@@ -329,9 +329,16 @@ public class TestCaseSetService {
                     }
                     break;
                 case "put":
+                    logs.append(log("INFO","=====> PUT "+url));
+                    logs.append(log("INFO","=====> Body "+body));
+                    logs.append(log("INFO","=====> Header "+headers));
+                    logs.append(log("INFO","=====> Cookie "+cookies));
                     response = webClientUtil.put(url, body, headersKv, cookiesKv);
                     break;
                 case "delete":
+                    logs.append(log("INFO","=====> DELETE "+url));
+                    logs.append(log("INFO","=====> Header "+headers));
+                    logs.append(log("INFO","=====> Cookie "+cookies));
                     response = webClientUtil.delete(url, headersKv, cookiesKv);
                     break;
                 default:
