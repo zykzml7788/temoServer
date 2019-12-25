@@ -344,6 +344,7 @@ public class TestCaseSetService {
             // 处理关联参数
             for (SavesResponse save:saves){
                 // 拼接uuid生成唯一key
+                String key = save.getParamKey();
                 String paramKey = save.getParamKey()+":"+uuid;
                 String jsonpath = save.getJexpression();
                 String regex = save.getRegex();
@@ -353,24 +354,25 @@ public class TestCaseSetService {
                     if ("1".equals(saveType)){
                         String value = String.valueOf(JSONPath.read(responseBody,jsonpath));
                         redisUtil.set(paramKey,value);
-                        logger.info(String.format("储存关联参数到redis=> %s:%s",paramKey,value));
+                        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
                     }else {
-                        saveRegexParamToRedis(responseBody,paramKey,regex);
+                        saveRegexParamToRedis(responseBody,paramKey,uuid,regex);
                     }
                 }else if ("2".equals(saveFrom)){
                     if ("1".equals(saveType)){
                         String value = String.valueOf(JSONPath.read(responseHeaders,jsonpath));
                         redisUtil.set(paramKey,value);
-                        logger.info(String.format("储存关联参数到redis=> %s:%s",paramKey,value));
+                        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
                     }else {
-                        saveRegexParamToRedis(responseHeaders,paramKey,regex);
+                        saveRegexParamToRedis(responseHeaders,paramKey,uuid,regex);
                     }
                 }else if ("3".equals(saveFrom)){
                     if ("1".equals(saveType)){
                         String value = String.valueOf(JSONPath.read(responseCookies,jsonpath));
                         redisUtil.set(paramKey,value);
+                        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
                     }else {
-                        saveRegexParamToRedis(responseCookies,paramKey,regex);
+                        saveRegexParamToRedis(responseCookies,paramKey,uuid,regex);
                     }
                 }else{
                     logger.error("不支持从该响应类型取值");
@@ -483,7 +485,7 @@ public class TestCaseSetService {
      * @param target
      * @param regex
      */
-    private void saveRegexParamToRedis(String target, String key, String regex){
+    private void saveRegexParamToRedis(String target, String key,String uuid, String regex){
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(target);
         String value = "";
@@ -492,7 +494,7 @@ public class TestCaseSetService {
         }
         logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
         // 往redis存值，设置默认过期时间为一小时
-        redisUtil.set(key,value,3600);
+        redisUtil.set(key+":"+uuid,value,3600);
     }
 
     /**
