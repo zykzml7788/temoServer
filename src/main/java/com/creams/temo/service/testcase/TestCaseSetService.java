@@ -290,225 +290,232 @@ public class TestCaseSetService {
             }
             ClientResponse response = null;
             logs.append(log("INFO","开始调用接口..."));
-            switch (method.toLowerCase()) {
-                case "get":
-                    logs.append(log("INFO","=====> GET "+url));
-                    logs.append(log("INFO","=====> Param "+param));
-                    logs.append(log("INFO","=====> Header "+headers));
-                    logs.append(log("INFO","=====> Cookie "+cookies));
-                    response = webClientUtil.get(url, paramKv, headersKv, cookiesKv);
-                    break;
-                case "post":
-                    // 判断表单提交 or JSON
-                    if ("1".equals(contentType)) {
-                        LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
-                        for (Map.Entry<String, String> kvs : bodyKV.entrySet()) {
-                            linkedMultiValueMap.add(kvs.getKey(), kvs.getValue());
-                        }
-                        logs.append(log("INFO","=====> POST "+url));
-                        logs.append(log("INFO","=====> FormData "+bodyKV));
-                        logs.append(log("INFO","=====> Header "+headers));
-                        logs.append(log("INFO","=====> Cookie "+cookies));
-                        response = webClientUtil.postByFormData(url, linkedMultiValueMap, headersKv, cookiesKv);
-                    } else if ("2".equals(contentType)) {
-                        logs.append(log("INFO","=====> POST "+url));
+            // 设置默认总体断言结果为真
+            boolean verifyResult = true;
+            try{
+                switch (method.toLowerCase()) {
+                    case "get":
+                        logs.append(log("INFO","=====> GET "+url));
                         logs.append(log("INFO","=====> Param "+param));
                         logs.append(log("INFO","=====> Header "+headers));
                         logs.append(log("INFO","=====> Cookie "+cookies));
-                        LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
-                        response = webClientUtil.postByFormData(url, linkedMultiValueMap, headersKv, cookiesKv);
-                    } else if ("3".equals(contentType)) {
-                        logs.append(log("INFO","=====> POST "+url));
+                        response = webClientUtil.get(url, paramKv, headersKv, cookiesKv);
+                        break;
+                    case "post":
+                        // 判断表单提交 or JSON
+                        if ("1".equals(contentType)) {
+                            LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
+                            for (Map.Entry<String, String> kvs : bodyKV.entrySet()) {
+                                linkedMultiValueMap.add(kvs.getKey(), kvs.getValue());
+                            }
+                            logs.append(log("INFO","=====> POST "+url));
+                            logs.append(log("INFO","=====> FormData "+bodyKV));
+                            logs.append(log("INFO","=====> Header "+headers));
+                            logs.append(log("INFO","=====> Cookie "+cookies));
+                            response = webClientUtil.postByFormData(url, linkedMultiValueMap, headersKv, cookiesKv);
+                        } else if ("2".equals(contentType)) {
+                            logs.append(log("INFO","=====> POST "+url));
+                            logs.append(log("INFO","=====> Param "+param));
+                            logs.append(log("INFO","=====> Header "+headers));
+                            logs.append(log("INFO","=====> Cookie "+cookies));
+                            LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
+                            response = webClientUtil.postByFormData(url, linkedMultiValueMap, headersKv, cookiesKv);
+                        } else if ("3".equals(contentType)) {
+                            logs.append(log("INFO","=====> POST "+url));
+                            logs.append(log("INFO","=====> Body "+body));
+                            logs.append(log("INFO","=====> Header "+headers));
+                            logs.append(log("INFO","=====> Cookie "+cookies));
+                            response = webClientUtil.postByJson(url, body, headersKv, cookiesKv);
+                        } else {
+                            logs.append(log("ERROR","暂不支持该POST请求格式"));
+                            logger.error("暂不支持该POST请求格式");
+                        }
+                        break;
+                    case "put":
+                        logs.append(log("INFO","=====> PUT "+url));
                         logs.append(log("INFO","=====> Body "+body));
                         logs.append(log("INFO","=====> Header "+headers));
                         logs.append(log("INFO","=====> Cookie "+cookies));
-                        response = webClientUtil.postByJson(url, body, headersKv, cookiesKv);
-                    } else {
-                        logs.append(log("ERROR","暂不支持该POST请求格式"));
-                        logger.error("暂不支持该POST请求格式");
-                    }
-                    break;
-                case "put":
-                    logs.append(log("INFO","=====> PUT "+url));
-                    logs.append(log("INFO","=====> Body "+body));
-                    logs.append(log("INFO","=====> Header "+headers));
-                    logs.append(log("INFO","=====> Cookie "+cookies));
-                    response = webClientUtil.put(url, body, headersKv, cookiesKv);
-                    break;
-                case "delete":
-                    logs.append(log("INFO","=====> DELETE "+url));
-                    logs.append(log("INFO","=====> Header "+headers));
-                    logs.append(log("INFO","=====> Cookie "+cookies));
-                    response = webClientUtil.delete(url, headersKv, cookiesKv);
-                    break;
-                default:
-                    logs.append(log("ERROR","暂不支持该请求方式"));
-                    logger.error("暂不支持该请求方式");
-            }
-            // 处理响应体，转换为JSON字符串
-            String responseBody = response.bodyToMono(String.class).block();
-            logs.append(log("INFO","<===== Response Body : " +responseBody));
-            String responseHeaders = "";
-            String responseCookies = "";
-            logger.info("Response Body : " +responseBody);
-            Map<String,Object> rHeaders = new HashMap<>();
-            // 处理响应头，转换为JSON字符串
-            for (Map.Entry<String, List<String>> entry:response.headers().asHttpHeaders().entrySet()){
-                rHeaders.put(entry.getKey(),entry.getValue());
-            }
-            responseHeaders = new JSONObject(rHeaders).toString();
-            logs.append(log("INFO","<===== Response Header : "+responseHeaders));
-            logger.info("Response Header : "+responseHeaders);
-            // 处理响应Cookie,转换为JSON字符串
-            Map<String,Object> rCookies = new HashMap<>();
-            for (Map.Entry<String, List<ResponseCookie>> entry:response.cookies().entrySet()){
-                rCookies.put(entry.getKey(),entry.getValue());
-            }
-            responseCookies = new JSONObject(rCookies).toString();
-            logs.append(log("INFO","<===== Response Cookie : "+ responseCookies));
-            logger.info("Response Cookie : "+ responseCookies);
+                        response = webClientUtil.put(url, body, headersKv, cookiesKv);
+                        break;
+                    case "delete":
+                        logs.append(log("INFO","=====> DELETE "+url));
+                        logs.append(log("INFO","=====> Header "+headers));
+                        logs.append(log("INFO","=====> Cookie "+cookies));
+                        response = webClientUtil.delete(url, headersKv, cookiesKv);
+                        break;
+                    default:
+                        logs.append(log("ERROR","暂不支持该请求方式"));
+                        logger.error("暂不支持该请求方式");
+                }
+                // 处理响应体，转换为JSON字符串
+                String responseBody = response.bodyToMono(String.class).block();
+                logs.append(log("INFO","<===== Response Body : " +responseBody));
+                String responseHeaders = "";
+                String responseCookies = "";
+                logger.info("Response Body : " +responseBody);
+                Map<String,Object> rHeaders = new HashMap<>();
+                // 处理响应头，转换为JSON字符串
+                for (Map.Entry<String, List<String>> entry:response.headers().asHttpHeaders().entrySet()){
+                    rHeaders.put(entry.getKey(),entry.getValue());
+                }
+                responseHeaders = new JSONObject(rHeaders).toString();
+                logs.append(log("INFO","<===== Response Header : "+responseHeaders));
+                logger.info("Response Header : "+responseHeaders);
+                // 处理响应Cookie,转换为JSON字符串
+                Map<String,Object> rCookies = new HashMap<>();
+                for (Map.Entry<String, List<ResponseCookie>> entry:response.cookies().entrySet()){
+                    rCookies.put(entry.getKey(),entry.getValue());
+                }
+                responseCookies = new JSONObject(rCookies).toString();
+                logs.append(log("INFO","<===== Response Cookie : "+ responseCookies));
+                logger.info("Response Cookie : "+ responseCookies);
 
-            // 处理关联参数
-            for (SavesResponse save:saves){
-                // 拼接uuid生成唯一key
-                String key = save.getParamKey();
-                String paramKey = save.getParamKey()+":"+uuid;
-                String jsonpath = save.getJexpression();
-                String regex = save.getRegex();
-                String saveFrom = save.getSaveFrom();
-                String saveType = save.getSaveType();
-                if ("1".equals(saveFrom)){
-                    if ("1".equals(saveType)){
-                        String value = String.valueOf(JSONPath.read(responseBody,jsonpath));
-                        redisUtil.set(paramKey,value);
-                        logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
-                        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
-                    }else {
+                // 处理关联参数
+                for (SavesResponse save:saves){
+                    // 拼接uuid生成唯一key
+                    String key = save.getParamKey();
+                    String paramKey = save.getParamKey()+":"+uuid;
+                    String jsonpath = save.getJexpression();
+                    String regex = save.getRegex();
+                    String saveFrom = save.getSaveFrom();
+                    String saveType = save.getSaveType();
+                    if ("1".equals(saveFrom)){
+                        if ("1".equals(saveType)){
+                            String value = String.valueOf(JSONPath.read(responseBody,jsonpath));
+                            redisUtil.set(paramKey,value);
+                            logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
+                            logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                        }else {
+                            Pattern pattern = Pattern.compile(regex);
+                            Matcher matcher = pattern.matcher(responseBody);
+                            String value = "";
+                            if(matcher.find()) {
+                                value = matcher.group(0);
+                            }
+                            logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
+                            logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                            // 往redis存值，设置默认过期时间为一小时
+                            redisUtil.set(paramKey,value,3600);
+                        }
+                    }else if ("2".equals(saveFrom)){
+                        if ("1".equals(saveType)){
+                            String value = String.valueOf(JSONPath.read(responseHeaders,jsonpath));
+                            redisUtil.set(paramKey,value);
+                            logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
+                            logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                        }else {
+                            Pattern pattern = Pattern.compile(regex);
+                            Matcher matcher = pattern.matcher(responseHeaders);
+                            String value = "";
+                            if(matcher.find()) {
+                                value = matcher.group(0);
+                            }
+                            logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
+                            logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                            // 往redis存值，设置默认过期时间为一小时
+                            redisUtil.set(paramKey,value,3600);
+                        }
+                    }else if ("3".equals(saveFrom)){
+                        if ("1".equals(saveType)){
+                            String value = String.valueOf(JSONPath.read(responseCookies,jsonpath));
+                            redisUtil.set(paramKey,value);
+                            logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
+                            logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                        }else {
+                            Pattern pattern = Pattern.compile(regex);
+                            Matcher matcher = pattern.matcher(responseCookies);
+                            String value = "";
+                            if(matcher.find()) {
+                                value = matcher.group(0);
+                            }
+                            logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
+                            logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                            // 往redis存值，设置默认过期时间为一小时
+                            redisUtil.set(paramKey,value,3600);
+                        }
+                    }else{
+                        logs.append(log("ERROR","不支持从该响应类型取值"));
+                        logger.error("不支持从该响应类型取值");
+                    }
+                }
+
+                // 遍历断言集合，进行断言
+                for (VerifyResponse verify:verifys){
+                    logs.append(log("INFO","正在进行第"+(verifys.indexOf(verify)+1)+"次断言..."));
+                    logger.info("正在进行第"+(verifys.indexOf(verify)+1)+"次断言...");
+                    String verifyType = verify.getVerifyType();
+                    String expect = verify.getExpect();
+                    String jsonpath = verify.getJexpression();
+                    String regex = verify.getRexpression();
+                    String relationShip = verify.getRelationShip();
+                    // 判断断言类型是 JsonPath 还是 正则
+                    if ("1".equals(verifyType)){
+                        Object value = JSONPath.read(responseBody,jsonpath);
+                        if (value == null){
+                            logs.append(log("ERROR","JsonPath未匹配到结果，请确认！"));
+                            logger.error("JsonPath未匹配到结果，请确认！");
+                            verifyResult = false;
+                            continue;
+                        }
+                        try{
+                            logs.append(log("INFO",String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect())));
+                            logger.info(String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect()));
+                            superAssert(relationShip,(String)value,expect);
+                            logs.append(log("INFO","断言成功！"));
+                            logger.info("断言成功！");
+                        }catch (AssertionError e){
+                            logs.append(log("ERROR","断言失败："+e));
+                            logger.error("断言失败："+e);
+                            verifyResult = false;
+                        }
+                    }else if ("2".equals(verifyType)){
                         Pattern pattern = Pattern.compile(regex);
                         Matcher matcher = pattern.matcher(responseBody);
                         String value = "";
                         if(matcher.find()) {
                             value = matcher.group(0);
+                        }else {
+                            logs.append(log("ERROR","正则表达式未匹配到任何值,请确认！"));
+                            logger.error("正则表达式未匹配到任何值,请确认！");
+                            verifyResult = false;
+                            continue;
                         }
-                        logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
-                        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
-                        // 往redis存值，设置默认过期时间为一小时
-                        redisUtil.set(paramKey,value,3600);
-                    }
-                }else if ("2".equals(saveFrom)){
-                    if ("1".equals(saveType)){
-                        String value = String.valueOf(JSONPath.read(responseHeaders,jsonpath));
-                        redisUtil.set(paramKey,value);
-                        logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
-                        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                        try{
+                            logs.append(log("INFO",String.format("表达式：%s,预期结果：%s,断言类型:regex",verify.getRexpression(),verify.getExpect())));
+                            logger.info(String.format("表达式：%s,预期结果：%s,断言类型:regex",verify.getRexpression(),verify.getExpect()));
+                            superAssert(relationShip,value,expect);
+                            logs.append(log("INFO","断言成功！"));
+                            logger.info("断言成功！");
+                        }catch (AssertionError e){
+                            logs.append(log("ERROR","断言失败："+e));
+                            logger.error("断言失败："+e);
+                            verifyResult = false;
+                        }
                     }else {
-                        Pattern pattern = Pattern.compile(regex);
-                        Matcher matcher = pattern.matcher(responseHeaders);
-                        String value = "";
-                        if(matcher.find()) {
-                            value = matcher.group(0);
-                        }
-                        logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
-                        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
-                        // 往redis存值，设置默认过期时间为一小时
-                        redisUtil.set(paramKey,value,3600);
+                        logs.append(log("ERROR","不支持该断言方式"));
+                        logger.error("不支持该断言方式");
                     }
-                }else if ("3".equals(saveFrom)){
-                    if ("1".equals(saveType)){
-                        String value = String.valueOf(JSONPath.read(responseCookies,jsonpath));
-                        redisUtil.set(paramKey,value);
-                        logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
-                        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
-                    }else {
-                        Pattern pattern = Pattern.compile(regex);
-                        Matcher matcher = pattern.matcher(responseCookies);
-                        String value = "";
-                        if(matcher.find()) {
-                            value = matcher.group(0);
-                        }
-                        logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
-                        logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
-                        // 往redis存值，设置默认过期时间为一小时
-                        redisUtil.set(paramKey,value,3600);
-                    }
-                }else{
-                    logs.append(log("ERROR","不支持从该响应类型取值"));
-                    logger.error("不支持从该响应类型取值");
                 }
-            }
-            // 设置默认总体断言结果为真
-            boolean verifyResult = true;
-            // 遍历断言集合，进行断言
-            for (VerifyResponse verify:verifys){
-                logs.append(log("INFO","正在进行第"+(verifys.indexOf(verify)+1)+"次断言..."));
-                logger.info("正在进行第"+(verifys.indexOf(verify)+1)+"次断言...");
-                String verifyType = verify.getVerifyType();
-                String expect = verify.getExpect();
-                String jsonpath = verify.getJexpression();
-                String regex = verify.getRexpression();
-                String relationShip = verify.getRelationShip();
-                // 判断断言类型是 JsonPath 还是 正则
-                if ("1".equals(verifyType)){
-                    Object value = JSONPath.read(responseBody,jsonpath);
-                    if (value == null){
-                        logs.append(log("ERROR","JsonPath未匹配到结果，请确认！"));
-                        logger.error("JsonPath未匹配到结果，请确认！");
-                        verifyResult = false;
-                        continue;
-                    }
+                if (jsonAssert!=null && !"".equals(jsonAssert)){
+                    // false代表非严格校验，只比较部分字段
+                    logs.append(log("INFO","正在进行json断言..."));
+                    logger.info("正在进行json断言...");
                     try{
-                        logs.append(log("INFO",String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect())));
-                        logger.info(String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect()));
-                        superAssert(relationShip,(String)value,expect);
-                        logs.append(log("INFO","断言成功！"));
-                        logger.info("断言成功！");
+                        JSONAssert.assertEquals(jsonAssert,responseBody,false);
+                        logs.append(log("INFO","JSON断言成功！"));
+                        logger.info("JSON断言成功！");
                     }catch (AssertionError e){
-                        logs.append(log("ERROR","断言失败："+e));
-                        logger.error("断言失败："+e);
+                        logs.append(log("ERROR","JSON断言失败："+e));
+                        logger.error("JSON断言失败："+e);
                         verifyResult = false;
                     }
-                }else if ("2".equals(verifyType)){
-                    Pattern pattern = Pattern.compile(regex);
-                    Matcher matcher = pattern.matcher(responseBody);
-                    String value = "";
-                    if(matcher.find()) {
-                        value = matcher.group(0);
-                    }else {
-                        logs.append(log("ERROR","正则表达式未匹配到任何值,请确认！"));
-                        logger.error("正则表达式未匹配到任何值,请确认！");
-                        verifyResult = false;
-                        continue;
-                    }
-                    try{
-                        logs.append(log("INFO",String.format("表达式：%s,预期结果：%s,断言类型:regex",verify.getRexpression(),verify.getExpect())));
-                        logger.info(String.format("表达式：%s,预期结果：%s,断言类型:regex",verify.getRexpression(),verify.getExpect()));
-                        superAssert(relationShip,value,expect);
-                        logs.append(log("INFO","断言成功！"));
-                        logger.info("断言成功！");
-                    }catch (AssertionError e){
-                        logs.append(log("ERROR","断言失败："+e));
-                        logger.error("断言失败："+e);
-                        verifyResult = false;
-                    }
-                }else {
-                    logs.append(log("ERROR","不支持该断言方式"));
-                    logger.error("不支持该断言方式");
                 }
+            }catch (Exception e){
+                logs.append(log("ERROR","服务端发生错误，请联系后台人员！Detail:\n"+e));
+                logger.error("发生错误："+e);
             }
-            if (jsonAssert!=null && !"".equals(jsonAssert)){
-                // false代表非严格校验，只比较部分字段
-                logs.append(log("INFO","正在进行json断言..."));
-                logger.info("正在进行json断言...");
-                try{
-                    JSONAssert.assertEquals(jsonAssert,responseBody,false);
-                    logs.append(log("INFO","JSON断言成功！"));
-                    logger.info("JSON断言成功！");
-                }catch (AssertionError e){
-                    logs.append(log("ERROR","JSON断言失败："+e));
-                    logger.error("JSON断言失败："+e);
-                    verifyResult = false;
-                }
-            }
+
             //格式化小数
             DecimalFormat df = new DecimalFormat("0.00");
             // 计算执行进度百分比
