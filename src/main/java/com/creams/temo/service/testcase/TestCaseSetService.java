@@ -484,7 +484,7 @@ public class TestCaseSetService {
                         try{
                             logs.append(log("INFO",String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect())));
                             logger.info(String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect()));
-                            superAssert(relationShip,(String)value,expect);
+                            superAssert(relationShip,String.valueOf(value),expect);
                             logs.append(log("INFO","断言成功！"));
                             logger.info("断言成功！");
                         }catch (AssertionError e){
