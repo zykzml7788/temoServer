@@ -382,10 +382,16 @@ public class TestCaseSetService {
                     String saveType = save.getSaveType();
                     if ("1".equals(saveFrom)){
                         if ("1".equals(saveType)){
-                            String value = String.valueOf(JSONPath.read(responseBody,jsonpath));
-                            redisUtil.set(paramKey,value);
-                            logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
-                            logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                            try{
+                                String value = String.valueOf(JSONPath.read(responseBody,jsonpath));
+                                redisUtil.set(paramKey,value);
+                                logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
+                                logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                            }catch (Exception e){
+                                logs.append(log("ERROR","请确认响应结构是否是JSON！"));
+                                e.printStackTrace();
+                            }
+
                         }else {
                             Pattern pattern = Pattern.compile(regex);
                             Matcher matcher = pattern.matcher(responseBody);
@@ -400,10 +406,15 @@ public class TestCaseSetService {
                         }
                     }else if ("2".equals(saveFrom)){
                         if ("1".equals(saveType)){
-                            String value = String.valueOf(JSONPath.read(responseHeaders,jsonpath));
-                            redisUtil.set(paramKey,value);
-                            logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
-                            logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                            try{
+                                String value = String.valueOf(JSONPath.read(responseHeaders,jsonpath));
+                                redisUtil.set(paramKey,value);
+                                logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
+                                logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                            }catch (Exception e){
+                                logs.append(log("ERROR","请确认响应结构是否是JSON！"));
+                                e.printStackTrace();
+                            }
                         }else {
                             Pattern pattern = Pattern.compile(regex);
                             Matcher matcher = pattern.matcher(responseHeaders);
@@ -418,10 +429,15 @@ public class TestCaseSetService {
                         }
                     }else if ("3".equals(saveFrom)){
                         if ("1".equals(saveType)){
-                            String value = String.valueOf(JSONPath.read(responseCookies,jsonpath));
-                            redisUtil.set(paramKey,value);
-                            logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
-                            logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                            try{
+                                String value = String.valueOf(JSONPath.read(responseCookies,jsonpath));
+                                redisUtil.set(paramKey,value);
+                                logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
+                                logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
+                            }catch (Exception e){
+                                logs.append(log("ERROR","请确认响应结构是否是JSON！"));
+                                e.printStackTrace();
+                            }
                         }else {
                             Pattern pattern = Pattern.compile(regex);
                             Matcher matcher = pattern.matcher(responseCookies);
