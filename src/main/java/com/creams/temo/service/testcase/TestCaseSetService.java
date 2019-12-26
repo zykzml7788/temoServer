@@ -388,8 +388,9 @@ public class TestCaseSetService {
                                 logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
                                 logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
                             }catch (Exception e){
+                                verifyResult = false;
                                 logs.append(log("ERROR","请确认响应结构是否是JSON！"));
-                                e.printStackTrace();
+                                logger.error("发生错误："+e);
                             }
 
                         }else {
@@ -412,8 +413,9 @@ public class TestCaseSetService {
                                 logs.append(log("INFO",String.format("储存关联参数到redis=> %s:%s",key,value)));
                                 logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
                             }catch (Exception e){
+                                verifyResult = false;
                                 logs.append(log("ERROR","请确认响应结构是否是JSON！"));
-                                e.printStackTrace();
+                                logger.error("发生错误："+e);
                             }
                         }else {
                             Pattern pattern = Pattern.compile(regex);
@@ -436,7 +438,8 @@ public class TestCaseSetService {
                                 logger.info(String.format("储存关联参数到redis=> %s:%s",key,value));
                             }catch (Exception e){
                                 logs.append(log("ERROR","请确认响应结构是否是JSON！"));
-                                e.printStackTrace();
+                                verifyResult = false;
+                                logger.error("发生错误："+e);
                             }
                         }else {
                             Pattern pattern = Pattern.compile(regex);
@@ -528,6 +531,7 @@ public class TestCaseSetService {
                     }
                 }
             }catch (Exception e){
+                verifyResult = false;
                 logs.append(log("ERROR","服务端发生错误，请联系后台人员！Detail:\n"+e));
                 logger.error("发生错误："+e);
             }
