@@ -289,7 +289,7 @@ public class TestCaseSetService {
                 bodyKV = JSON.parseObject(body,new TypeReference<Map<String, String>>(){});
             }
             ClientResponse response = null;
-            logs.append("开始调用接口...");
+            logs.append(log("INFO","开始调用接口..."));
             switch (method.toLowerCase()) {
                 case "get":
                     logs.append(log("INFO","=====> GET "+url));
