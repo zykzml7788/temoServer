@@ -538,6 +538,7 @@ public class TestCaseSetService {
                 verifyResult = false;
                 logs.append(log("ERROR","服务端发生错误，请联系后台人员！Detail:\n"+e));
                 logger.error("发生错误："+e);
+                e.printStackTrace();
             }
 
             // 最后生成全局cookie和header
