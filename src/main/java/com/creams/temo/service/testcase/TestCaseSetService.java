@@ -346,17 +346,10 @@ public class TestCaseSetService {
                     logger.error("暂不支持该请求方式");
             }
             // 处理响应体，转换为JSON字符串
-            String responseBody = "";
+            String responseBody = response.bodyToMono(String.class).block();
+            logs.append(log("INFO","<===== Response Body : " +responseBody));
             String responseHeaders = "";
             String responseCookies = "";
-            try {
-                responseBody = new JSONObject(response.bodyToMono(Map.class).block()).toString();
-            } catch (Exception e){
-                logs.append(log("INFO","响应体JSON转换失败,请确认响应结构是否为JSON!默认直接转为字符串"));
-                logger.info("响应体JSON转换失败,请确认响应结构是否为JSON!默认直接转为字符串");
-                responseBody = response.bodyToMono(String.class).block();
-            }
-            logs.append(log("INFO","<===== Response Body : " +responseBody));
             logger.info("Response Body : " +responseBody);
             Map<String,Object> rHeaders = new HashMap<>();
             // 处理响应头，转换为JSON字符串
