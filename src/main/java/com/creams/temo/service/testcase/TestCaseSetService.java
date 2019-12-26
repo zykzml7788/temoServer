@@ -348,6 +348,10 @@ public class TestCaseSetService {
                         logs.append(log("ERROR","暂不支持该请求方式"));
                         logger.error("暂不支持该请求方式");
                 }
+                // 响应状态吗
+                String status = String.valueOf(response.statusCode().value());
+                logs.append(log("INFO","<===== Status Code : " +status));
+                logger.info("Status Code : " +status);
                 // 处理响应体，转换为JSON字符串
                 String responseBody = response.bodyToMono(String.class).block();
                 logs.append(log("INFO","<===== Response Body : " +responseBody));
@@ -536,16 +540,6 @@ public class TestCaseSetService {
                 logger.error("发生错误："+e);
             }
 
-            //格式化小数
-            DecimalFormat df = new DecimalFormat("0.00");
-            // 计算执行进度百分比
-            String executedRate = df.format(((float)index/casesNum)*100);
-            // 计算成功率
-            String successRate = df.format(((float)(index-error)/casesNum)*100);
-            TestResult testResult = new TestResult(index,index-error,error,casesNum,successRate,executedRate);
-            String result = JSON.toJSONString(testResult);
-            WebSocketServer.sendInfo(result,"123");
-
             // 最后生成全局cookie和header
             String gCookies = getCommonParam(testCase.getGlobalCookies(),uuid);
             String gHeaders = getCommonParam(testCase.getGlobalHeaders(),uuid);
@@ -571,13 +565,22 @@ public class TestCaseSetService {
                 webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             }
             if (verifyResult){
-                success++;
                 executedRow = JSON.toJSONString(new ExecutedRow(index,caseName,1,logs.toString()));
             }else {
                 error++;
                 executedRow = JSON.toJSONString(new ExecutedRow(index,caseName,0,logs.toString()));
             }
+            // 发送消息
             WebSocketServer.sendInfo(executedRow,"101");
+            //格式化小数
+            DecimalFormat df = new DecimalFormat("0.00");
+            // 计算执行进度百分比
+            String executedRate = df.format(((float)index/casesNum)*100);
+            // 计算成功率
+            String successRate = df.format(((float)(index-error)/casesNum)*100);
+            TestResult testResult = new TestResult(index,index-error,error,casesNum,successRate,executedRate);
+            String result = JSON.toJSONString(testResult);
+            WebSocketServer.sendInfo(result,"123");
         }
         return null;
     }
