@@ -17,10 +17,6 @@ public interface ProjectMapper extends BaseMapper<Project> {
     @Select("select *from project where pid = #{pid}")
     ProjectResponse queryProjectById(@Param("pid") String pid);
 
-    @Select("select * from project")
-    List<ProjectResponse> queryAllProject();
 
     List<ProjectResponse> queryProjectByName(@Param("pname") String name);
-
-
 }

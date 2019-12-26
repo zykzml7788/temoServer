@@ -1,7 +1,6 @@
 package com.creams.temo.mapper.database;
 
 import com.creams.temo.entity.database.request.ScriptRequest;
-import com.creams.temo.entity.database.response.ScriptDbResponse;
 import com.creams.temo.entity.database.response.ScriptResponse;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
@@ -13,10 +12,8 @@ import java.util.List;
 @Mapper
 public interface ScriptMapper {
 
-    @Select("SELECT * FROM script order by update_time desc")
-    List<ScriptResponse> queryAllScript();
 
-    List<ScriptDbResponse> queryScriptDb(@Param("db_id")String dbId, @Param("script_name") String scriptName);
+    List<ScriptResponse> queryAllScript(@Param("db_id")String dbId, @Param("script_name") String scriptName);
 
     @Select("SELECT * FROM script WHERE script_id= #{script_id}")
     ScriptResponse queryScriptById(@Param("script_id") String scriptId);

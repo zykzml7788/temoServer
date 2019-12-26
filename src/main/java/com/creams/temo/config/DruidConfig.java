@@ -14,7 +14,6 @@ import java.util.HashMap;
 
 /**
  * 注入druid为了yml文件配置生效
- * @author Jelly
  */
 @Configuration
 public class DruidConfig {

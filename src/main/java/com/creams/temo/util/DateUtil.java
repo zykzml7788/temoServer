@@ -28,17 +28,8 @@ public class DateUtil {
         return df2.format(date1);
     }
 
-    /**
-     * 获取当前日期时间
-     * @return 当前日期
-     */
-    public static String getCurrentTime(){
-        Date d = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return sdf.format(d);
-    }
-
     public static void main(String[] args) {
-        System.out.println(DateUtil.getCurrentTime());
+        String date = dealDateFormat("2019-07-17T16:48:22.000+0000");
+        System.out.println(date);
     }
 }

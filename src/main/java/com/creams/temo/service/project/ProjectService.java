@@ -55,27 +55,6 @@ public class ProjectService {
     }
 
     /**
-     * 查询项目列表
-     * @return
-     */
-    @Transactional
-    public List<ProjectResponse> queryAllProjects(){
-        List<ProjectResponse> projectResponses = projectMapper.queryAllProject();
-        return projectResponses;
-    }
-
-    /**
-     * 根据项目id查询所属环境
-     * @param projectId
-     * @return
-     */
-    @Transactional
-    public List<EnvResponse> queryEnvByProjectId(String projectId){
-        List<EnvResponse> envResponses = envMapper.queryEnvByProjectId(projectId);
-        return envResponses;
-    }
-
-    /**
      * 模糊查询项目
      * @param name
      * @return
