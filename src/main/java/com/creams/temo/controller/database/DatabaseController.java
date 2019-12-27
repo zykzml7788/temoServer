@@ -29,7 +29,7 @@ public class DatabaseController {
     @Autowired
     private DatabaseService databaseService;
 
-    @ApiOperation("模糊查询数据库列表")
+    @ApiOperation("查询所有数据库信息")
     @GetMapping(value = "/")
     public JsonResult queryAllDatabase(){
         try{

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.creams.temo.mapper.testcase.TestCaseSetMapper">
+    <insert id="addTestCaseSet">
+        insert into testcase_set (set_id, set_name, set_desc, project_id,set_status, valid)
+        values
+        (#{setId}, #{setName}, #{setDesc}, #{projectId},#{setStatus}, #{valid})
+    </insert>
+
+
+    <select id="queryTestCaseSet" resultType="com.creams.temo.entity.testcase.response.TestCaseSetResponse">
+        select * from testcase_set
+        <where>
+            <if test="setId !=null and setId !=''">
+                and set_id = #{setId}
+            </if>
+            <if test="setName !=null and setName !=''">
+                and set_name like concat('%', #{setName}, '%')
+            </if>
+            <if test="setDesc !=null and setDesc !=''">
+                and set_desc like concat('%', #{setDesc}, '%')
+            </if>
+            <if test="projectId !=null and projectId !=''">
+                and project_id = #{projectId}
+            </if>
+        </where>
+        order by createTime desc
+    </select>
+    <select id="queryTestCaseSetByNameandId" resultType="com.creams.temo.entity.testcase.response.TestCaseSetResponse">
+        select * from testcase_set
+        <where>
+
+            <if test="set_name !=null and set_name !=''">
+                and set_name like concat('%', #{set_name}, '%')
+            </if>
+
+            <if test="project_id !=null and project_id !=''">
+                and project_id = #{project_id}
+            </if>
+
+            <if test="set_status !=null and set_status !=''">
+                and set_status = #{set_status}
+            </if>
+        </where>
+        order by createTime desc
+    </select>
+
+
+    <update id="updateTestCaseSetById">
+        update  testcase_set set
+        set_name = #{setName},
+        set_desc = #{setDesc},
+        project_id = #{projectId},
+        set_status = #{setStatus},
+        valid = #{valid}
+        where set_id = #{setId}
+    </update>
+
+</mapper>
