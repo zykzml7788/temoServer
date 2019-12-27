@@ -4,6 +4,8 @@ import com.creams.temo.entity.ExecutedRow;
 import com.creams.temo.entity.JsonResult;
 import com.creams.temo.mapper.MongoMapper;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,7 @@ public class MongoTestController {
     private MongoMapper mongoMapper;
 
     @PostMapping(value="/save")
+    @ApiOperation(value = "保存用例日志")
     public JsonResult save(@RequestBody ExecutedRow executedRow) {
         try {
             mongoMapper.save(executedRow);
@@ -30,8 +33,9 @@ public class MongoTestController {
      * @param caseId
      * @return
      */
-    @GetMapping(value="/")
-    public JsonResult findByCaseId(String caseId){
+    @ApiOperation(value = "根据caseId查询用例日志")
+    @GetMapping(value="/{caseId}/info")
+    public JsonResult findByCaseId(@PathVariable @ApiParam("用例id") String caseId){
         try {
             ExecutedRow executedRow= mongoMapper.findByCaseId(caseId);
             System.out.println(caseId);
@@ -44,7 +48,8 @@ public class MongoTestController {
 
     }
 
-    @PutMapping(value="/test3")
+    @PutMapping(value="/")
+    @ApiOperation("根据用例id修改用例日志")
     public JsonResult update(ExecutedRow executedRow){
         try {
             mongoMapper.update(executedRow);
@@ -56,8 +61,9 @@ public class MongoTestController {
 
     }
 
-    @DeleteMapping(value="/")
-    public JsonResult deleteById(String caseId){
+    @DeleteMapping(value="/{id}")
+    @ApiOperation("删除用例日志")
+    public JsonResult deleteById(@PathVariable("id") @ApiParam("用例id") String caseId){
         try {
             mongoMapper.deleteByCaseId(caseId);
             return new JsonResult("操作成功", 200, caseId, true);

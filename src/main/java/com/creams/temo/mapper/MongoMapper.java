@@ -38,7 +38,8 @@ public class MongoMapper {
         Update update= new Update()
                 .set("logs",executedRow.getLogs())
                 .set("status", executedRow.getStatus())
-                .set("caseName", executedRow.getCaseName());
+                .set("caseName", executedRow.getCaseName())
+                .set("index", executedRow.getIndex());
         //更新查询返回结果集的第一条
         mongoTemplate.updateFirst(query,update,ExecutedRow.class);
         //更新查询返回结果集的所有
