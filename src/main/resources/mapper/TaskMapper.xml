@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.creams.temo.mapper.task.TaskMapper">
+
+
+    <insert id="addTask">
+        INSERT into task
+        (task_id, task_name, task_desc, is_timing, is_parallel, cron, times, mail, testsets, status)
+        values
+        (#{taskId}, #{taskName}, #{taskDesc}, #{isTiming},#{isParallel}, #{cron}, #{times}, #{mail}, #{testSets}, #{status})
+    </insert>
+
+    <update id="updateTaskById">
+        update  task set
+        task_id = #{taskId},
+        task_name = #{taskName},
+        task_desc = #{taskDesc},
+        is_timing = #{isTiming},
+        is_parallel = #{isParallel},
+        cron = #{cron},
+        times = #{times},
+        mail = #{mail},
+        testsets = #{testSets},
+        status = #{status}
+    </update>
+
+</mapper>
