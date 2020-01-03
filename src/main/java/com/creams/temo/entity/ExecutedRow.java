@@ -19,6 +19,12 @@ public class ExecutedRow {
     private Integer status;
 
     /**
+     * 用例id
+     */
+    private String caseId;
+
+
+    /**
      * 用例名称
      */
     private String caseName;
@@ -34,4 +40,6 @@ public class ExecutedRow {
         this.caseName = caseName;
         this.index = index;
     }
+
+
 }
