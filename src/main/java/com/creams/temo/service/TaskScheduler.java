@@ -52,7 +52,7 @@ public class TaskScheduler implements Job {
     }
 
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    public void execute(JobExecutionContext jobExecutionContext) {
         // 执行逻辑，此处应写执行任务的逻辑
     }
 }

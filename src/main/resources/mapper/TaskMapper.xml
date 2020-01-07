@@ -14,7 +14,6 @@
 
     <update id="updateTaskById">
         update  task set
-        task_id = #{taskId},
         task_name = #{taskName},
         task_desc = #{taskDesc},
         is_timing = #{isTiming},
@@ -24,6 +23,7 @@
         mail = #{mail},
         testsets = #{testSets},
         status = #{status}
+        where task_id = #{taskId}
     </update>
 
 </mapper>
