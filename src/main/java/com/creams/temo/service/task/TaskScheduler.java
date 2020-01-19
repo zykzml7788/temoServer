@@ -1,4 +1,4 @@
-package com.creams.temo.service;
+package com.creams.temo.service.task;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;

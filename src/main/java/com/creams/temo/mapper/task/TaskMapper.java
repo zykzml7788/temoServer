@@ -12,8 +12,12 @@ import java.util.List;
 
 @Mapper
 public interface TaskMapper {
-    @Select("select * from task")
-    List<TaskResponse> queryAllTasks();
+
+
+    List<TaskResponse> queryTasks(String taskName,Integer status);
+
+    @Select("select * from task where task_id = #{taskId}")
+    TaskResponse queryTaskDetail(String taskId);
 
     boolean addTask(TaskRequest taskRequest);
 

@@ -37,12 +37,12 @@ public class TaskRequest {
     @TableField(value = "times")
     private Integer times;
 
-    @ApiModelProperty("执行状态（0待执行，1执行中，2执行完毕）")
-    @TableField(value = "status")
+    @ApiModelProperty("邮件")
+    @TableField(value = "mail")
     private String mail;
 
-    @ApiModelProperty("执行状态（0待执行，1执行中，2执行完毕）")
-    @TableField(value = "status")
+    @ApiModelProperty("用例集")
+    @TableField(value = "testSets")
     private String testSets;
 
     @ApiModelProperty("执行状态（0待执行，1执行中，2执行完毕）")

@@ -26,4 +26,16 @@
         where task_id = #{taskId}
     </update>
 
+    <select id="queryTasks" resultType="com.creams.temo.entity.task.response.TaskResponse">
+        select * from task
+        <where>
+            <if test="taskName != null and taskName != ''">
+                task_name like concat('%',#{taskName},'%')
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
 </mapper>

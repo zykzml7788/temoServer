@@ -2,8 +2,11 @@ package com.creams.temo.entity.task.response;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
+@Data
 public class TaskResponse {
+
     @ApiModelProperty("任务id")
     @TableField(value = "task_id")
     private String taskId;
@@ -32,12 +35,12 @@ public class TaskResponse {
     @TableField(value = "times")
     private Integer times;
 
-    @ApiModelProperty("执行状态（0待执行，1执行中，2执行完毕）")
-    @TableField(value = "status")
+    @ApiModelProperty("邮件")
+    @TableField(value = "mail")
     private String mail;
 
-    @ApiModelProperty("执行状态（0待执行，1执行中，2执行完毕）")
-    @TableField(value = "status")
+    @ApiModelProperty("用例集")
+    @TableField(value = "testSets")
     private String testSets;
 
     @ApiModelProperty("执行状态（0待执行，1执行中，2执行完毕）")

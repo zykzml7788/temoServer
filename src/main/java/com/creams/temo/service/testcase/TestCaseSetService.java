@@ -214,8 +214,8 @@ public class TestCaseSetService {
      * @param setId 用例集ID
      * @param envId 调试环境ID
      */
-    @Async
-    public Object executeSet(String setId, String envId) throws Exception {
+    public List<ExecutedRow> executeSet(String setId, String envId) throws Exception {
+        List<ExecutedRow> testResults = new ArrayList<>();
         TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
         EnvResponse env = envMapper.queryEnvById(envId);
         String uuid = StringUtil.uuid();
@@ -223,12 +223,11 @@ public class TestCaseSetService {
         List<TestCaseResponse> testCases = testCaseSet.getTestCase();
         // 获取用例数量
         int casesNum = testCases.size();
-        // 设置初始成功用例数为 0
-        int success = 0;
         // 设置初始失败用例数为 0
         int error = 0;
         // 设置初始的执行记录
-        String executedRow = null;
+        String executedRow;
+        ExecutedRow testResultRow;
         Map<String,String> globalCookies = new HashMap<>();
         Map<String,String> globalHeaders = new HashMap<>();
         WebClientUtil webClientUtil  = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
@@ -566,11 +565,15 @@ public class TestCaseSetService {
                 webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             }
             if (verifyResult){
-                executedRow = JSON.toJSONString(new ExecutedRow(index,caseName,1,logs.toString()));
+                testResultRow = new ExecutedRow(index,caseName,1,logs.toString());
+                executedRow = JSON.toJSONString(testResultRow);
             }else {
                 error++;
-                executedRow = JSON.toJSONString(new ExecutedRow(index,caseName,0,logs.toString()));
-            }
+                testResultRow = new ExecutedRow(index,caseName,0,logs.toString());
+                executedRow = JSON.toJSONString(testResultRow);
+        }
+            // 把执行结果加到总体的执行结果中
+            testResults.add(testResultRow);
             // 发送消息
             WebSocketServer.sendInfo(executedRow,"101");
             //格式化小数
@@ -583,7 +586,7 @@ public class TestCaseSetService {
             String result = JSON.toJSONString(testResult);
             WebSocketServer.sendInfo(result,"123");
         }
-        return null;
+        return testResults;
     }
 
 //    /**
@@ -689,4 +692,37 @@ public class TestCaseSetService {
         return null;
     }
 
+    /**
+     * 调试用例集
+     * @param setId
+     * @param envId
+     */
+    @Async
+    public void debugSet(String setId, String envId) throws Exception {
+        executeSet(setId,envId);
+    }
+
+    /**
+     * 任务同步执行用例集
+     * @param setId
+     * @param envId
+     * @throws Exception
+     */
+    public void executeSetBySynchronizeTask(String setId, String envId) throws Exception {
+        List<ExecutedRow> executedRows = executeSet(setId,envId);
+        // 把执行记录落库
+    }
+
+
+    /**
+     * 异步执行用例集
+     * @param setId
+     * @param envId
+     * @throws Exception
+     */
+    @Async
+    public void executeSetByAsynchronizeTask(String setId, String envId) throws Exception {
+        List<ExecutedRow> executedRows = executeSet(setId,envId);
+        // 把执行记录落库
+    }
 }
