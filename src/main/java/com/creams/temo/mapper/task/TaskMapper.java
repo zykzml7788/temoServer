@@ -3,10 +3,7 @@ package com.creams.temo.mapper.task;
 import com.creams.temo.entity.task.request.TaskRequest;
 import com.creams.temo.entity.task.response.TaskResponse;
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -22,6 +19,9 @@ public interface TaskMapper {
     boolean addTask(TaskRequest taskRequest);
 
     boolean updateTaskById(TaskRequest taskRequest);
+
+    @Update("update task set status=#{status} where task_id=#{taskId}")
+    boolean changeStatus(Integer status,String taskId);
 
     @Delete("delete from task where task_id = #{task_id}")
     boolean deleteTask(@Param("task_id") String taskId);

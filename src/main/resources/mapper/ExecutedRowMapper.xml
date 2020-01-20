@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.creams.temo.mapper.task.ExecuteRowMapper">
+
+
+    <insert id="addExecutedRow">
+        insert into executed_row (case_name,set_id,`status`,index_of_executed,`index`,`logs`,case_id)
+        values (#{caseName},#{setId},#{status},#{indexOfExecuted},#{index},#{logs},#{caseId})
+    </insert>
+
+
+    <select id="queryMaxIndexOfExecutedRow" resultType="java.lang.Integer">
+        select max(index_of_executed) from executed_row where set_id=#{setId}
+    </select>
+
+    <select id="queryExecutedRowBySetId" resultType="com.creams.temo.entity.task.response.ExecutedRowResponse">
+        select * from executed_row where set_id = #{setId} order by index
+    </select>
+
+
+</mapper>

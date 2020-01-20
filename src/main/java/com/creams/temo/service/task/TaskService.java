@@ -1,6 +1,7 @@
 package com.creams.temo.service.task;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.creams.temo.entity.task.TestSet;
 import com.creams.temo.entity.task.request.TaskRequest;
 import com.creams.temo.entity.task.response.TaskResponse;
@@ -10,6 +11,7 @@ import com.creams.temo.util.StringUtil;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -75,26 +77,71 @@ public class TaskService {
     }
 
     /**
-     * 发起任务
+     * 发起同步任务
      * @param taskId
      */
-    public void startTask(String taskId){
+    @Async
+    public void startSynchronizeTask(String taskId){
+        // 更改任务状态为待执行
+        taskMapper.changeStatus(0,taskId);
         // 获取任务相关联的需要执行的用例集
         TaskResponse taskResponse = queryTaskDetail(taskId);
-        List testSets = JSON.parseObject(taskResponse.getTestSets(),List.class);
+        List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets(),TestSet.class);
         if ("0".equals(taskResponse.getIsTiming())){
-            // 不定时执行
-            for (Object testSet:testSets){
-                TestSet set = (TestSet)testSet;
-                String setId = set.getSetId();
-                String envId = set.getEnvId();
+            // 立即执行
+            for (TestSet testSet:testSets){
+                String setId = testSet.getSetId();
+                String envId = testSet.getEnvId();
                 try {
-                    testCaseSetService.executeSet(setId,envId);
+                    // 同步调用用例集
+                    testCaseSetService.executeSetBySynchronizeTask(taskId,setId,envId);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }else {
+            // 定时执行
+
+            //定义一个Trigger
+            Trigger trigger = newTrigger().withIdentity(taskResponse.getTaskName())
+                    .startNow()//一旦加入scheduler，立即生效
+                    .withSchedule(cronSchedule(taskResponse.getCron()))
+                    .build();
+            //定义一个JobDetail
+            JobDetail job = newJob(TaskScheduler.class)
+                    .withIdentity(taskResponse.getTaskName())
+                    .usingJobData("testSets", taskResponse.getTestSets())
+                    .build();
+            // 把job加入到任务调度器
+            taskScheduler.addJob(job,trigger);
+
+        }
+    }
+
+    /**
+     * 发起并发任务
+     * @param taskId
+     */
+    @Async
+    public void startAsnchronizeTask(String taskId){
+        // 获取任务相关联的需要执行的用例集
+        TaskResponse taskResponse = queryTaskDetail(taskId);
+        List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets().replaceAll("\\\\",""),TestSet.class);
+        if ("0".equals(taskResponse.getIsTiming())){
+            // 立即
+            for (TestSet testSet:testSets){
+                String setId = testSet.getSetId();
+                String envId = testSet.getEnvId();
+                try {
+                    // 异步调用用例集
+                    testCaseSetService.executeSetByAsynchronizeTask(taskId,setId,envId);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }else {
+            // 定时执行
+
             //定义一个Trigger
             Trigger trigger = newTrigger().withIdentity(taskResponse.getTaskName())
                     .startNow()//一旦加入scheduler，立即生效

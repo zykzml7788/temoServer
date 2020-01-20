@@ -18,6 +18,8 @@ import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.entity.testcase.response.VerifyResponse;
 import com.creams.temo.mapper.database.ScriptMapper;
 import com.creams.temo.mapper.project.EnvMapper;
+import com.creams.temo.mapper.task.ExecuteRowMapper;
+import com.creams.temo.mapper.task.TaskMapper;
 import com.creams.temo.mapper.testcase.*;
 import com.creams.temo.service.WebSocketServer;
 import com.creams.temo.util.RedisUtil;
@@ -38,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
 
+import javax.swing.event.InternalFrameEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,6 +77,12 @@ public class TestCaseSetService {
 
     @Autowired
     EnvMapper envMapper;
+
+    @Autowired
+    ExecuteRowMapper executeRowMapper;
+
+    @Autowired
+    TaskMapper taskMapper;
 
     @Autowired
     RedisUtil redisUtil;
@@ -240,6 +249,7 @@ public class TestCaseSetService {
             // 取到用例相关信息，并处理${key}的关联部分
             String url = getCommonParam(testCase.getUrl(),uuid);
             webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
+            String caseId = testCase.getCaseId();
             String caseName = testCase.getCaseDesc();
             String method = getCommonParam(testCase.getMethod(),uuid);
             String body = getCommonParam(testCase.getBody(),uuid);
@@ -564,12 +574,18 @@ public class TestCaseSetService {
                 }
                 webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             }
+            // 查询是第几次执行
+            Integer maxIndexOfExecuted = executeRowMapper.queryMaxIndexOfExecutedRow(setId);
+            if (maxIndexOfExecuted==null){
+                maxIndexOfExecuted = 0;
+            }
             if (verifyResult){
-                testResultRow = new ExecutedRow(index,caseName,1,logs.toString());
+                // 这边0需要从数据库查询出最大的，再加一，后续修改
+                testResultRow = new ExecutedRow(setId,caseId,maxIndexOfExecuted+1,index,caseName,1,logs.toString());
                 executedRow = JSON.toJSONString(testResultRow);
             }else {
                 error++;
-                testResultRow = new ExecutedRow(index,caseName,0,logs.toString());
+                testResultRow = new ExecutedRow(setId,caseId,maxIndexOfExecuted+1,index,caseName,0,logs.toString());
                 executedRow = JSON.toJSONString(testResultRow);
         }
             // 把执行结果加到总体的执行结果中
@@ -704,25 +720,41 @@ public class TestCaseSetService {
 
     /**
      * 任务同步执行用例集
+     * @param taskId
      * @param setId
      * @param envId
      * @throws Exception
      */
-    public void executeSetBySynchronizeTask(String setId, String envId) throws Exception {
+    public void executeSetBySynchronizeTask(String taskId,String setId, String envId) throws Exception {
+        // 更改用例状态为执行中
+        taskMapper.changeStatus(1,taskId);
         List<ExecutedRow> executedRows = executeSet(setId,envId);
+        // 更改用例状态为执行完毕
+        taskMapper.changeStatus(2,taskId);
         // 把执行记录落库
+        for (ExecutedRow executedRow:executedRows){
+            executeRowMapper.addExecutedRow(executedRow);
+        }
     }
 
 
     /**
      * 异步执行用例集
+     * @param taskId
      * @param setId
      * @param envId
      * @throws Exception
      */
     @Async
-    public void executeSetByAsynchronizeTask(String setId, String envId) throws Exception {
+    public void executeSetByAsynchronizeTask(String taskId,String setId, String envId) throws Exception {
+        // 更改用例状态为执行中
+        taskMapper.changeStatus(1,taskId);
         List<ExecutedRow> executedRows = executeSet(setId,envId);
+        // 更改用例状态为执行完毕
+        taskMapper.changeStatus(2,taskId);
         // 把执行记录落库
+        for (ExecutedRow executedRow:executedRows){
+            executeRowMapper.addExecutedRow(executedRow);
+        }
     }
 }
