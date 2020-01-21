@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -720,17 +722,12 @@ public class TestCaseSetService {
 
     /**
      * 任务同步执行用例集
-     * @param taskId
      * @param setId
      * @param envId
      * @throws Exception
      */
-    public void executeSetBySynchronizeTask(String taskId,String setId, String envId) throws Exception {
-        // 更改用例状态为执行中
-        taskMapper.changeStatus(1,taskId);
+    public void executeSetBySynchronizeTask(String setId, String envId) throws Exception {
         List<ExecutedRow> executedRows = executeSet(setId,envId);
-        // 更改用例状态为执行完毕
-        taskMapper.changeStatus(2,taskId);
         // 把执行记录落库
         for (ExecutedRow executedRow:executedRows){
             executeRowMapper.addExecutedRow(executedRow);
@@ -740,21 +737,18 @@ public class TestCaseSetService {
 
     /**
      * 异步执行用例集
-     * @param taskId
      * @param setId
      * @param envId
      * @throws Exception
      */
-    @Async
-    public void executeSetByAsynchronizeTask(String taskId,String setId, String envId) throws Exception {
-        // 更改用例状态为执行中
-        taskMapper.changeStatus(1,taskId);
+    @Async("taskExecutor")
+    public Future<Boolean> executeSetByAsynchronizeTask(String setId, String envId) throws Exception {
+
         List<ExecutedRow> executedRows = executeSet(setId,envId);
-        // 更改用例状态为执行完毕
-        taskMapper.changeStatus(2,taskId);
         // 把执行记录落库
         for (ExecutedRow executedRow:executedRows){
             executeRowMapper.addExecutedRow(executedRow);
         }
+        return new AsyncResult<>(true);
     }
 }
