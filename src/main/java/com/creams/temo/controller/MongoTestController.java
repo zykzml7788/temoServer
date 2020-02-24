@@ -38,8 +38,6 @@ public class MongoTestController {
     public JsonResult findByCaseId(@PathVariable @ApiParam("用例id") String caseId){
         try {
             ExecutedRow executedRow= mongoMapper.findByCaseId(caseId);
-            System.out.println(caseId);
-            System.out.println(executedRow);
             return new JsonResult("操作成功", 200, executedRow, true);
         }catch (Exception e){
             e.printStackTrace();

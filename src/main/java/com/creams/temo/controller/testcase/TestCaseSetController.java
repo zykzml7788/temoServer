@@ -154,7 +154,7 @@ public class TestCaseSetController {
             return new JsonResult("该用例集被禁用，禁止调试", 500, null, false);
         }
         try {
-            testCaseSetService.executeSet(setId,envId);
+            testCaseSetService.debugSet(setId,envId);
             return new JsonResult("已发起调试，请等待执行结果...", 200, null, true);
         }catch (Exception e){
             e.printStackTrace();

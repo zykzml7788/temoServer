@@ -58,7 +58,7 @@ public class TestCaseController {
     public JsonResult queryTestCaseInfo(@PathVariable("id") String id){
         try{
             TestCaseResponse testCaseResponse = testCaseService.queryTestCaseInfo(id);
-            return new JsonResult("操作成功", 200, testCaseResponse, false);
+            return new JsonResult("操作成功", 200, testCaseResponse, true);
         }catch (Exception e){
             e.printStackTrace();
             return new JsonResult("操作失败", 500, null, false);

@@ -18,6 +18,8 @@ import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.entity.testcase.response.VerifyResponse;
 import com.creams.temo.mapper.database.ScriptMapper;
 import com.creams.temo.mapper.project.EnvMapper;
+import com.creams.temo.mapper.task.ExecuteRowMapper;
+import com.creams.temo.mapper.task.TaskMapper;
 import com.creams.temo.mapper.testcase.*;
 import com.creams.temo.service.WebSocketServer;
 import com.creams.temo.util.RedisUtil;
@@ -33,16 +35,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
 
+import javax.swing.event.InternalFrameEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,6 +79,12 @@ public class TestCaseSetService {
 
     @Autowired
     EnvMapper envMapper;
+
+    @Autowired
+    ExecuteRowMapper executeRowMapper;
+
+    @Autowired
+    TaskMapper taskMapper;
 
     @Autowired
     RedisUtil redisUtil;
@@ -214,8 +225,8 @@ public class TestCaseSetService {
      * @param setId 用例集ID
      * @param envId 调试环境ID
      */
-    @Async
-    public Object executeSet(String setId, String envId) throws Exception {
+    public List<ExecutedRow> executeSet(String setId, String envId) throws Exception {
+        List<ExecutedRow> testResults = new ArrayList<>();
         TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
         EnvResponse env = envMapper.queryEnvById(envId);
         String uuid = StringUtil.uuid();
@@ -223,12 +234,11 @@ public class TestCaseSetService {
         List<TestCaseResponse> testCases = testCaseSet.getTestCase();
         // 获取用例数量
         int casesNum = testCases.size();
-        // 设置初始成功用例数为 0
-        int success = 0;
         // 设置初始失败用例数为 0
         int error = 0;
         // 设置初始的执行记录
-        String executedRow = null;
+        String executedRow;
+        ExecutedRow testResultRow;
         Map<String,String> globalCookies = new HashMap<>();
         Map<String,String> globalHeaders = new HashMap<>();
         WebClientUtil webClientUtil  = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
@@ -241,8 +251,8 @@ public class TestCaseSetService {
             // 取到用例相关信息，并处理${key}的关联部分
             String url = getCommonParam(testCase.getUrl(),uuid);
             webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
-            String caseName = testCase.getCaseDesc();
             String caseId = testCase.getCaseId();
+            String caseName = testCase.getCaseDesc();
             String method = getCommonParam(testCase.getMethod(),uuid);
             String body = getCommonParam(testCase.getBody(),uuid);
             String delayTime = testCase.getDelayTime();
@@ -485,7 +495,7 @@ public class TestCaseSetService {
                         try{
                             logs.append(log("INFO",String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect())));
                             logger.info(String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect()));
-                            superAssert(relationShip,(String)value,expect);
+                            superAssert(relationShip,String.valueOf(value),expect);
                             logs.append(log("INFO","断言成功！"));
                             logger.info("断言成功！");
                         }catch (AssertionError e){
@@ -539,6 +549,7 @@ public class TestCaseSetService {
                 verifyResult = false;
                 logs.append(log("ERROR","服务端发生错误，请联系后台人员！Detail:\n"+e));
                 logger.error("发生错误："+e);
+                e.printStackTrace();
             }
 
             // 最后生成全局cookie和header
@@ -565,12 +576,22 @@ public class TestCaseSetService {
                 }
                 webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             }
+            // 查询是第几次执行
+            Integer maxIndexOfExecuted = executeRowMapper.queryMaxIndexOfExecutedRow(setId);
+            if (maxIndexOfExecuted==null){
+                maxIndexOfExecuted = 0;
+            }
             if (verifyResult){
-                executedRow = JSON.toJSONString(new ExecutedRow(index,caseId,caseName,1,logs.toString()));
+                // 这边0需要从数据库查询出最大的，再加一，后续修改
+                testResultRow = new ExecutedRow(setId,caseId,maxIndexOfExecuted+1,index,caseName,1,logs.toString());
+                executedRow = JSON.toJSONString(testResultRow);
             }else {
                 error++;
-                executedRow = JSON.toJSONString(new ExecutedRow(index,caseId,caseName,0,logs.toString()));
-            }
+                testResultRow = new ExecutedRow(setId,caseId,maxIndexOfExecuted+1,index,caseName,0,logs.toString());
+                executedRow = JSON.toJSONString(testResultRow);
+        }
+            // 把执行结果加到总体的执行结果中
+            testResults.add(testResultRow);
             // 发送消息
             WebSocketServer.sendInfo(executedRow,"101");
             //格式化小数
@@ -583,7 +604,7 @@ public class TestCaseSetService {
             String result = JSON.toJSONString(testResult);
             WebSocketServer.sendInfo(result,"123");
         }
-        return null;
+        return testResults;
     }
 
 //    /**
@@ -689,4 +710,45 @@ public class TestCaseSetService {
         return null;
     }
 
+    /**
+     * 调试用例集
+     * @param setId
+     * @param envId
+     */
+    @Async
+    public void debugSet(String setId, String envId) throws Exception {
+        executeSet(setId,envId);
+    }
+
+    /**
+     * 任务同步执行用例集
+     * @param setId
+     * @param envId
+     * @throws Exception
+     */
+    public void executeSetBySynchronizeTask(String setId, String envId) throws Exception {
+        List<ExecutedRow> executedRows = executeSet(setId,envId);
+        // 把执行记录落库
+        for (ExecutedRow executedRow:executedRows){
+            executeRowMapper.addExecutedRow(executedRow);
+        }
+    }
+
+
+    /**
+     * 异步执行用例集
+     * @param setId
+     * @param envId
+     * @throws Exception
+     */
+    @Async("taskExecutor")
+    public Future<Boolean> executeSetByAsynchronizeTask(String setId, String envId) throws Exception {
+
+        List<ExecutedRow> executedRows = executeSet(setId,envId);
+        // 把执行记录落库
+        for (ExecutedRow executedRow:executedRows){
+            executeRowMapper.addExecutedRow(executedRow);
+        }
+        return new AsyncResult<>(true);
+    }
 }
