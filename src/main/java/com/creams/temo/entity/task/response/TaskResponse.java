@@ -1,8 +1,12 @@
 package com.creams.temo.entity.task.response;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.creams.temo.entity.task.TestSet;
+import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class TaskResponse {
@@ -42,6 +46,10 @@ public class TaskResponse {
     @ApiModelProperty("用例集")
     @TableField(value = "testSets")
     private String testSets;
+
+    @ApiModelProperty("用例列表")
+    @TableField(value = "testSetList")
+    private List<TestSet> testSetList;
 
     @ApiModelProperty("执行状态（0待执行，1执行中，2执行完毕）")
     @TableField(value = "status")
