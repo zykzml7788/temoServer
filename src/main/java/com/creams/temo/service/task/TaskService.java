@@ -2,12 +2,15 @@ package com.creams.temo.service.task;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.creams.temo.entity.database.response.ScriptDbResponse;
 import com.creams.temo.entity.task.TestSet;
 import com.creams.temo.entity.task.request.TaskRequest;
 import com.creams.temo.entity.task.response.TaskResponse;
 import com.creams.temo.mapper.task.TaskMapper;
 import com.creams.temo.service.testcase.TestCaseSetService;
 import com.creams.temo.util.StringUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,8 +97,10 @@ public class TaskService {
     /**
      * 根据任务名和状态筛选任务
      */
-    public List<TaskResponse> queryTasks(String taskName, Integer status) {
-        return taskMapper.queryTasks(taskName, status);
+    public PageInfo<TaskResponse> queryTasks(Integer page,String taskName, Integer status) {
+        PageHelper.startPage(page, 10);
+        List<TaskResponse> taskResponses = taskMapper.queryTasks(taskName, status);
+        return new PageInfo<>(taskResponses);
     }
 
     /**
