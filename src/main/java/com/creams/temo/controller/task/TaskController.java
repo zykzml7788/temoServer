@@ -23,6 +23,43 @@ public class TaskController {
     @Autowired
     public TaskService taskService;
 
+    @ApiOperation("批量执行任务")
+    @PostMapping("/executeTasks")
+    public JsonResult executeTasks(@RequestBody List<String> taskIds){
+        try {
+            if (taskIds == null || taskIds.isEmpty()){
+                return new JsonResult("操作失败", 500, "任务为空", false);
+            }
+            for (String taskId: taskIds){
+                TaskResponse taskResponse = taskService.queryTaskDetail(taskId);
+                if ("1".equals(String.valueOf(taskResponse.getStatus()))){
+                    return new JsonResult("不允许执行状态为执行中的任务", 500, null, false);
+                }
+            }
+            for (String taskId: taskIds){
+                TaskResponse taskResponse = taskService.queryTaskDetail(taskId);
+                //判断用例集状态0和2可以进行执行
+                if ("0".equals(String.valueOf(taskResponse.getStatus())) || "2".equals(String.valueOf(taskResponse.getStatus()))){
+                    //判断是否为定时任务
+                    if ("1".equals(taskResponse.getIsTiming())){
+                        taskService.startTimingTask(taskId);
+
+                    }else if ("0".equals(taskResponse.getIsTiming())){
+                        //判断是否并行
+                        if ("1".equals(taskResponse.getIsParallel())){
+                            taskService.startAsnchronizeTask(taskId);
+                        }else if ("0".equals(taskResponse.getIsParallel())){
+                            taskService.startSynchronizeTask(taskId);
+                        }
+                    }
+                }
+            }
+            return new JsonResult("已成功发起批量执行任务", 200, null, true);
+        }catch (Exception e){
+            return new JsonResult("操作失败", 500, e, false);
+        }
+    }
+
 
     @ApiOperation(value = "新增任务")
     @PostMapping("")
