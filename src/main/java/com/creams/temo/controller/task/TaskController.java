@@ -4,11 +4,13 @@ import com.creams.temo.entity.JsonResult;
 import com.creams.temo.entity.task.request.TaskRequest;
 import com.creams.temo.entity.task.response.TaskResponse;
 import com.creams.temo.service.task.TaskService;
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -37,15 +39,18 @@ public class TaskController {
     }
 
     @ApiOperation(value = "根据任务名和执行状态查询任务")
-    @GetMapping("")
-    public JsonResult queryTasks(@RequestParam(value = "taskName", required = false) String taskName, @RequestParam(value = "status", required = false) Integer status) {
-        List<TaskResponse> taskResponses = taskService.queryTasks(taskName, status);
-        return new JsonResult("操作成功", 200, taskResponses, true);
+    @GetMapping("/{page}")
+    public JsonResult queryTasks(@PathVariable(value = "page") Integer page,@RequestParam(value = "taskName", required = false) String taskName, @RequestParam(value = "status", required = false) Integer status) {
+        PageInfo<TaskResponse> pageInfo = taskService.queryTasks(page,taskName, status);
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("list", pageInfo.getList());
+        map.put("total", pageInfo.getTotal());
+        return new JsonResult("操作成功", 200, map, true);
     }
 
 
     @ApiOperation(value = "查询任务详情")
-    @GetMapping("/{taskId}")
+    @GetMapping("/{taskId}/info")
     public JsonResult queryTaskDetail(@PathVariable("taskId") String taskId) {
         TaskResponse taskResponse = taskService.queryTaskDetail(taskId);
         return new JsonResult("操作成功", 200, taskResponse, true);

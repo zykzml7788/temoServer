@@ -2,12 +2,17 @@ package com.creams.temo.service.task;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.creams.temo.entity.database.response.ScriptDbResponse;
 import com.creams.temo.entity.task.TestSet;
 import com.creams.temo.entity.task.request.TaskRequest;
 import com.creams.temo.entity.task.response.TaskResponse;
+import com.creams.temo.entity.testcase.response.TestCaseResponse;
+import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.mapper.task.TaskMapper;
 import com.creams.temo.service.testcase.TestCaseSetService;
 import com.creams.temo.util.StringUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,8 +99,17 @@ public class TaskService {
     /**
      * 根据任务名和状态筛选任务
      */
-    public List<TaskResponse> queryTasks(String taskName, Integer status) {
-        return taskMapper.queryTasks(taskName, status);
+    public PageInfo<TaskResponse> queryTasks(Integer page,String taskName, Integer status) {
+        PageHelper.startPage(page, 10);
+        List<TaskResponse> taskResponses = taskMapper.queryTasks(taskName, status);
+        for (TaskResponse taskResponse : taskResponses){
+            List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
+            for (TestSet testSet:testSets){
+                testSet.setSetName(testCaseSetService.queryTestCaseSetInfo(testSet.getSetId()).getSetName());
+            }
+            taskResponse.setTestSetList(testSets);
+        }
+        return new PageInfo<>(taskResponses);
     }
 
     /**
@@ -104,7 +118,13 @@ public class TaskService {
      * @param taskId
      */
     public TaskResponse queryTaskDetail(String taskId) {
-        return taskMapper.queryTaskDetail(taskId);
+        TaskResponse taskResponse = taskMapper.queryTaskDetail(taskId);
+        List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
+        for (TestSet testSet:testSets){
+            testSet.setSetName(testCaseSetService.queryTestCaseSetInfo(testSet.getSetId()).getSetName());
+        }
+        taskResponse.setTestSetList(testSets);
+        return taskResponse;
     }
 
     /**
@@ -118,7 +138,7 @@ public class TaskService {
         taskMapper.changeStatus(0, taskId);
         // 获取任务相关联的需要执行的用例集
         TaskResponse taskResponse = queryTaskDetail(taskId);
-        List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets(), TestSet.class);
+        List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
         // 更改用例状态为执行中
         taskMapper.changeStatus(1, taskId);
         // 立即执行
