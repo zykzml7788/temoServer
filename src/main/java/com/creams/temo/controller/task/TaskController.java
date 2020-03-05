@@ -110,7 +110,7 @@ public class TaskController {
     }
 
     @ApiOperation(value = "关闭定时任务")
-    @PostMapping("/startTimingTask/{taskId}")
+    @PostMapping("/closeTimingTask/{taskId}")
     public JsonResult closeTimingTask(@PathVariable("taskId") String taskId) {
         try{
             taskService.closeTimingTask(taskId);
