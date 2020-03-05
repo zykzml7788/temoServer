@@ -90,10 +90,10 @@ public class TaskController {
         // 判断是并发执行还是同步执行
         if ("0".equals(isParallel)) {
             taskService.startSynchronizeTask(taskId);
-            return new JsonResult("已成功发起同步任务", 200, null, true);
+            return new JsonResult("已成功发起普通任务", 200, null, true);
         } else {
             taskService.startAsnchronizeTask(taskId);
-            return new JsonResult("已成功发起异步任务", 200, null, true);
+            return new JsonResult("已成功发起并发任务", 200, null, true);
         }
     }
 
