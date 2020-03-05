@@ -220,7 +220,7 @@ public class TaskService {
                 .build();
         //定义一个JobDetail
         JobDetail job = newJob(TaskScheduler.class)
-                .withIdentity(taskResponse.getTaskName())
+                .withIdentity(taskResponse.getTaskId())
                 .usingJobData("taskId",taskId)
                 .build();
         // 把job加入到任务调度器
