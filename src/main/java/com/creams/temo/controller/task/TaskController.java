@@ -82,28 +82,42 @@ public class TaskController {
     }
 
 
-    @ApiOperation(value = "发起任务")
-    @PostMapping("/start/{taskId}")
+    @ApiOperation(value = "发起普通任务")
+    @PostMapping("/startTask/{taskId}")
     public JsonResult startTask(@PathVariable("taskId") String taskId) {
         TaskResponse taskResponse = taskService.queryTaskDetail(taskId);
         String isParallel = taskResponse.getIsParallel();
-        String isTiming = taskResponse.getIsTiming();
-        // 判断是否是定时任务
-        if ("0".equals(isTiming)) {
-            // 判断是并发执行还是同步执行
-            if ("0".equals(isParallel)) {
-                taskService.startSynchronizeTask(taskId);
-                return new JsonResult("已成功发起同步任务", 200, null, true);
-            } else {
-                taskService.startAsnchronizeTask(taskId);
-                return new JsonResult("已成功发起异步任务", 200, null, true);
-            }
+        // 判断是并发执行还是同步执行
+        if ("0".equals(isParallel)) {
+            taskService.startSynchronizeTask(taskId);
+            return new JsonResult("已成功发起同步任务", 200, null, true);
         } else {
-            // 发起定时任务
+            taskService.startAsnchronizeTask(taskId);
+            return new JsonResult("已成功发起异步任务", 200, null, true);
+        }
+    }
+
+    @ApiOperation(value = "开启定时任务")
+    @PostMapping("/startTimingTask/{taskId}")
+    public JsonResult startTimingTask(@PathVariable("taskId") String taskId) {
+        try{
             taskService.startTimingTask(taskId);
-            return new JsonResult("已成功发起定时任务", 200, null, true);
+            return new JsonResult("已成功开启定时任务", 200, null, true);
+        }catch (Exception e){
+            return new JsonResult("操作失败", 500, e, false);
         }
 
+    }
+
+    @ApiOperation(value = "关闭定时任务")
+    @PostMapping("/startTimingTask/{taskId}")
+    public JsonResult closeTimingTask(@PathVariable("taskId") String taskId) {
+        try{
+            taskService.closeTimingTask(taskId);
+            return new JsonResult("已关闭开启定时任务", 200, null, true);
+        }catch (Exception e){
+            return new JsonResult("操作失败", 500, e, false);
+        }
     }
 
 }

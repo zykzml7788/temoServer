@@ -203,7 +203,7 @@ public class TaskService {
     }
 
     /**
-     * 发起定时任务
+     * 开启定时任务
      *
      * @param taskId
      */
@@ -215,7 +215,7 @@ public class TaskService {
         // 定时执行
 
         //定义一个Trigger
-        Trigger trigger = newTrigger().withIdentity(taskResponse.getTaskName())
+        Trigger trigger = newTrigger().withIdentity(taskResponse.getTaskId())
                 .startNow()//一旦加入scheduler，立即生效
                 .withSchedule(cronSchedule(taskResponse.getCron()))
                 .build();
@@ -226,6 +226,16 @@ public class TaskService {
                 .build();
         // 把job加入到任务调度器
         taskScheduler.addJob(job, trigger);
+    }
+
+    /**
+     * 关闭定时任务
+     *
+     * @param taskId
+     */
+    public void closeTimingTask(String taskId){
+
+        taskScheduler.deleteJob(taskId);
     }
 
 
