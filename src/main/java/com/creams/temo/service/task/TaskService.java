@@ -207,7 +207,6 @@ public class TaskService {
      *
      * @param taskId
      */
-    @Async
     public void startTimingTask(String taskId) {
         // 获取任务相关联的需要执行的用例集
         TaskResponse taskResponse = queryTaskDetail(taskId);
