@@ -9,7 +9,7 @@
         INSERT into task
         (task_id, task_name, task_desc, is_timing, is_parallel, cron, times, mail, testsets, status)
         values
-        (#{taskId}, #{taskName}, #{taskDesc}, #{isTiming},#{isParallel}, #{cron}, #{times}, #{mail}, #{testSets}, #{status})
+        (#{taskId}, #{taskName}, #{taskDesc}, #{isTiming},#{isParallel}, #{cron}, #{times}, #{mail}, #{testSets}, 0)
     </insert>
 
     <update id="updateTaskById">

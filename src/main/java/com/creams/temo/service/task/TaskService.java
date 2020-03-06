@@ -134,12 +134,10 @@ public class TaskService {
      */
     @Async
     public void startSynchronizeTask(String taskId) {
-        // 更改任务状态为待执行
-        taskMapper.changeStatus(0, taskId);
         // 获取任务相关联的需要执行的用例集
         TaskResponse taskResponse = queryTaskDetail(taskId);
         List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
-        // 更改用例状态为执行中
+        // 更改任务状态为执行中
         taskMapper.changeStatus(1, taskId);
         // 立即执行
         for (TestSet testSet : testSets) {
@@ -148,12 +146,13 @@ public class TaskService {
             try {
                 // 同步调用用例集
                 testCaseSetService.executeSetBySynchronizeTask(setId, envId);
-                // 更改用例状态为执行完毕
-                taskMapper.changeStatus(2, taskId);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        // 更改任务状态为执行完毕
+        taskMapper.changeStatus(2, taskId);
 
     }
 
@@ -169,7 +168,7 @@ public class TaskService {
         // 获取任务相关联的需要执行的用例集
         TaskResponse taskResponse = queryTaskDetail(taskId);
         List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
-        // 更改用例状态为执行中
+        // 更改任务状态为执行中
         taskMapper.changeStatus(1, taskId);
         // 所有的执行结果future
         List<Future<Boolean>> results = new ArrayList<>();
@@ -193,7 +192,7 @@ public class TaskService {
                 }
             }
             if (isAllDone) {
-                // 更改用例状态为执行中
+                // 更改任务状态为执行中
                 taskMapper.changeStatus(2, taskId);
                 break;
             }

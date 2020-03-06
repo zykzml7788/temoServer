@@ -576,18 +576,14 @@ public class TestCaseSetService {
                 }
                 webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             }
-            // 查询是第几次执行
-            Integer maxIndexOfExecuted = executeRowMapper.queryMaxIndexOfExecutedRow(setId);
-            if (maxIndexOfExecuted==null){
-                maxIndexOfExecuted = 0;
-            }
+
             if (verifyResult){
                 // 这边0需要从数据库查询出最大的，再加一，后续修改
-                testResultRow = new ExecutedRow(setId,caseId,maxIndexOfExecuted+1,index,caseName,1,logs.toString());
+                testResultRow = new ExecutedRow(index,caseName,1,logs.toString());
                 executedRow = JSON.toJSONString(testResultRow);
             }else {
                 error++;
-                testResultRow = new ExecutedRow(setId,caseId,maxIndexOfExecuted+1,index,caseName,0,logs.toString());
+                testResultRow = new ExecutedRow(index,caseName,0,logs.toString());
                 executedRow = JSON.toJSONString(testResultRow);
         }
             // 把执行结果加到总体的执行结果中
@@ -727,11 +723,7 @@ public class TestCaseSetService {
      * @throws Exception
      */
     public void executeSetBySynchronizeTask(String setId, String envId) throws Exception {
-        List<ExecutedRow> executedRows = executeSet(setId,envId);
-        // 把执行记录落库
-        for (ExecutedRow executedRow:executedRows){
-            executeRowMapper.addExecutedRow(executedRow);
-        }
+        executeSet(setId,envId);
     }
 
 
@@ -745,10 +737,6 @@ public class TestCaseSetService {
     public Future<Boolean> executeSetByAsynchronizeTask(String setId, String envId) throws Exception {
 
         List<ExecutedRow> executedRows = executeSet(setId,envId);
-        // 把执行记录落库
-        for (ExecutedRow executedRow:executedRows){
-            executeRowMapper.addExecutedRow(executedRow);
-        }
         return new AsyncResult<>(true);
     }
 }

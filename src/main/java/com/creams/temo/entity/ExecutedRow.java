@@ -45,14 +45,11 @@ public class ExecutedRow {
      */
     private Integer indexOfExecuted;
 
-    public ExecutedRow(String setId,String caseId,Integer indexOfExecuted,Integer index, String caseName, Integer status, String logs) {
-        this.setId = setId;
-        this.indexOfExecuted = indexOfExecuted;
+    public ExecutedRow(Integer index, String caseName, Integer status, String logs) {
         this.logs = logs;
         this.status = status;
         this.caseName = caseName;
         this.index = index;
-        this.caseId = caseId;
     }
 
 
