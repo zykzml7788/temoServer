@@ -1,5 +1,6 @@
 package com.creams.temo.util;
 
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,7 +39,11 @@ public class DateUtil {
         return sdf.format(d);
     }
 
+    public static Timestamp getCurrentTimestamp(){
+        return new Timestamp(System.currentTimeMillis());
+    }
+
     public static void main(String[] args) {
-        System.out.println(DateUtil.getCurrentTime());
+        System.out.println(DateUtil.getCurrentTimestamp());
     }
 }

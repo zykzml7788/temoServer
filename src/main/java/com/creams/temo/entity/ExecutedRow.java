@@ -3,7 +3,7 @@ package com.creams.temo.entity;
 import lombok.Data;
 
 /**
- * 执行记录实体
+ * 用例执行记录实体
  */
 @Data
 public class ExecutedRow {
@@ -19,12 +19,6 @@ public class ExecutedRow {
     private Integer status;
 
     /**
-     * 用例id
-     */
-    private String caseId;
-
-
-    /**
      * 用例名称
      */
     private String caseName;
@@ -34,16 +28,9 @@ public class ExecutedRow {
      */
     private Integer index;
 
-    /**
-     * 集合id
-     */
-    private String setId;
 
 
-    /**
-     * 执行的唯一标识(执行一次用例集就加1)
-     */
-    private Integer indexOfExecuted;
+
 
     public ExecutedRow(Integer index, String caseName, Integer status, String logs) {
         this.logs = logs;

@@ -31,6 +31,9 @@ public class TaskResult {
     @ApiModelProperty("成功率")
     private Double successRate;
 
+    @ApiModelProperty("状态")
+    private Integer status;
+
     @ApiModelProperty("轮询次数")
     private Integer times;
 

@@ -182,9 +182,6 @@ public class TestCaseService {
     public boolean updateTestCaseOrderById(String caseId, String move){
 
         TestCaseResponse testCaseResponse = testCaseMapper.queryTestCaseById(caseId);
-        System.out.println("打印testCaseResponse" + testCaseResponse);
-        System.out.println("打印caseId" + caseId);
-
 
         if (testCaseResponse != null && "up".equals(move)){
             Integer sorting = testCaseResponse.getSorting();
