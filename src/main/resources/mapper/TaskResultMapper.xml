@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.creams.temo.mapper.task.TaskResultMapper">
+
+
+    <insert id="addTaskResult">
+        insert into task_result
+        (task_result_id,task_id,task_name,person,`status`,start_time)
+        values
+        (#{taskResultId},#{taskId},#{taskName},#{person},#{status},#{startTime})
+    </insert>
+
+
+    <update id="updateTaskResult">
+        update task_result
+        set success_num=#{successNum},total_num=#{totalNum},success_rate=#{successRate},end_time=#{endTime},`status`=#{status}
+        where task_reuslt_id = #{taskResultId}
+    </update>
+
+    <select id="queryTaskResults" resultType="com.creams.temo.entity.task.TaskResult">
+        select * from task_result
+        <where>
+            <if test="taskName!=null and taskName!=''">
+                task_name like concat('%',#{taskName},'%')
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="queryTaskResult" resultType="com.creams.temo.entity.task.TaskResult">
+        select * from task_result where task_result_id = #{taskResultId}
+    </select>
+
+
+</mapper>

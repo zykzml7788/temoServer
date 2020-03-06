@@ -26,6 +26,7 @@
         </where>
         order by createTime desc
     </select>
+
     <select id="queryTestCaseSetByNameandId" resultType="com.creams.temo.entity.testcase.response.TestCaseSetResponse">
         select * from testcase_set
         <where>

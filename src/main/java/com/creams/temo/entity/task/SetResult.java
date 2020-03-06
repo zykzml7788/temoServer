@@ -11,7 +11,7 @@ import lombok.Data;
  * @Modify By:
  */
 @Data
-class SetResult {
+public class SetResult {
 
     @ApiModelProperty("用例集名称")
     private String setName;
@@ -24,4 +24,7 @@ class SetResult {
 
     @ApiModelProperty("用例结果列表")
     private String caseResults;
+
+    @ApiModelProperty("任务执行结果id")
+    private String taskResultId;
 }

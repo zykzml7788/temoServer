@@ -3,13 +3,16 @@ package com.creams.temo.service.task;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.creams.temo.entity.database.response.ScriptDbResponse;
+import com.creams.temo.entity.task.TaskResult;
 import com.creams.temo.entity.task.TestSet;
 import com.creams.temo.entity.task.request.TaskRequest;
 import com.creams.temo.entity.task.response.TaskResponse;
 import com.creams.temo.entity.testcase.response.TestCaseResponse;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.mapper.task.TaskMapper;
+import com.creams.temo.mapper.task.TaskResultMapper;
 import com.creams.temo.service.testcase.TestCaseSetService;
+import com.creams.temo.util.DateUtil;
 import com.creams.temo.util.StringUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -21,8 +24,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
@@ -46,6 +51,9 @@ public class TaskService {
 
     @Autowired
     public TestCaseSetService testCaseSetService;
+
+    @Autowired
+    public TaskResultMapper taskResultMapper;
 
     /**
      * 新增任务
@@ -136,23 +144,42 @@ public class TaskService {
     public void startSynchronizeTask(String taskId) {
         // 获取任务相关联的需要执行的用例集
         TaskResponse taskResponse = queryTaskDetail(taskId);
+        // 添加执行记录
+        String taskResultId = StringUtil.uuid();
+        TaskResult taskResult = new TaskResult();
+        taskResult.setTaskName(taskResponse.getTaskName());
+        taskResult.setStatus(0);
+        taskResult.setStartTime(DateUtil.getCurrentTimestamp());
+        taskResult.setPerson("系统用户");
+        taskResult.setTaskId(taskId);
+        taskResult.setTaskResultId(taskResultId);
+        taskResultMapper.addTaskResult(taskResult);
+        // 转换json
         List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
-        // 更改任务状态为执行中
-        taskMapper.changeStatus(1, taskId);
         // 立即执行
+        Integer total = testSets.size();
+        Integer successNum = 0;
         for (TestSet testSet : testSets) {
-            String setId = testSet.getSetId();
-            String envId = testSet.getEnvId();
             try {
                 // 同步调用用例集
-                testCaseSetService.executeSetBySynchronizeTask(setId, envId);
-
+                Boolean result = testCaseSetService.executeSetBySynchronizeTask(taskResultId, testSet);
+                if (result){
+                    successNum++;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        // 更改任务状态为执行完毕
-        taskMapper.changeStatus(2, taskId);
+        // 更新执行记录状态
+        taskResult.setEndTime(DateUtil.getCurrentTimestamp());
+        taskResult.setStatus(1);
+        taskResult.setSuccessNum(successNum);
+        taskResult.setTotalNum(total);
+        // 计算成功率
+        DecimalFormat df = new DecimalFormat("0.00");
+        String successRate = df.format(((float)successNum/total)*100);
+        taskResult.setSuccessRate(successRate);
+        taskResultMapper.updateTaskResult(taskResult);
 
     }
 
@@ -162,23 +189,30 @@ public class TaskService {
      * @param taskId
      */
     @Async
-    public void startAsnchronizeTask(String taskId) {
-        // 更改任务状态为待执行
-        taskMapper.changeStatus(0, taskId);
+    public void startAsnchronizeTask(String taskId) throws ExecutionException, InterruptedException {
         // 获取任务相关联的需要执行的用例集
         TaskResponse taskResponse = queryTaskDetail(taskId);
+        // 添加执行记录
+        TaskResult taskResult = new TaskResult();
+        String taskResultId = StringUtil.uuid();
+        taskResult.setTaskName(taskResponse.getTaskName());
+        taskResult.setStatus(0);
+        taskResult.setStartTime(DateUtil.getCurrentTimestamp());
+        taskResult.setPerson("系统用户");
+        taskResult.setTaskId(taskId);
+        taskResult.setTaskResultId(taskResultId);
+        taskResultMapper.addTaskResult(taskResult);
+        // 转换json
         List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
-        // 更改任务状态为执行中
-        taskMapper.changeStatus(1, taskId);
         // 所有的执行结果future
         List<Future<Boolean>> results = new ArrayList<>();
         // 立即执行
+        Integer total = testSets.size();
+        Integer successNum = 0;
         for (TestSet testSet : testSets) {
-            String setId = testSet.getSetId();
-            String envId = testSet.getEnvId();
             try {
                 // 异步调用用例集
-                Future<Boolean> result = testCaseSetService.executeSetByAsynchronizeTask(setId, envId);
+                Future<Boolean> result = testCaseSetService.executeSetByAsynchronizeTask(taskResultId, testSet);
                 results.add(result);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -188,12 +222,27 @@ public class TaskService {
             boolean isAllDone = true;
             for (Future<Boolean> result : results) {
                 if (!result.isDone()) {
+                    // 如果没执行完，标记isAllDone为false
                     isAllDone = false;
+                }else{
+                    // 如果执行完了
+                    if (result.get()){
+                        // 获取用例集测试结果，如果为true
+                        successNum ++;
+                    }
                 }
             }
             if (isAllDone) {
-                // 更改任务状态为执行中
-                taskMapper.changeStatus(2, taskId);
+                // 更新执行记录状态
+                taskResult.setEndTime(DateUtil.getCurrentTimestamp());
+                taskResult.setStatus(1);
+                taskResult.setSuccessNum(successNum);
+                taskResult.setTotalNum(total);
+                // 计算成功率
+                DecimalFormat df = new DecimalFormat("0.00");
+                String successRate = df.format(((float)successNum/total)*100);
+                taskResult.setSuccessRate(successRate);
+                taskResultMapper.updateTaskResult(taskResult);
                 break;
             }
         }
@@ -235,8 +284,6 @@ public class TaskService {
 
         taskScheduler.deleteJob(taskId);
     }
-
-
 
 }
 

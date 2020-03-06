@@ -3,7 +3,8 @@ package com.creams.temo.entity.task;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.security.Timestamp;
+
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -19,6 +20,9 @@ public class TaskResult {
     @ApiModelProperty("任务id")
     private String taskId;
 
+    @ApiModelProperty("任务执行结果id")
+    private String taskResultId;
+
     @ApiModelProperty("任务名称")
     private String taskName;
 
@@ -29,7 +33,7 @@ public class TaskResult {
     private Integer totalNum;
 
     @ApiModelProperty("成功率")
-    private Double successRate;
+    private String successRate;
 
     @ApiModelProperty("状态")
     private Integer status;

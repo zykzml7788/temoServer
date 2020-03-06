@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 定时任务调度器
@@ -81,7 +82,11 @@ public class TaskScheduler implements Job {
         if ("0".equals(isParallel)){
             taskScheduler.taskService.startSynchronizeTask(taskId);
         }else {
-            taskScheduler.taskService.startAsnchronizeTask(taskId);
+            try {
+                taskScheduler.taskService.startAsnchronizeTask(taskId);
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

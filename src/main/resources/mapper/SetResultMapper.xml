@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.creams.temo.mapper.task.SetResultMapper">
+
+
+    <insert id="addSetResult">
+        insert into set_result
+        (set_name,success_num,total_num,case_results)
+        values
+        (#{setName},#{successNum},#{totalNum},#{caseResults})
+    </insert>
+
+    <select id="querySetResultsByTaskResultId" resultType="com.creams.temo.entity.task.SetResult">
+        select * from set_result where task_result_id = #{taskResultId}
+    </select>
+
+
+</mapper>

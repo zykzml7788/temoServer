@@ -21,9 +21,9 @@ public class TaskConfig {
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         // 设置核心线程数
-        executor.setCorePoolSize(10);
+        executor.setCorePoolSize(30);
         // 设置最大线程数
-        executor.setMaxPoolSize(50);
+        executor.setMaxPoolSize(200);
         // 设置队列容量
         executor.setQueueCapacity(20);
         // 设置线程活跃时间（秒）
