@@ -16,7 +16,7 @@
     <update id="updateTaskResult">
         update task_result
         set success_num=#{successNum},total_num=#{totalNum},success_rate=#{successRate},end_time=#{endTime},`status`=#{status}
-        where task_reuslt_id = #{taskResultId}
+        where task_result_id = #{taskResultId}
     </update>
 
     <select id="queryTaskResults" resultType="com.creams.temo.entity.task.TaskResult">

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 任务
@@ -84,7 +85,7 @@ public class TaskController {
 
     @ApiOperation(value = "发起普通任务")
     @PostMapping("/startTask/{taskId}")
-    public JsonResult startTask(@PathVariable("taskId") String taskId) {
+    public JsonResult startTask(@PathVariable("taskId") String taskId) throws ExecutionException, InterruptedException {
         TaskResponse taskResponse = taskService.queryTaskDetail(taskId);
         String isParallel = taskResponse.getIsParallel();
         // 判断是并发执行还是同步执行
