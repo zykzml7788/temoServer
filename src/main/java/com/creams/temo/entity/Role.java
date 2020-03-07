@@ -7,34 +7,28 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 @Data
-public class UserEntity implements Serializable {
+@TableName(value = "role")
+public class Role {
 
     @ApiModelProperty("项目主键")
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
+
     @ApiModelProperty("用户id")
     @TableField(value = "user_id")
     private String userId;
 
-    @ApiModelProperty("用户名称")
-    @TableField(value = "user_name")
-    private String userName;
+    @ApiModelProperty("角色id")
+    @TableField(value = "role_id")
+    private String roleId;
 
-    @ApiModelProperty("用户密码")
-    @TableField(value = "password")
-    private String password;
 
-    @ApiModelProperty("创建时间")
-    @TableField(value = "create_time")
-    private String createTime;
+    @ApiModelProperty("角色名称")
+    @TableField(value = "role_name")
+    private String roleName;
 
-    @ApiModelProperty("修改时间")
-    @TableField(value = "update_time")
-    private String updateTime;
 }
