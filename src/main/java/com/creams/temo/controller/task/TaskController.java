@@ -39,10 +39,10 @@ public class TaskController {
 
     }
 
-    @ApiOperation(value = "根据任务名和执行状态查询任务")
+    @ApiOperation(value = "根据任务名和执行方式查询任务")
     @GetMapping("/{page}")
-    public JsonResult queryTasks(@PathVariable(value = "page") Integer page,@RequestParam(value = "taskName", required = false) String taskName, @RequestParam(value = "status", required = false) Integer status) {
-        PageInfo<TaskResponse> pageInfo = taskService.queryTasks(page,taskName, status);
+    public JsonResult queryTasks(@PathVariable(value = "page") Integer page,@RequestParam(value = "taskName", required = false) String taskName, @RequestParam(value = "isParallel", required = false) String isParallel) {
+        PageInfo<TaskResponse> pageInfo = taskService.queryTasks(page,taskName, isParallel);
         HashMap<String,Object> map = new HashMap<>();
         map.put("list", pageInfo.getList());
         map.put("total", pageInfo.getTotal());

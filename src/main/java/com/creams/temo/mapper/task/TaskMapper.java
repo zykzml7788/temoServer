@@ -11,7 +11,7 @@ import java.util.List;
 public interface TaskMapper {
 
 
-    List<TaskResponse> queryTasks(String taskName,Integer status);
+    List<TaskResponse> queryTasks(String taskName,String isParallel);
 
     @Select("select * from task where task_id = #{taskId}")
     TaskResponse queryTaskDetail(String taskId);

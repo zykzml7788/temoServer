@@ -23,7 +23,10 @@
         select * from task_result
         <where>
             <if test="taskName!=null and taskName!=''">
-                task_name like concat('%',#{taskName},'%')
+                and task_name like concat('%',#{taskName},'%')
+            </if>
+            <if test="status!=null">
+                and status= #{status}
             </if>
         </where>
         order by id desc

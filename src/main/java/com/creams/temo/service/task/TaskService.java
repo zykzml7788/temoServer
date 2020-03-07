@@ -3,17 +3,20 @@ package com.creams.temo.service.task;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.creams.temo.entity.database.response.ScriptDbResponse;
+import com.creams.temo.entity.task.SetResult;
 import com.creams.temo.entity.task.TaskResult;
 import com.creams.temo.entity.task.TestSet;
 import com.creams.temo.entity.task.request.TaskRequest;
 import com.creams.temo.entity.task.response.TaskResponse;
 import com.creams.temo.entity.testcase.response.TestCaseResponse;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
+import com.creams.temo.mapper.task.SetResultMapper;
 import com.creams.temo.mapper.task.TaskMapper;
 import com.creams.temo.mapper.task.TaskResultMapper;
 import com.creams.temo.service.testcase.TestCaseSetService;
 import com.creams.temo.util.DateUtil;
 import com.creams.temo.util.StringUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.quartz.JobDetail;
@@ -54,6 +57,9 @@ public class TaskService {
 
     @Autowired
     public TaskResultMapper taskResultMapper;
+
+    @Autowired
+    public SetResultMapper setResultMapper;
 
     /**
      * 新增任务
@@ -107,9 +113,9 @@ public class TaskService {
     /**
      * 根据任务名和状态筛选任务
      */
-    public PageInfo<TaskResponse> queryTasks(Integer page,String taskName, Integer status) {
+    public PageInfo<TaskResponse> queryTasks(Integer page,String taskName, String isParallel) {
         PageHelper.startPage(page, 10);
-        List<TaskResponse> taskResponses = taskMapper.queryTasks(taskName, status);
+        List<TaskResponse> taskResponses = taskMapper.queryTasks(taskName, isParallel);
         for (TaskResponse taskResponse : taskResponses){
             List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
             for (TestSet testSet:testSets){
@@ -285,5 +291,26 @@ public class TaskService {
         taskScheduler.deleteJob(taskId);
     }
 
+    /**
+     * 查询执行任务结果
+     * @param page
+     * @param taskName
+     * @param status
+     * @return
+     */
+    public PageInfo<TaskResult> queryTaskResults(Integer page,String taskName,Integer status){
+        PageHelper.startPage(page, 10);
+        List<TaskResult> taskResults = taskResultMapper.queryTaskResults(taskName,status);
+        return new PageInfo<>(taskResults);
+    }
+
+    /**
+     * 查询任务执行接结果详情
+     * @param taskResultId
+     * @return
+     */
+    public List<SetResult> queryTaskResultDetail(String taskResultId){
+        return setResultMapper.querySetResultsByTaskResultId(taskResultId);
+    }
 }
 

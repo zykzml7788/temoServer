@@ -14,9 +14,9 @@ public class TaskMapperTest {
     @Autowired
     TaskMapper taskMapper;
 
-    @Test
-    public void testQueryAllTasks() {
-
-        System.out.println(taskMapper.queryTasks(null,1));
-    }
+//    @Test
+//    public void testQueryAllTasks() {
+//
+//        System.out.println(taskMapper.queryTasks(null,1));
+//    }
 }

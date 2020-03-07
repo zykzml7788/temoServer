@@ -32,8 +32,8 @@
             <if test="taskName != null and taskName != ''">
                 task_name like concat('%',#{taskName},'%')
             </if>
-            <if test="status != null">
-                and status = #{status}
+            <if test="isParallel != null and isParallel != ''">
+                and is_parallel = #{isParallel}
             </if>
         </where>
     </select>

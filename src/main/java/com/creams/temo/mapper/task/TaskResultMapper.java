@@ -2,6 +2,7 @@ package com.creams.temo.mapper.task;
 
 import com.creams.temo.entity.task.TaskResult;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface TaskResultMapper {
 
     boolean updateTaskResult(TaskResult taskResult);
 
-    List<TaskResult>  queryTaskResults(String taskName);
+    List<TaskResult>  queryTaskResults(String taskName,@Param(value = "status") Integer status);
 
     TaskResult queryTaskResult(String taskResultId);
 
