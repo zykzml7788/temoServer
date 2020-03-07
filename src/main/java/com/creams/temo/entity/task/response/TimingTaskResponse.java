@@ -2,14 +2,13 @@ package com.creams.temo.entity.task.response;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.creams.temo.entity.task.TestSet;
-import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class TaskResponse {
+public class TimingTaskResponse {
 
     @ApiModelProperty("任务id")
     @TableField(value = "task_id")
@@ -27,9 +26,21 @@ public class TaskResponse {
     @TableField(value = "is_parallel")
     private String isParallel;
 
+    @ApiModelProperty("cron表达式")
+    @TableField(value = "cron")
+    private String cron;
+
     @ApiModelProperty("轮询次数")
     @TableField(value = "times")
     private Integer times;
+
+    @ApiModelProperty("开启/关闭")
+    @TableField(value = "is_open")
+    private Integer isOpen;
+
+    @ApiModelProperty("邮件开关")
+    @TableField(value = "is_mail")
+    private Integer isMail;
 
     @ApiModelProperty("邮件")
     @TableField(value = "mail")
@@ -42,10 +53,6 @@ public class TaskResponse {
     @ApiModelProperty("用例列表")
     @TableField(value = "testSetList")
     private List<TestSet> testSetList;
-
-    @ApiModelProperty("执行状态（0待执行，1执行中，2执行完毕）")
-    @TableField(value = "status")
-    private Integer status;
 
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time")

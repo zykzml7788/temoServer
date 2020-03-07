@@ -7,7 +7,9 @@ import com.creams.temo.entity.task.SetResult;
 import com.creams.temo.entity.task.TaskResult;
 import com.creams.temo.entity.task.TestSet;
 import com.creams.temo.entity.task.request.TaskRequest;
+import com.creams.temo.entity.task.request.TimingTaskRequest;
 import com.creams.temo.entity.task.response.TaskResponse;
+import com.creams.temo.entity.task.response.TimingTaskResponse;
 import com.creams.temo.entity.testcase.response.TestCaseResponse;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.mapper.task.SetResultMapper;
@@ -19,6 +21,7 @@ import com.creams.temo.util.StringUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import jdk.nashorn.internal.runtime.Timing;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -69,22 +73,6 @@ public class TaskService {
     public void addTask(TaskRequest taskRequest) {
         taskRequest.setTaskId(StringUtil.uuid());
         taskMapper.addTask(taskRequest);
-        // 激活定时任务
-        if ("1".equals(taskRequest.getIsTiming())){
-            // 发起定时任务
-            //定义一个Trigger
-            Trigger trigger = newTrigger().withIdentity(taskRequest.getTaskName())
-                    .startNow()//一旦加入scheduler，立即生效
-                    .withSchedule(cronSchedule(taskRequest.getCron()))
-                    .build();
-            //定义一个JobDetail
-            JobDetail job = newJob(TaskScheduler.class)
-                    .withIdentity(taskRequest.getTaskName())
-                    .usingJobData("taskId",taskRequest.getTaskId())
-                    .build();
-            // 把job加入到任务调度器
-            taskScheduler.addJob(job, trigger);
-        }
     }
 
     /**
@@ -101,12 +89,8 @@ public class TaskService {
      *
      * @param id
      */
+    @Transactional
     public void deleteTask(String id) {
-        TaskResponse taskResponse = taskMapper.queryTaskDetail(id);
-        // 如果是定时任务，则从调度器中移除
-        if ("1".equals(taskResponse.getIsTiming())){
-            taskScheduler.deleteJob(id);
-        }
         taskMapper.deleteTask(id);
     }
 
@@ -127,6 +111,22 @@ public class TaskService {
     }
 
     /**
+     * 根据定时任务名和状态筛选定时任务
+     */
+    public PageInfo<TimingTaskResponse> queryTimingTasks(Integer page,String taskName, String isParallel) {
+        PageHelper.startPage(page, 10);
+        List<TimingTaskResponse> timingTaskResponses = taskMapper.queryTimingTasks(taskName, isParallel);
+        for (TimingTaskResponse timingTaskResponse : timingTaskResponses){
+            List<TestSet> testSets = JSON.parseArray(timingTaskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
+            for (TestSet testSet:testSets){
+                testSet.setSetName(testCaseSetService.queryTestCaseSetInfo(testSet.getSetId()).getSetName());
+            }
+            timingTaskResponse.setTestSetList(testSets);
+        }
+        return new PageInfo<>(timingTaskResponses);
+    }
+
+    /**
      * 查询任务详情
      *
      * @param taskId
@@ -142,7 +142,48 @@ public class TaskService {
     }
 
     /**
-     * 发起同步任务
+     * 查询定时任务详情
+     *
+     * @param taskId
+     */
+    public TimingTaskResponse queryTimingTaskDetail(String taskId) {
+        TimingTaskResponse timingTaskResponse = taskMapper.queryTimingTaskDetail(taskId);
+        List<TestSet> testSets = JSON.parseArray(timingTaskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
+        for (TestSet testSet:testSets){
+            testSet.setSetName(testCaseSetService.queryTestCaseSetInfo(testSet.getSetId()).getSetName());
+        }
+        timingTaskResponse.setTestSetList(testSets);
+        return timingTaskResponse;
+    }
+
+    @Transactional
+    public boolean addTimingTask(TimingTaskRequest timingTaskRequest){
+        //定义一个Trigger
+        Trigger trigger = newTrigger().withIdentity(timingTaskRequest.getTaskName())
+                .startNow()//一旦加入scheduler，立即生效
+                .withSchedule(cronSchedule(timingTaskRequest.getCron()))
+                .build();
+        //定义一个JobDetail
+        JobDetail job = newJob(TaskScheduler.class)
+                .withIdentity(timingTaskRequest.getTaskName())
+                .usingJobData("taskId",timingTaskRequest.getTaskId())
+                .build();
+        // 把job加入到任务调度器
+        taskScheduler.addJob(job, trigger);
+        timingTaskRequest.setTaskId(StringUtil.uuid());
+        return taskMapper.addTimingTask(timingTaskRequest);
+    }
+
+    /**
+     * 编辑定时任务
+     *
+     * @param timingTaskRequest
+     */
+    public void updateTimingTask(TimingTaskRequest timingTaskRequest) {
+        taskMapper.updateTimingTask(timingTaskRequest);
+    }
+    /**
+     * 发起串行任务
      *
      * @param taskId
      */
@@ -262,20 +303,22 @@ public class TaskService {
      *
      * @param taskId
      */
+    @Transactional
     public void startTimingTask(String taskId) {
         // 获取任务相关联的需要执行的用例集
-        TaskResponse taskResponse = queryTaskDetail(taskId);
-
+        TimingTaskResponse timingTaskResponse = queryTimingTaskDetail(taskId);
+        // 更新状态为开启
+        taskMapper.updateTimingTaskStatus(taskId,1);
         // 定时执行
 
         //定义一个Trigger
-        Trigger trigger = newTrigger().withIdentity(taskResponse.getTaskId())
+        Trigger trigger = newTrigger().withIdentity(timingTaskResponse.getTaskId())
                 .startNow()//一旦加入scheduler，立即生效
-                .withSchedule(cronSchedule(taskResponse.getCron()))
+                .withSchedule(cronSchedule(timingTaskResponse.getCron()))
                 .build();
         //定义一个JobDetail
         JobDetail job = newJob(TaskScheduler.class)
-                .withIdentity(taskResponse.getTaskId())
+                .withIdentity(timingTaskResponse.getTaskId())
                 .usingJobData("taskId",taskId)
                 .build();
         // 把job加入到任务调度器
@@ -287,8 +330,10 @@ public class TaskService {
      *
      * @param taskId
      */
+    @Transactional
     public void closeTimingTask(String taskId){
-
+        // 更新状态为开启
+        taskMapper.updateTimingTaskStatus(taskId,0);
         taskScheduler.deleteJob(taskId);
     }
 
