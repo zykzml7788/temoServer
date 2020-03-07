@@ -232,28 +232,27 @@ public class TaskService {
                 if (!result.isDone()) {
                     // 如果没执行完，标记isAllDone为false
                     isAllDone = false;
-                }else{
-                    // 如果执行完了
-                    if (result.get()){
-                        // 获取用例集测试结果，如果为true
-                        successNum ++;
-                    }
                 }
             }
             if (isAllDone) {
-                // 更新执行记录状态
-                taskResult.setEndTime(DateUtil.getCurrentTimestamp());
-                taskResult.setStatus(2);
-                taskResult.setSuccessNum(successNum);
-                taskResult.setTotalNum(total);
-                // 计算成功率
-                DecimalFormat df = new DecimalFormat("0.00");
-                String successRate = df.format(((float)successNum/total)*100);
-                taskResult.setSuccessRate(successRate);
-                taskResultMapper.updateTaskResult(taskResult);
                 break;
             }
         }
+        for (Future<Boolean> result : results) {
+            if (result.get()) {
+                successNum++;
+            }
+        }
+        // 更新执行记录状态
+        taskResult.setEndTime(DateUtil.getCurrentTimestamp());
+        taskResult.setStatus(2);
+        taskResult.setSuccessNum(successNum);
+        taskResult.setTotalNum(total);
+        // 计算成功率
+        DecimalFormat df = new DecimalFormat("0.00");
+        String successRate = df.format(((float)successNum/total)*100);
+        taskResult.setSuccessRate(successRate);
+        taskResultMapper.updateTaskResult(taskResult);
 
 
     }
