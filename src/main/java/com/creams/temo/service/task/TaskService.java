@@ -154,7 +154,7 @@ public class TaskService {
         String taskResultId = StringUtil.uuid();
         TaskResult taskResult = new TaskResult();
         taskResult.setTaskName(taskResponse.getTaskName());
-        taskResult.setStatus(0);
+        taskResult.setStatus(1);
         taskResult.setStartTime(DateUtil.getCurrentTimestamp());
         taskResult.setPerson("系统用户");
         taskResult.setTaskId(taskId);
@@ -178,7 +178,7 @@ public class TaskService {
         }
         // 更新执行记录状态
         taskResult.setEndTime(DateUtil.getCurrentTimestamp());
-        taskResult.setStatus(1);
+        taskResult.setStatus(2);
         taskResult.setSuccessNum(successNum);
         taskResult.setTotalNum(total);
         // 计算成功率
@@ -202,7 +202,7 @@ public class TaskService {
         TaskResult taskResult = new TaskResult();
         String taskResultId = StringUtil.uuid();
         taskResult.setTaskName(taskResponse.getTaskName());
-        taskResult.setStatus(0);
+        taskResult.setStatus(1);
         taskResult.setStartTime(DateUtil.getCurrentTimestamp());
         taskResult.setPerson("系统用户");
         taskResult.setTaskId(taskId);
@@ -241,7 +241,7 @@ public class TaskService {
             if (isAllDone) {
                 // 更新执行记录状态
                 taskResult.setEndTime(DateUtil.getCurrentTimestamp());
-                taskResult.setStatus(1);
+                taskResult.setStatus(2);
                 taskResult.setSuccessNum(successNum);
                 taskResult.setTotalNum(total);
                 // 计算成功率
