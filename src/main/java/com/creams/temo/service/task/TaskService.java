@@ -153,6 +153,7 @@ public class TaskService {
         // 添加执行记录
         String taskResultId = StringUtil.uuid();
         TaskResult taskResult = new TaskResult();
+        taskResult.setTaskResultNum("task-"+System.currentTimeMillis());
         taskResult.setTaskName(taskResponse.getTaskName());
         taskResult.setStatus(1);
         taskResult.setStartTime(DateUtil.getCurrentTimestamp());
@@ -201,6 +202,7 @@ public class TaskService {
         // 添加执行记录
         TaskResult taskResult = new TaskResult();
         String taskResultId = StringUtil.uuid();
+        taskResult.setTaskResultNum("task-"+System.currentTimeMillis());
         taskResult.setTaskName(taskResponse.getTaskName());
         taskResult.setStatus(1);
         taskResult.setStartTime(DateUtil.getCurrentTimestamp());

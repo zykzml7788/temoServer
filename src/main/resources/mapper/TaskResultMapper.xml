@@ -7,9 +7,9 @@
 
     <insert id="addTaskResult">
         insert into task_result
-        (task_result_id,task_id,task_name,person,`status`,start_time)
+        (task_result_num,task_result_id,task_id,task_name,person,`status`,start_time)
         values
-        (#{taskResultId},#{taskId},#{taskName},#{person},#{status},#{startTime})
+        (#{taskResultNum},#{taskResultId},#{taskId},#{taskName},#{person},#{status},#{startTime})
     </insert>
 
 

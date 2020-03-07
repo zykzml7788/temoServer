@@ -17,6 +17,9 @@ import java.util.List;
 @Data
 public class TaskResult {
 
+    @ApiModelProperty("执行记录编号")
+    private String taskResultNum;
+
     @ApiModelProperty("任务id")
     private String taskId;
 
