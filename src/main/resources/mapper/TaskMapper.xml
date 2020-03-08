@@ -7,7 +7,7 @@
 
     <insert id="addTask">
         INSERT into task
-        (task_id, task_name, task_desc, is_timing, is_parallel,  times,  testsets,)
+        (task_id, task_name, task_desc, is_timing, is_parallel,  times,  testsets)
         values
         (#{taskId}, #{taskName}, #{taskDesc}, #{isTiming},#{isParallel},  #{times},  #{testSets})
     </insert>
