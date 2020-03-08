@@ -19,6 +19,7 @@ import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.entity.testcase.response.VerifyResponse;
 import com.creams.temo.mapper.database.ScriptMapper;
 import com.creams.temo.mapper.project.EnvMapper;
+import com.creams.temo.mapper.project.ProjectMapper;
 import com.creams.temo.mapper.task.ExecuteRowMapper;
 import com.creams.temo.mapper.task.SetResultMapper;
 import com.creams.temo.mapper.task.TaskMapper;
@@ -202,6 +203,15 @@ public class TestCaseSetService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 获取用例集的执行环境
+     * @param setId
+     */
+    public List<EnvResponse> getEnvsOfSet(String setId) {
+        TestCaseSetResponse testCaseSetResponse = testCaseSetMapper.queryTestCaseSetById(setId);
+        return envMapper.queryEnvByProjectId(testCaseSetResponse.getProjectId());
     }
 
     /**
@@ -772,4 +782,6 @@ public class TestCaseSetService {
         setResultMapper.addSetResult(setResult);
         return new AsyncResult<>(error==0);
     }
+
+
 }

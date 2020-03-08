@@ -145,6 +145,17 @@ public class TestCaseSetController {
         }
     }
 
+    @ApiOperation("查询用例集的执行环境")
+    @GetMapping(value = "/{id}/env")
+    public JsonResult queryEnvOfSet(@PathVariable("id") @ApiParam("用例集id")  String setId){
+        try {
+            return new JsonResult("操作成功", 200, testCaseSetService.getEnvsOfSet(setId), true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+    }
+
     @ApiOperation("调试用例集")
     @PostMapping(value = "/execute/{id}")
     public JsonResult executeTestCaseSet(@PathVariable("id") @ApiParam("用例集id")  String setId,
