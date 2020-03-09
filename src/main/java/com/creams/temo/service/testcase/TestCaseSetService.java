@@ -749,6 +749,7 @@ public class TestCaseSetService {
         setResult.setSuccessNum(total-error);
         setResult.setTotalNum(total);
         setResult.setTaskResultId(taskResultId);
+        setResult.setStatus(error==0?1:0);
         setResult.setCaseResults(JSON.toJSONString(executedRows));
         setResultMapper.addSetResult(setResult);
         return error == 0;
@@ -778,6 +779,7 @@ public class TestCaseSetService {
         setResult.setSuccessNum(total-error);
         setResult.setTotalNum(total);
         setResult.setTaskResultId(taskResultId);
+        setResult.setStatus(error==0?1:0);
         setResult.setCaseResults(JSON.toJSONString(executedRows));
         setResultMapper.addSetResult(setResult);
         return new AsyncResult<>(error==0);

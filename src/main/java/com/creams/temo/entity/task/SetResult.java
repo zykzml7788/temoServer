@@ -22,6 +22,9 @@ public class SetResult {
     @ApiModelProperty("总用例数")
     private Integer totalNum;
 
+    @ApiModelProperty("状态")
+    private Integer status;
+
     @ApiModelProperty("用例结果列表")
     private String caseResults;
 
