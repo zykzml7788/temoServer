@@ -43,10 +43,6 @@ public class TaskResponse {
     @TableField(value = "testSetList")
     private List<TestSet> testSetList;
 
-    @ApiModelProperty("执行状态（0待执行，1执行中，2执行完毕）")
-    @TableField(value = "status")
-    private Integer status;
-
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time")
     private String createTime;
