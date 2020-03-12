@@ -27,6 +27,10 @@ public class TimingTaskRequest {
     @TableField(value = "cron")
     private String cron;
 
+    @ApiModelProperty("是否并行，0为否，1为是")
+    @TableField(value = "is_timing")
+    private String isTiming;
+
     @ApiModelProperty("邮件开关")
     @TableField(value = "is_mail")
     private String isMail;
