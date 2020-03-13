@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -90,7 +91,7 @@ public class TimingTaskController {
             taskService.startTimingTask(taskId);
             return new JsonResult("已成功开启定时任务", 200, null, true);
         }catch (Exception e){
-            return new JsonResult("不允许重复开启", 500, e, false);
+            return new JsonResult("发生未知错误", 500, e, false);
         }
 
     }
@@ -102,7 +103,39 @@ public class TimingTaskController {
             taskService.closeTimingTask(taskId);
             return new JsonResult("已关闭开启定时任务", 200, null, true);
         }catch (Exception e){
-            return new JsonResult("不允许关闭开启", 500, e, false);
+            return new JsonResult("发生未知错误", 500, e, false);
+        }
+    }
+
+
+    @ApiOperation(value = "批量开启定时任务")
+    @PostMapping("/startTasks/")
+    public JsonResult startTimingTasks(@RequestBody List<String> taskIds) {
+        try{
+            for (String taskId:taskIds){
+                if (taskService.queryTimingTaskDetail(taskId).getIsOpen() == 0){
+                    taskService.startTimingTask(taskId);
+                }
+            }
+            return new JsonResult("已批量开启定时任务", 200, null, true);
+        }catch (Exception e){
+            return new JsonResult("发生未知错误", 500, e, false);
+        }
+
+    }
+
+    @ApiOperation(value = "批量关闭定时任务")
+    @PostMapping("/closeTasks/")
+    public JsonResult closeTimingTask(@RequestBody List<String> taskIds) {
+        try{
+            for (String taskId:taskIds){
+                if (taskService.queryTimingTaskDetail(taskId).getIsOpen() == 1){
+                    taskService.closeTimingTask(taskId);
+                }
+            }
+            return new JsonResult("已批量开启定时任务", 200, null, true);
+        }catch (Exception e){
+            return new JsonResult("发生未知错误", 500, e, false);
         }
     }
 

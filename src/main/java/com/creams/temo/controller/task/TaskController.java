@@ -98,5 +98,19 @@ public class TaskController {
         }
     }
 
-
+    @ApiOperation(value = "批量发起普通任务")
+    @PostMapping("/startTasks/")
+    public JsonResult startTasks(@RequestBody List<String> taskIds) throws ExecutionException, InterruptedException {
+        for (String taskId : taskIds){
+            TaskResponse taskResponse = taskService.queryTaskDetail(taskId);
+            String isParallel = taskResponse.getIsParallel();
+            // 判断是并发执行还是同步执行
+            if ("0".equals(isParallel)) {
+                taskService.startSynchronizeTask(taskId);
+            } else {
+                taskService.startAsnchronizeTask(taskId);
+            }
+        }
+        return new JsonResult("已批量发起任务", 200, null, true);
+    }
 }
