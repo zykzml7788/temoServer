@@ -133,7 +133,7 @@ public class TimingTaskController {
                     taskService.closeTimingTask(taskId);
                 }
             }
-            return new JsonResult("已批量开启定时任务", 200, null, true);
+            return new JsonResult("已批量关闭定时任务", 200, null, true);
         }catch (Exception e){
             return new JsonResult("发生未知错误", 500, e, false);
         }
