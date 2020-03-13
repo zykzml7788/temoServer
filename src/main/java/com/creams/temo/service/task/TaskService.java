@@ -158,18 +158,6 @@ public class TaskService {
 
     @Transactional
     public boolean addTimingTask(TimingTaskRequest timingTaskRequest){
-        //定义一个Trigger
-        Trigger trigger = newTrigger().withIdentity(timingTaskRequest.getTaskName())
-                .startNow()//一旦加入scheduler，立即生效
-                .withSchedule(cronSchedule(timingTaskRequest.getCron()))
-                .build();
-        //定义一个JobDetail
-        JobDetail job = newJob(TaskScheduler.class)
-                .withIdentity(timingTaskRequest.getTaskName())
-                .usingJobData("taskId",timingTaskRequest.getTaskId())
-                .build();
-        // 把job加入到任务调度器
-        taskScheduler.addJob(job, trigger);
         timingTaskRequest.setTaskId(StringUtil.uuid());
         return taskMapper.addTimingTask(timingTaskRequest);
     }
