@@ -33,7 +33,7 @@ public class TimingTaskRequest {
 
     @ApiModelProperty("邮件开关")
     @TableField(value = "is_mail")
-    private String isMail;
+    private Integer isMail;
 
     @ApiModelProperty("开启/关闭")
     @TableField(value = "is_open")

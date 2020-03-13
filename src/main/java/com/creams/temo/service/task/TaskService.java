@@ -213,7 +213,12 @@ public class TaskService {
         taskResult.setTotalNum(total);
         // 计算成功率
         DecimalFormat df = new DecimalFormat("0.00");
-        String successRate = df.format(((float)successNum/total)*100);
+        String successRate;
+        if (total == 0){
+            successRate = "0.00";
+        }else{
+            successRate = df.format(((float)successNum/total)*100);
+        }
         taskResult.setSuccessRate(successRate);
         taskResultMapper.updateTaskResult(taskResult);
 
@@ -279,7 +284,12 @@ public class TaskService {
         taskResult.setTotalNum(total);
         // 计算成功率
         DecimalFormat df = new DecimalFormat("0.00");
-        String successRate = df.format(((float)successNum/total)*100);
+        String successRate;
+        if (total == 0){
+            successRate = "0.00";
+        }else{
+            successRate = df.format(((float)successNum/total)*100);
+        }
         taskResult.setSuccessRate(successRate);
         taskResultMapper.updateTaskResult(taskResult);
 
