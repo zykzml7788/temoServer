@@ -15,7 +15,13 @@ public class CorsConfig {
         return new WebMvcConfigurerAdapter() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**");
+                registry.addMapping("/**")
+                        //设置允许跨域请求的域名
+                        .allowedOrigins("*")
+                        //这里：是否允许证书 不再默认开启
+                        .allowCredentials(true)
+                        //设置允许的方法
+                        .allowedMethods("*");
             }
         };
     }
