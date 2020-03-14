@@ -134,9 +134,6 @@ public class TaskService {
     public TaskResponse queryTaskDetail(String taskId) {
         TaskResponse taskResponse = taskMapper.queryTaskDetail(taskId);
         List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
-        for (TestSet testSet:testSets){
-            testSet.setSetName(testCaseSetService.queryTestCaseSetInfo(testSet.getSetId()).getSetName());
-        }
         taskResponse.setTestSetList(testSets);
         return taskResponse;
     }
