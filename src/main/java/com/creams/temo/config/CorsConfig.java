@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 @SuppressWarnings("deprecation")
 @Configuration
-public class CronConfig {
+public class CorsConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
