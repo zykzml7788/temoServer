@@ -102,9 +102,6 @@ public class TaskService {
         List<TaskResponse> taskResponses = taskMapper.queryTasks(taskName, isParallel);
         for (TaskResponse taskResponse : taskResponses){
             List<TestSet> testSets = JSON.parseArray(taskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
-            for (TestSet testSet:testSets){
-                testSet.setSetName(testCaseSetService.queryTestCaseSetInfo(testSet.getSetId()).getSetName());
-            }
             taskResponse.setTestSetList(testSets);
         }
         return new PageInfo<>(taskResponses);
@@ -118,9 +115,6 @@ public class TaskService {
         List<TimingTaskResponse> timingTaskResponses = taskMapper.queryTimingTasks(taskName, isParallel);
         for (TimingTaskResponse timingTaskResponse : timingTaskResponses){
             List<TestSet> testSets = JSON.parseArray(timingTaskResponse.getTestSets().replaceAll("\\\\", ""), TestSet.class);
-            for (TestSet testSet:testSets){
-                testSet.setSetName(testCaseSetService.queryTestCaseSetInfo(testSet.getSetId()).getSetName());
-            }
             timingTaskResponse.setTestSetList(testSets);
         }
         return new PageInfo<>(timingTaskResponses);
