@@ -1,17 +1,14 @@
-package com.creams.temo.entity.task;
+package com.creams.temo.entity.task.response;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.creams.temo.entity.task.TestSet;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@Data
-public class Task {
+import java.util.List;
 
-    @ApiModelProperty("项目主键")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+@Data
+public class TimingTaskResponse {
 
     @ApiModelProperty("任务id")
     @TableField(value = "task_id")
@@ -25,10 +22,6 @@ public class Task {
     @TableField(value = "task_desc")
     private String taskDesc;
 
-    @ApiModelProperty("是否定时，0为否，1为是")
-    @TableField(value = "is_timing")
-    private String isTiming;
-
     @ApiModelProperty("是否并行，0为否，1为是")
     @TableField(value = "is_parallel")
     private String isParallel;
@@ -41,6 +34,14 @@ public class Task {
     @TableField(value = "times")
     private Integer times;
 
+    @ApiModelProperty("开启/关闭")
+    @TableField(value = "is_open")
+    private Integer isOpen;
+
+    @ApiModelProperty("邮件开关")
+    @TableField(value = "is_mail")
+    private Integer isMail;
+
     @ApiModelProperty("邮件")
     @TableField(value = "mail")
     private String mail;
@@ -49,9 +50,9 @@ public class Task {
     @TableField(value = "testSets")
     private String testSets;
 
-    @ApiModelProperty("执行状态（0待执行，1执行中，2执行完毕）")
-    @TableField(value = "status")
-    private Integer status;
+    @ApiModelProperty("用例列表")
+    @TableField(value = "testSetList")
+    private List<TestSet> testSetList;
 
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time")

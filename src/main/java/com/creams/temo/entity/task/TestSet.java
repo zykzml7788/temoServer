@@ -8,7 +8,11 @@ import lombok.Data;
 @Data
 public class TestSet {
 
+    private String setName;
+
     private String setId;
+
+    private String envName;
 
     private String envId;
 }

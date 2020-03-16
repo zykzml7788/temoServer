@@ -21,12 +21,6 @@ public class ExecutedRowResponse {
     @ApiModelProperty("执行状态")
     private Integer status;
 
-    /**
-     * 用例id
-     */
-    @ApiModelProperty("用例id")
-    private String caseId;
-
 
     /**
      * 用例名称
@@ -40,16 +34,6 @@ public class ExecutedRowResponse {
     @ApiModelProperty("执行顺序")
     private Integer index;
 
-    /**
-     * 集合id
-     */
-    @ApiModelProperty("集合id")
-    private String setId;
 
 
-    /**
-     * 执行的唯一标识(执行一次用例集就加1)
-     */
-    @ApiModelProperty("执行的唯一标识(执行一次用例集就加1)")
-    private Integer indexOfExecuted;
 }

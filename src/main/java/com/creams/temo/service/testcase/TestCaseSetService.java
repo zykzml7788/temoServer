@@ -8,7 +8,8 @@ import com.alibaba.fastjson.TypeReference;
 import com.creams.temo.entity.ExecutedRow;
 import com.creams.temo.entity.TestResult;
 import com.creams.temo.entity.project.response.EnvResponse;
-import com.creams.temo.entity.testcase.Verify;
+import com.creams.temo.entity.task.SetResult;
+import com.creams.temo.entity.task.TestSet;
 import com.creams.temo.entity.testcase.request.StScriptRequest;
 import com.creams.temo.entity.testcase.request.StScriptRequests;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
@@ -18,7 +19,9 @@ import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.entity.testcase.response.VerifyResponse;
 import com.creams.temo.mapper.database.ScriptMapper;
 import com.creams.temo.mapper.project.EnvMapper;
+import com.creams.temo.mapper.project.ProjectMapper;
 import com.creams.temo.mapper.task.ExecuteRowMapper;
+import com.creams.temo.mapper.task.SetResultMapper;
 import com.creams.temo.mapper.task.TaskMapper;
 import com.creams.temo.mapper.testcase.*;
 import com.creams.temo.service.WebSocketServer;
@@ -27,12 +30,10 @@ import com.creams.temo.util.StringUtil;
 import com.creams.temo.util.WebClientUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import org.assertj.core.api.Assertions;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -41,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
 
-import javax.swing.event.InternalFrameEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,6 +85,9 @@ public class TestCaseSetService {
 
     @Autowired
     TaskMapper taskMapper;
+
+    @Autowired
+    SetResultMapper setResultMapper;
 
     @Autowired
     RedisUtil redisUtil;
@@ -200,6 +203,15 @@ public class TestCaseSetService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 获取用例集的执行环境
+     * @param setId
+     */
+    public List<EnvResponse> getEnvsOfSet(String setId) {
+        TestCaseSetResponse testCaseSetResponse = testCaseSetMapper.queryTestCaseSetById(setId);
+        return envMapper.queryEnvByProjectId(testCaseSetResponse.getProjectId());
     }
 
     /**
@@ -576,18 +588,14 @@ public class TestCaseSetService {
                 }
                 webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             }
-            // 查询是第几次执行
-            Integer maxIndexOfExecuted = executeRowMapper.queryMaxIndexOfExecutedRow(setId);
-            if (maxIndexOfExecuted==null){
-                maxIndexOfExecuted = 0;
-            }
+
             if (verifyResult){
                 // 这边0需要从数据库查询出最大的，再加一，后续修改
-                testResultRow = new ExecutedRow(setId,caseId,maxIndexOfExecuted+1,index,caseName,1,logs.toString());
+                testResultRow = new ExecutedRow(index,caseName,1,logs.toString());
                 executedRow = JSON.toJSONString(testResultRow);
             }else {
                 error++;
-                testResultRow = new ExecutedRow(setId,caseId,maxIndexOfExecuted+1,index,caseName,0,logs.toString());
+                testResultRow = new ExecutedRow(index,caseName,0,logs.toString());
                 executedRow = JSON.toJSONString(testResultRow);
         }
             // 把执行结果加到总体的执行结果中
@@ -722,33 +730,60 @@ public class TestCaseSetService {
 
     /**
      * 任务同步执行用例集
-     * @param setId
-     * @param envId
+     * @param taskResultId
+     * @param testSet
      * @throws Exception
      */
-    public void executeSetBySynchronizeTask(String setId, String envId) throws Exception {
-        List<ExecutedRow> executedRows = executeSet(setId,envId);
-        // 把执行记录落库
-        for (ExecutedRow executedRow:executedRows){
-            executeRowMapper.addExecutedRow(executedRow);
+    public Boolean executeSetBySynchronizeTask(String taskResultId,TestSet testSet) throws Exception {
+        List<ExecutedRow> executedRows = executeSet(testSet.getSetId(),testSet.getEnvId());
+        Integer error = 0;
+        Integer total = executedRows.size();
+        for (ExecutedRow executedRow : executedRows){
+            if (executedRow.getStatus()==0){
+                error++;
+            }
         }
+        // 存储用例集执行记录
+        SetResult setResult = new SetResult();
+        setResult.setSetName(testSet.getSetName());
+        setResult.setSuccessNum(total-error);
+        setResult.setTotalNum(total);
+        setResult.setTaskResultId(taskResultId);
+        setResult.setStatus(error==0?1:0);
+        setResult.setCaseResults(JSON.toJSONString(executedRows));
+        setResultMapper.addSetResult(setResult);
+        return error == 0;
     }
 
 
     /**
      * 异步执行用例集
-     * @param setId
-     * @param envId
+     * @param taskResultId
+     * @param testSet
      * @throws Exception
      */
     @Async("taskExecutor")
-    public Future<Boolean> executeSetByAsynchronizeTask(String setId, String envId) throws Exception {
+    public Future<Boolean> executeSetByAsynchronizeTask(String taskResultId,TestSet testSet) throws Exception {
 
-        List<ExecutedRow> executedRows = executeSet(setId,envId);
-        // 把执行记录落库
-        for (ExecutedRow executedRow:executedRows){
-            executeRowMapper.addExecutedRow(executedRow);
+        List<ExecutedRow> executedRows = executeSet(testSet.getSetId(),testSet.getEnvId());
+        Integer error = 0;
+        Integer total = executedRows.size();
+        for (ExecutedRow executedRow : executedRows){
+            if (executedRow.getStatus()==0){
+                error++;
+            }
         }
-        return new AsyncResult<>(true);
+        // 存储用例集执行记录
+        SetResult setResult = new SetResult();
+        setResult.setSetName(testSet.getSetName());
+        setResult.setSuccessNum(total-error);
+        setResult.setTotalNum(total);
+        setResult.setTaskResultId(taskResultId);
+        setResult.setStatus(error==0?1:0);
+        setResult.setCaseResults(JSON.toJSONString(executedRows));
+        setResultMapper.addSetResult(setResult);
+        return new AsyncResult<>(error==0);
     }
+
+
 }

@@ -46,18 +46,18 @@ public class MongoTestController {
 
     }
 
-    @PutMapping(value="/")
-    @ApiOperation("根据用例id修改用例日志")
-    public JsonResult update(ExecutedRow executedRow){
-        try {
-            mongoMapper.update(executedRow);
-            return new JsonResult("操作成功", 200, executedRow.getCaseId(), true);
-        }catch (Exception e){
-            e.printStackTrace();
-            return new JsonResult("操作失败", 500, null, false);
-        }
-
-    }
+//    @PutMapping(value="/")
+//    @ApiOperation("根据用例id修改用例日志")
+//    public JsonResult update(ExecutedRow executedRow){
+//        try {
+//            mongoMapper.update(executedRow);
+//            return new JsonResult("操作成功", 200, executedRow.getCaseId(), true);
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            return new JsonResult("操作失败", 500, null, false);
+//        }
+//
+//    }
 
     @DeleteMapping(value="/{id}")
     @ApiOperation("删除用例日志")

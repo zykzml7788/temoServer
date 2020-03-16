@@ -7,24 +7,17 @@
 
     <insert id="addTask">
         INSERT into task
-        (task_id, task_name, task_desc, is_timing, is_parallel, cron, times, mail, testsets, status)
+        (task_id, task_name, task_desc, is_timing, is_parallel,  times,  testsets)
         values
-        (#{taskId}, #{taskName}, #{taskDesc}, #{isTiming},#{isParallel}, #{cron}, #{times}, #{mail}, #{testSets}, #{status})
+        (#{taskId}, #{taskName}, #{taskDesc}, #{isTiming},#{isParallel},  #{times},  #{testSets})
     </insert>
 
-    <update id="updateTaskById">
-        update  task set
-        task_name = #{taskName},
-        task_desc = #{taskDesc},
-        is_timing = #{isTiming},
-        is_parallel = #{isParallel},
-        cron = #{cron},
-        times = #{times},
-        mail = #{mail},
-        testsets = #{testSets},
-        status = #{status}
-        where task_id = #{taskId}
-    </update>
+    <insert id="addTimingTask">
+        INSERT into task
+        (task_id, task_name, task_desc, is_timing, cron, is_mail,mail, is_parallel, times,is_open, testsets)
+        values
+        (#{taskId}, #{taskName}, #{taskDesc}, #{isTiming},#{cron},#{isMail},#{mail},#{isParallel}, #{times},#{isOpen}, #{testSets})
+    </insert>
 
     <select id="queryTasks" resultType="com.creams.temo.entity.task.response.TaskResponse">
         select * from task
@@ -32,10 +25,48 @@
             <if test="taskName != null and taskName != ''">
                 task_name like concat('%',#{taskName},'%')
             </if>
-            <if test="status != null">
-                and status = #{status}
+            <if test="isParallel != null and isParallel != ''">
+                and is_parallel = #{isParallel}
             </if>
+            and is_timing = 0
         </where>
     </select>
+
+    <select id="queryTimingTasks" resultType="com.creams.temo.entity.task.response.TimingTaskResponse">
+        select * from task
+        <where>
+            <if test="taskName != null and taskName != ''">
+                task_name like concat('%',#{taskName},'%')
+            </if>
+            <if test="isParallel != null and isParallel != ''">
+                and is_parallel = #{isParallel}
+            </if>
+            and is_timing = 1
+        </where>
+    </select>
+
+    <update id="updateTaskById">
+        update  task set
+        task_name = #{taskName},
+        task_desc = #{taskDesc},
+        is_parallel = #{isParallel},
+        times = #{times},
+        testsets = #{testSets}
+        where task_id = #{taskId}
+    </update>
+
+    <update id="updateTimingTask">
+        update  task set
+        task_name = #{taskName},
+        task_desc = #{taskDesc},
+        is_parallel = #{isParallel},
+        cron = #{cron},
+        is_mail = #{isMail},
+        mail = #{mail},
+        is_open = #{isOpen},
+        times = #{times},
+        testsets = #{testSets}
+        where task_id = #{taskId}
+    </update>
 
 </mapper>
