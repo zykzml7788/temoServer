@@ -1,12 +1,10 @@
 package com.creams.temo.controller;
 
-import com.creams.temo.entity.UserEntity;
+import com.creams.temo.entity.sys.UserEntity;
 import com.creams.temo.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Date;
 
 @RequestMapping("/redis")
 @RestController

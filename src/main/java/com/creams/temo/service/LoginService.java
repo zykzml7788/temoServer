@@ -1,11 +1,14 @@
 package com.creams.temo.service;
 
-import com.creams.temo.entity.Permissions;
-import com.creams.temo.entity.Role;
-import com.creams.temo.entity.UserEntity;
-import com.creams.temo.mapper.PermissionsMapper;
-import com.creams.temo.mapper.RoleMapper;
-import com.creams.temo.mapper.UserMapper;
+import com.creams.temo.entity.sys.Permissions;
+import com.creams.temo.entity.sys.Role;
+import com.creams.temo.entity.sys.UserEntity;
+import com.creams.temo.entity.sys.request.PermissionsRequest;
+import com.creams.temo.entity.sys.request.RoleRequest;
+import com.creams.temo.entity.sys.request.UserRequest;
+import com.creams.temo.mapper.sys.PermissionsMapper;
+import com.creams.temo.mapper.sys.RoleMapper;
+import com.creams.temo.mapper.sys.UserMapper;
 import com.creams.temo.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,13 +40,13 @@ public class LoginService {
 
     /**
      * 新增
-     * @param userEntity
+     * @param user
      * @return
      */
-    public Boolean queryUser(UserEntity userEntity){
+    public Boolean queryUser(UserRequest user){
         String userId = StringUtil.uuid();
-        userEntity.setUserId(userId);
-        return userMapper.addUser(userEntity);
+        user.setUserId(userId);
+        return userMapper.addUser(user);
     }
 
     /**
@@ -72,7 +75,7 @@ public class LoginService {
      * @param role
      * @return
      */
-    public Boolean addRole(Role role){
+    public Boolean addRole(RoleRequest role){
         String roleId = StringUtil.uuid();
         role.setRoleId(roleId);
         return roleMapper.addRole(role);
@@ -83,7 +86,7 @@ public class LoginService {
      * @param permissions
      * @return
      */
-    public Boolean addPermissions(Permissions permissions){
+    public Boolean addPermissions(PermissionsRequest permissions){
         String permissionsId = StringUtil.uuid();
         permissions.setPermissionsId(permissionsId);
         return permissionsMapper.addPermissions(permissions);

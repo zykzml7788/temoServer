@@ -1,22 +1,11 @@
-package com.creams.temo.entity;
+package com.creams.temo.entity.sys.request;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-@TableName(value = "role")
-public class Role {
-
-    @ApiModelProperty("项目主键")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-
+public class RoleRequest {
 
     @ApiModelProperty("用户id")
     @TableField(value = "user_id")
@@ -31,4 +20,7 @@ public class Role {
     @TableField(value = "role_name")
     private String roleName;
 
+    @ApiModelProperty("角色")
+    @TableField(value = "status")
+    private Integer status;
 }

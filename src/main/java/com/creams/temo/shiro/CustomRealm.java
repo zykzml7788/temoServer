@@ -1,18 +1,15 @@
 package com.creams.temo.shiro;
 
-import com.creams.temo.entity.Permissions;
-import com.creams.temo.entity.Role;
-import com.creams.temo.entity.UserEntity;
-import com.creams.temo.mapper.UserMapper;
+import com.creams.temo.entity.sys.Permissions;
+import com.creams.temo.entity.sys.Role;
+import com.creams.temo.entity.sys.UserEntity;
 import com.creams.temo.service.LoginService;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -22,7 +19,10 @@ public class CustomRealm extends AuthorizingRealm {
     @Autowired
     LoginService loginService;
 
-
+    /**
+     * 授权(验证权限时调用)
+     * 获取用户权限集合
+     */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         //获取登录用户名
@@ -55,7 +55,10 @@ public class CustomRealm extends AuthorizingRealm {
     }
 
 
-
+    /**
+     * 认证(登录时调用)
+     * 验证用户登录
+     */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
 
@@ -65,14 +68,22 @@ public class CustomRealm extends AuthorizingRealm {
             return null;
         }
         //获取用户信息
+        //UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken) authenticationToken;
         String userName = authenticationToken.getPrincipal().toString();
+//        String password = new String((char[]) authenticationToken.getCredentials());
+//        String shiroPwd = new Sha256Hash(password, userName).toString();
+//        System.out.println("打印shiroPwd:" +shiroPwd);
         UserEntity user = loginService.queryUserByName(userName);
+
         if (user == null) {
             //这里返回后会报出对应异常
-            return null;
+            throw new LockedAccountException("账户不存在,请联系管理员");
         } else {
             //这里验证authenticationToken和simpleAuthenticationInfo的信息
-            SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo(userName, user.getPassword().toString(), getName());
+            SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo
+                    (userName,
+                    user.getPassword().toString(),
+                            ByteSource.Util.bytes(user.getUserName()), getName());
             return simpleAuthenticationInfo;
         }
 

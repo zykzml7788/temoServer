@@ -1,4 +1,4 @@
-package com.creams.temo.entity;
+package com.creams.temo.entity.sys;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -30,11 +30,9 @@ public class UserEntity implements Serializable {
     @TableField(value = "password")
     private String password;
 
-    @ApiModelProperty("创建时间")
-    @TableField(value = "create_time")
-    private String createTime;
+    @ApiModelProperty("用户状态")
+    @TableField(value = "status")
+    private Integer status;
 
-    @ApiModelProperty("修改时间")
-    @TableField(value = "update_time")
-    private String updateTime;
+
 }
