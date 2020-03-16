@@ -14,6 +14,9 @@ import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,11 +24,10 @@ import java.util.List;
 
 @Api("LoginController Api")
 @RestController
-@RequestMapping("/")
 public class LoginController {
 
 
-    @GetMapping("login")
+    @GetMapping("/login")
     public String loginByGet(LoginRequest user) {
         //添加用户认证信息
         Subject subject = ShiroUtils.getSubject();
@@ -38,8 +40,7 @@ public class LoginController {
         try {
             //进行验证，这里可以捕获异常，然后返回对应信息
             subject.login(usernamePasswordToken);
-            System.out.println("登录成功" +
-                    "");
+            System.out.println("登录成功");
         } catch (AuthenticationException e) {
             e.printStackTrace();
             return "账号或密码错误！";
@@ -50,7 +51,7 @@ public class LoginController {
         return "login success";
     }
 
-    @PostMapping("login")
+    @PostMapping("/login")
     public JsonResult login(@RequestBody LoginRequest user) {
         //添加用户认证信息
         Subject subject = ShiroUtils.getSubject();
@@ -71,7 +72,7 @@ public class LoginController {
     }
 
     @PostMapping("/logout")
-    public JsonResult login() {
+    public JsonResult logout() {
         //添加用户认证信息
         Subject subject = ShiroUtils.getSubject();
         try {
