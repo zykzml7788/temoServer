@@ -24,12 +24,15 @@ public class UserService {
      * 添加用户
      * @param user
      */
+    @Transactional(rollbackFor = Exception.class)
     public boolean addUser(UserRequest user){
         if (StringUtils.isEmpty(user)){
             return false;
         }else {
             String userId = StringUtil.uuid();
             user.setUserId(userId);
+            String shaPwd = ShiroUtils.sha256(user.getPassword(), userId);
+            user.setPassword(shaPwd);
             userMapper.addUser(user);
         }
         return true;
@@ -67,20 +70,15 @@ public class UserService {
      * @param userId
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateUserPwd(String userId, String pwd){
         if (userId.isEmpty() || "".equals(userId)){
             return false;
         }else {
-            String userName = userMapper.queryUserById(userId).getUserName();
-            if (userName.isEmpty() || "".equals(userName)){
-                return false;
-            }else {
-                String ShaPwd = ShiroUtils.sha256(pwd, userName);
-                return userMapper.updateUserPwd(userId, ShaPwd);
-            }
+            String ShaPwd = ShiroUtils.sha256(pwd, userId);
+            return userMapper.updateUserPwd(userId, ShaPwd);
         }
     }
-
 
 
     /**
@@ -108,6 +106,8 @@ public class UserService {
         if (StringUtils.isEmpty(user)) {
             return false;
         }else {
+            String shaPwd = ShiroUtils.sha256(user.getPassword(), user.getUserId());
+            user.setPassword(shaPwd);
             return userMapper.updateUser(user);
         }
     }

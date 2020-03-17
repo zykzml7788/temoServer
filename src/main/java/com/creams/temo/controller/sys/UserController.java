@@ -68,6 +68,7 @@ public class UserController {
         }
     }
 
+
     @ApiOperation("更新用户状态")
     @PutMapping(value = "/{id}")
     public JsonResult setUserStatus(@PathVariable(value = "id") @ApiParam("用户id") String userId, Integer status){
