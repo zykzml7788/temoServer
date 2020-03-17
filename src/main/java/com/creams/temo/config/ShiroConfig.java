@@ -1,6 +1,7 @@
 package com.creams.temo.config;
 
 
+import com.creams.temo.filter.ShiroUserFilter;
 import com.creams.temo.shiro.CustomRealm;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.servlet.Filter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +46,11 @@ public class ShiroConfig {
     @Bean
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+
+        // 自定义拦截器的配置
+        Map<String, Filter> filter = new HashMap<>();
+        filter.put("authc", new ShiroUserFilter());
+        shiroFilterFactoryBean.setFilters(filter);
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         Map<String, String> map = new HashMap<>();
         //对所有用户认证

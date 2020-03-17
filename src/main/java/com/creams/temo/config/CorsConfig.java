@@ -16,12 +16,13 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        //设置允许跨域请求的域名
                         .allowedOrigins("*")
-                        //这里：是否允许证书 不再默认开启
+                        .allowedMethods("*")
+                        .allowedHeaders("*")
+                        //设置是否允许跨域传cookie
                         .allowCredentials(true)
-                        //设置允许的方法
-                        .allowedMethods("*");
+                        //设置缓存时间，减少重复响应
+                        .maxAge(3600);
             }
         };
     }
