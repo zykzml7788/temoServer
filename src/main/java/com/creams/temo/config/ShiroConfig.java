@@ -82,12 +82,12 @@ public class ShiroConfig {
 
         // 自定义拦截器的配置
         Map<String, Filter> filter = new HashMap<>();
-        filter.put("authc", new ShiroUserFilter());
+        filter.put("costom", new ShiroUserFilter());
         shiroFilterFactoryBean.setFilters(filter);
         shiroFilterFactoryBean.setSecurityManager(securityManager);
 
         // 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
-
+        shiroFilterFactoryBean.setLoginUrl("/login");
         // 登录成功后要跳转的链接
         //shiroFilterFactoryBean.setSuccessUrl("/index");
         //设置无权限跳转页面
@@ -100,9 +100,9 @@ public class ShiroConfig {
         map.put("/swagger-resources/**","anon");
         map.put("/v2/api-docs/**","anon");
         map.put("/webjars/springfox-swagger-ui/**","anon");
-        map.put("/**", "authc");
         map.put("/login-controller/**", "anon");
-        shiroFilterFactoryBean.setLoginUrl("/login");
+        map.put("/**", "costom");
+//        shiroFilterFactoryBean.setLoginUrl("/");
         //对PermissionAction.class 中的url进行权限控制
         //map.put("/user", "roles[user]");//需要user角色才可以访问
         //map.put("/user/per", "perms[user:query]");//需要user角色才可以访问

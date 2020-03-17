@@ -53,6 +53,9 @@ public class LoginController {
         //添加用户认证信息
         Subject subject = ShiroUtils.getSubject();
         UserEntity userEntity =  userService.queryUsersByName(user.getUserName());
+        if (userEntity==null){
+            return new JsonResult("该用户不存在！",500,null,false);
+        }
         String shairPwd = ShiroUtils.sha256(user.getPassword(), userEntity.getUserId());
         user.setPassword(shairPwd);
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(
