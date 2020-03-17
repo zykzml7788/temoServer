@@ -32,25 +32,16 @@ public class CustomRealm extends AuthorizingRealm {
         //添加角色和权限
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         List<Role> list = loginService.queryRoleByUserId(user.getUserId());
-        //添加角色
+        //添加该用户拥有user角色
         for (Role role: list){
             simpleAuthorizationInfo.addRole(role.getRoleName());
-            //添加权限
+            //添加该用户拥有query权限
             List<Permissions> listPer = loginService.queryPermissionsByRoleId(role.getRoleId());
             for (Permissions per: listPer
                  ) {
                 simpleAuthorizationInfo.addStringPermission(per.getPermissionsName());
             }
         }
-
-//        for (Role role : user.getRoles()) {
-//            //添加角色
-//            simpleAuthorizationInfo.addRole(role.getRoleName());
-//            //添加权限
-//            for (Permissions permissions : role.getPermissions()) {
-//                simpleAuthorizationInfo.addStringPermission(permissions.getPermissionsName());
-//            }
-//        }
         return simpleAuthorizationInfo;
     }
 
@@ -70,9 +61,6 @@ public class CustomRealm extends AuthorizingRealm {
         //获取用户信息
         //UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken) authenticationToken;
         String userName = authenticationToken.getPrincipal().toString();
-//        String password = new String((char[]) authenticationToken.getCredentials());
-//        String shiroPwd = new Sha256Hash(password, userName).toString();
-//        System.out.println("打印shiroPwd:" +shiroPwd);
         UserEntity user = loginService.queryUserByName(userName);
 
         if (user == null) {
@@ -81,9 +69,9 @@ public class CustomRealm extends AuthorizingRealm {
         } else {
             //这里验证authenticationToken和simpleAuthenticationInfo的信息
             SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo
-                    (userName,
+                    (user,
                     user.getPassword().toString(),
-                            ByteSource.Util.bytes(user.getUserName()), getName());
+                            ByteSource.Util.bytes(user.getUserId()), getName());
             return simpleAuthenticationInfo;
         }
 

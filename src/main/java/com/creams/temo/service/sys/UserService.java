@@ -54,6 +54,13 @@ public class UserService {
     }
 
 
+    /**
+     *  根据用户name查询用户
+     * @return
+     */
+    public UserEntity queryUsersByName(String userName){
+        return userMapper.queryUserByName(userName);
+    }
 
     /**
      * 修改用户密码

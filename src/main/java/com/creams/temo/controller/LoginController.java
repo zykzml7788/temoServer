@@ -1,9 +1,9 @@
 package com.creams.temo.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.creams.temo.entity.JsonResult;
 import com.creams.temo.entity.sys.UserEntity;
 import com.creams.temo.entity.sys.request.LoginRequest;
+import com.creams.temo.service.sys.UserService;
 import com.creams.temo.util.ShiroUtils;
 import io.swagger.annotations.Api;
 import org.apache.shiro.authc.AuthenticationException;
@@ -12,26 +12,23 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-
 
 
 @Api("LoginController Api")
 @RestController
 public class LoginController {
 
+    @Autowired
+    UserService userService;
 
     @GetMapping("/login")
     public String loginByGet(LoginRequest user) {
         //添加用户认证信息
         Subject subject = ShiroUtils.getSubject();
-        String shairPwd = ShiroUtils.sha256(user.getPassword(), user.getUserName());
+        UserEntity userEntity =  userService.queryUsersByName(user.getUserName());
+        String shairPwd = ShiroUtils.sha256(user.getPassword(), userEntity.getUserId());
         user.setPassword(shairPwd);
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(
                 user.getUserName(),
@@ -55,7 +52,8 @@ public class LoginController {
     public JsonResult login(@RequestBody LoginRequest user) {
         //添加用户认证信息
         Subject subject = ShiroUtils.getSubject();
-        String shairPwd = ShiroUtils.sha256(user.getPassword(), user.getUserName());
+        UserEntity userEntity =  userService.queryUsersByName(user.getUserName());
+        String shairPwd = ShiroUtils.sha256(user.getPassword(), userEntity.getUserId());
         user.setPassword(shairPwd);
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(
                 user.getUserName(),
