@@ -1,10 +1,10 @@
 package com.creams.temo.filter;
 
 
+import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.filter.authc.UserFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -41,14 +41,22 @@ public class ShiroUserFilter extends UserFilter {
      * 该方法会在验证失败后调用，这里由于是前后端分离，后台不控制页面跳转
      * 因此重写改成传输JSON数据
      */
+//    @Override
+//    protected void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
+//        saveRequest(request);
+//        setHeader((HttpServletRequest) request,(HttpServletResponse) response);
+//        HttpServletResponse httpResponse = (HttpServletResponse) response;
+//        httpResponse.sendError(403,"身份验证失败");
+//    }
+
     @Override
-    protected void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         saveRequest(request);
         setHeader((HttpServletRequest) request,(HttpServletResponse) response);
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        ((HttpServletResponse) response).sendError(403,"身份验证失败");
+        httpResponse.sendError(403,"身份验证失败");
+        return true;
     }
-
 
     /**
      * 为response设置header，实现跨域

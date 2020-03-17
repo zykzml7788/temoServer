@@ -45,7 +45,7 @@ public class ShiroConfig {
     public SimpleCookie rememberMeCookie() {
         SimpleCookie cookie = new SimpleCookie("rememberMe");
         cookie.setHttpOnly(true);
-        cookie.setMaxAge(1 * 60 * 60);
+        cookie.setMaxAge(60 * 60);
         return cookie;
     }
 
@@ -54,7 +54,7 @@ public class ShiroConfig {
     public SessionManager sessionManager(){
         DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
         sessionManager.setSessionIdUrlRewritingEnabled(true);
-        sessionManager.setGlobalSessionTimeout(1 * 60 * 60 * 1000);
+        sessionManager.setGlobalSessionTimeout(60 * 60 * 1000);
         sessionManager.setDeleteInvalidSessions(true);
         sessionManager.setSessionIdCookie(rememberMeCookie());
         return sessionManager;
@@ -82,7 +82,7 @@ public class ShiroConfig {
 
         // 自定义拦截器的配置
         Map<String, Filter> filter = new HashMap<>();
-        filter.put("costom", new ShiroUserFilter());
+        filter.put("authc", new ShiroUserFilter());
         shiroFilterFactoryBean.setFilters(filter);
         shiroFilterFactoryBean.setSecurityManager(securityManager);
 
@@ -95,13 +95,15 @@ public class ShiroConfig {
         Map<String,String> map = new LinkedHashMap<>();
 
         //swagger为静态页面，需要增加这个接口 anon表示不鉴权
+        map.put("/login", "anon");
+        map.put("/websocket/**", "anon");
         map.put("/swagger/**", "anon");
         map.put("/swagger-ui.html","anon");
         map.put("/swagger-resources/**","anon");
         map.put("/v2/api-docs/**","anon");
         map.put("/webjars/springfox-swagger-ui/**","anon");
         map.put("/login-controller/**", "anon");
-        map.put("/**", "costom");
+        map.put("/**", "authc");
 //        shiroFilterFactoryBean.setLoginUrl("/");
         //对PermissionAction.class 中的url进行权限控制
         //map.put("/user", "roles[user]");//需要user角色才可以访问
