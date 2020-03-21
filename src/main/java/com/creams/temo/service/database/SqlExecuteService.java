@@ -1,6 +1,7 @@
 package com.creams.temo.service.database;
 
 import com.creams.temo.entity.database.Database;
+import com.creams.temo.entity.database.request.DatabaseRequest;
 import com.creams.temo.entity.database.request.ScriptRequest;
 import com.creams.temo.entity.database.response.DatabaseResponse;
 import com.creams.temo.entity.database.response.ScriptResponse;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,17 @@ public class SqlExecuteService {
 
     @Autowired
     private  DatabaseMapper databaseMapper;
+
+    public  void testConnect(DatabaseRequest databaseInfo){
+        // 构建数据库实例
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setUrl(String.format("jdbc:mysql://%s:%d/%s?characterEncoding=utf-8", databaseInfo.getHost(),databaseInfo.getPort(),
+                databaseInfo.getDbLibraryName()));
+        dataSource.setUsername(databaseInfo.getUser());
+        dataSource.setPassword(databaseInfo.getPwd());
+        DataSourceUtils.getConnection(dataSource);
+    }
 
     private  DriverManagerDataSource getDataSource(String dbId){
         DatabaseResponse databaseInfo = databaseMapper.queryDatabaseById(dbId);

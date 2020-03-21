@@ -237,7 +237,7 @@ public class TestCaseSetService {
      * @param setId 用例集ID
      * @param envId 调试环境ID
      */
-    public List<ExecutedRow> executeSet(String setId, String envId) throws Exception {
+    public List<ExecutedRow> executeSet(String setId, String envId,Map<String,String> variables) throws Exception {
         List<ExecutedRow> testResults = new ArrayList<>();
         TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
         EnvResponse env = envMapper.queryEnvById(envId);
@@ -725,7 +725,8 @@ public class TestCaseSetService {
      */
     @Async
     public void debugSet(String setId, String envId) throws Exception {
-        executeSet(setId,envId);
+        // 加上前置
+        executeSet(setId,envId,null);
     }
 
     /**
@@ -735,7 +736,8 @@ public class TestCaseSetService {
      * @throws Exception
      */
     public Boolean executeSetBySynchronizeTask(String taskResultId,TestSet testSet) throws Exception {
-        List<ExecutedRow> executedRows = executeSet(testSet.getSetId(),testSet.getEnvId());
+        // 加上前置
+        List<ExecutedRow> executedRows = executeSet(testSet.getSetId(),testSet.getEnvId(),null);
         Integer error = 0;
         Integer total = executedRows.size();
         for (ExecutedRow executedRow : executedRows){
@@ -764,8 +766,8 @@ public class TestCaseSetService {
      */
     @Async("taskExecutor")
     public Future<Boolean> executeSetByAsynchronizeTask(String taskResultId,TestSet testSet) throws Exception {
-
-        List<ExecutedRow> executedRows = executeSet(testSet.getSetId(),testSet.getEnvId());
+        // 加上前置
+        List<ExecutedRow> executedRows = executeSet(testSet.getSetId(),testSet.getEnvId(),null);
         Integer error = 0;
         Integer total = executedRows.size();
         for (ExecutedRow executedRow : executedRows){
