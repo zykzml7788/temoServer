@@ -71,7 +71,16 @@ public class DataStatisticsController {
     public JsonResult queryTodayExecuteTaskInfo() {
         try {
             ExecuteTodayResponse executeTodayResponse = executeTodayService.queryTodayExecuteTaskInfo();
-            return new JsonResult("获取成功", 200, executeTodayResponse, true);
+            if (executeTodayResponse!=null){
+                return new JsonResult("获取成功", 200, executeTodayResponse, true);
+            }else{
+                executeTodayResponse = new ExecuteTodayResponse();
+                executeTodayResponse.setExecuteCaseTodayNum(0);
+                executeTodayResponse.setFalseNum("0");
+                executeTodayResponse.setSuccessNum("0");
+                executeTodayResponse.setSuccessRate("0.00");
+                return new JsonResult("获取成功", 200, executeTodayResponse, true);
+            }
         }catch (Exception e){
             return new JsonResult("获取失败", 500, null, false);
         }
@@ -83,7 +92,17 @@ public class DataStatisticsController {
     public JsonResult queryTodayExecuteTestCaseInfo() {
         try {
             ExecuteTodayResponse executeTodayResponse = executeTodayService.queryTodayExecuteTestCaseInfo();
-            return new JsonResult("获取成功", 200, executeTodayResponse, true);
+            if (executeTodayResponse!=null){
+                return new JsonResult("获取成功", 200, executeTodayResponse, true);
+            }else {
+                executeTodayResponse = new ExecuteTodayResponse();
+                executeTodayResponse.setExecuteCaseTodayNum(0);
+                executeTodayResponse.setFalseNum("0");
+                executeTodayResponse.setSuccessNum("0");
+                executeTodayResponse.setSuccessRate("0.00");
+                return new JsonResult("获取成功", 200, executeTodayResponse, true);
+            }
+
         }catch (Exception e){
             return new JsonResult("获取失败", 500, null, false);
         }
