@@ -12,10 +12,10 @@ public interface TasksInfoMapper {
     @Select("SELECT count(1) FROM task where is_open=1")
     Integer queryTaskIsTimingNum();
 
-    @Select("SELECT COUNT(DISTINCT task_id) FROM task_result WHERE `status`=1")
+    @Select("SELECT COUNT(task_id) FROM task_result WHERE `status`=1")
     Integer queryTaskStatusIsEnd();
 
-    @Select("SELECT COUNT(DISTINCT task_id) FROM task_result WHERE `status`=2")
+    @Select("SELECT COUNT(task_id) FROM task_result WHERE `status`=2")
     Integer queryTaskStatusIsStart();
 
 }

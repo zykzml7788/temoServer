@@ -15,5 +15,8 @@ public class ExecuteSevenDaysResponse {
     @ApiModelProperty("成功率")
     private String successRate;
 
+    @ApiModelProperty("日期")
+    private String days;
+
 
 }
