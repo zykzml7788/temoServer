@@ -15,6 +15,7 @@ public interface TasksInfoMapper {
     @Select("SELECT COUNT(task_id) FROM task_result WHERE `status`=1")
     Integer queryTaskStatusIsEnd();
 
+    
     @Select("SELECT COUNT(task_id) FROM task_result WHERE `status`=2")
     Integer queryTaskStatusIsStart();
 
