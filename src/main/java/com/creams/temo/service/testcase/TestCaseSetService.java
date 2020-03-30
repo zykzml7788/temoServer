@@ -63,9 +63,6 @@ public class TestCaseSetService {
     TestCaseSetMapper testCaseSetMapper;
 
     @Autowired
-    StScriptMapper stScriptMapper;
-
-    @Autowired
     TestCaseMapper testCaseMapper;
 
     @Autowired
@@ -105,7 +102,7 @@ public class TestCaseSetService {
     /**
      * 替换符，如果数据中包含“#{}”则会被替换成公共参数中存储的数据
      */
-    private Pattern replaceSetUpParamPattern = Pattern.compile("\\{\\{(.*?)\\}\\}");
+    private Pattern replaceSetUpParamPattern = Pattern.compile("\\$\\{setup_(.*?)\\}");
 
     /**
      * 查询用例集
@@ -131,26 +128,7 @@ public class TestCaseSetService {
         return testCaseSetResponses;
     }
 
-    /**
-     * 批量新增前后置脚本
-     * @return
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public String addTestCaseSetStScript(StScriptRequests stScriptRequests){
 
-        stScriptMapper.deleteStScript(stScriptRequests.getSetId());
-
-        if (!stScriptRequests.getStScriptRequests().isEmpty()){
-            for (StScriptRequest st: stScriptRequests.getStScriptRequests()
-            ) {
-                st.setStScriptId(StringUtil.uuid());
-                stScriptMapper.addStScript(st);
-            }
-
-        }
-        return stScriptRequests.getSetId();
-
-    }
 
     /**
      * 根据用例集name,项目id,状态查询用例集
@@ -226,7 +204,6 @@ public class TestCaseSetService {
      */
     public TestCaseSetResponse queryTestCaseSetInfo(String setId){
         TestCaseSetResponse testCaseSetResponse = testCaseSetMapper.queryTestCaseSetById(setId);
-        testCaseSetResponse.setStScript(stScriptMapper.queryStScriptBySetId(setId));
         List<TestCaseResponse> testCaseResponses = testCaseMapper.queryTestCaseBySetId(setId);
         testCaseResponses.forEach(n->{
             n.setSaves(savesMapper.querySaves(n.getCaseId()));

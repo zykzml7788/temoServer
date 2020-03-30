@@ -78,19 +78,6 @@ public class TestCaseSetController {
 
     }
 
-    @ApiOperation(value = "批量新增关联脚本")
-    @PostMapping("/stScript")
-    public JsonResult addTestCaseSetStScript(@RequestBody StScriptRequests stScriptRequests){
-        try {
-            String result = testCaseSetService.addTestCaseSetStScript(stScriptRequests);
-            return new JsonResult("操作成功", 200, result, true);
-
-        }catch (Exception e){
-            e.printStackTrace();
-            return new JsonResult("操作失败", 500, null, false);
-        }
-    }
-
 
     @ApiOperation(value = "查询用例集(已废弃)")
     @PostMapping (value = "/{page}/discard")
