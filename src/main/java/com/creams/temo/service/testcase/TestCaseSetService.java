@@ -215,6 +215,26 @@ public class TestCaseSetService {
     }
 
     /**
+     * 保存前置脚本
+     * @param setId
+     * @param setupScript
+     * @return
+     */
+    public boolean saveSetUpScript(String setId,String setupScript){
+        return testCaseSetMapper.updateTestCaseSetOfSetUpScript(setId, setupScript);
+    }
+
+    /**
+     * 保存后置脚本
+     * @param setId
+     * @param teardownScript
+     * @return
+     */
+    public boolean saveTearDownScript(String setId,String teardownScript){
+        return testCaseSetMapper.updateTestCaseSetOfTearDownScript(setId, teardownScript);
+    }
+
+    /**
      * 执行前置用例集
      * @param setId 用例集ID
      * @param envId 调试环境ID

@@ -21,7 +21,6 @@ public interface TestCaseSetMapper {
     @Select("select * from testcase_set")
     List<TestCaseSetResponse> queryAllTestCaseSet();
 
-
     List<TestCaseSetResponse> queryTestCaseSet(TestCaseSetRequest testCaseSetRequest);
 
     @Select("select * from testcase_set where set_id = #{set_id}")
@@ -30,6 +29,10 @@ public interface TestCaseSetMapper {
     boolean addTestCaseSet(TestCaseSetRequest testCaseSetRequest);
 
     boolean updateTestCaseSetById(TestCaseSetRequest testCaseSetRequest);
+
+    boolean updateTestCaseSetOfSetUpScript(String setId,String setupScript);
+
+    boolean updateTestCaseSetOfTearDownScript(String setId,String teardownScript);
 
     @Delete("delete from testcase_set where set_id = #{set_id}")
     boolean deleteTestCaseSetById(@Param("set_id") String setId);
