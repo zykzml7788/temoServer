@@ -17,8 +17,6 @@ public class RedisController {
 
     @RequestMapping("set")
     public boolean redisset(String key, String value){
-        UserEntity userEntity =new UserEntity();
-
         return redisUtil.set(key,value);
     }
 

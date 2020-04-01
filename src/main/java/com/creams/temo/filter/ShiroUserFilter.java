@@ -41,14 +41,6 @@ public class ShiroUserFilter extends UserFilter {
      * 该方法会在验证失败后调用，这里由于是前后端分离，后台不控制页面跳转
      * 因此重写改成传输JSON数据
      */
-//    @Override
-//    protected void saveRequestAndRedirectToLogin(ServletRequest request, ServletResponse response) throws IOException {
-//        saveRequest(request);
-//        setHeader((HttpServletRequest) request,(HttpServletResponse) response);
-//        HttpServletResponse httpResponse = (HttpServletResponse) response;
-//        httpResponse.sendError(403,"身份验证失败");
-//    }
-
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         saveRequest(request);

@@ -10,6 +10,7 @@ import com.creams.temo.entity.TestResult;
 import com.creams.temo.entity.project.response.EnvResponse;
 import com.creams.temo.entity.task.SetResult;
 import com.creams.temo.entity.task.TestSet;
+import com.creams.temo.entity.testcase.SetupScript;
 import com.creams.temo.entity.testcase.request.StScriptRequest;
 import com.creams.temo.entity.testcase.request.StScriptRequests;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
@@ -1046,20 +1047,47 @@ public class TestCaseSetService {
      */
     @Async
     public void debugSet(String setId, String envId) throws Exception {
-        // 加上前置
-        executeSet(setId,envId,null);
+        Map<String,String> variables = new HashMap<>();
+        TestCaseSetResponse testCaseSet = queryTestCaseSetInfo(setId);
+        String setupScript = testCaseSet.getSetupScript();
+        String teardownScript = testCaseSet.getTeardownScript();
+        // 执行前置
+        if (setupScript!=null){
+            List<SetupScript> setupScripts = JSON.parseArray(setupScript,SetupScript.class);
+            for (SetupScript s: setupScripts){
+                if ("SET".equals(s.getScriptTypecript().getType())){
+                    variables.putAll(executeSetUpSet(s.getScriptId(),envId));
+                }else {
+                    // 执行数据库前置脚本
+                }
+            }
+        }
+        // 执行用例集
+        executeSet(setId,envId,variables);
+        // 执行后置
+
     }
 
-    /**
-     * 任务同步执行用例集
-     * @param taskResultId
-     * @param testSet
-     * @throws Exception
-     */
-    public Boolean executeSetBySynchronizeTask(String taskResultId,TestSet testSet) throws Exception {
+
+    public Boolean executeSetByTask(String taskResultId,TestSet testSet) throws Exception {
         // 加上前置（需要遍历获取所有前置id）
-//        Map<String,String> variables = executeSetUpSet(testSet.getSetId(),testSet.getEnvId());
-        List<ExecutedRow> executedRows = executeSet(testSet.getSetId(),testSet.getEnvId(),null);
+        Map<String,String> variables = new HashMap<>();
+        TestCaseSetResponse testCaseSet = queryTestCaseSetInfo(testSet.getSetId());
+        String setupScript = testCaseSet.getSetupScript();
+        String teardownScript = testCaseSet.getTeardownScript();
+        // 执行前置
+        if (setupScript!=null){
+            List<SetupScript> setupScripts = JSON.parseArray(setupScript,SetupScript.class);
+            for (SetupScript s: setupScripts){
+                if ("SET".equals(s.getScriptTypecript().getType())){
+                    variables.putAll(executeSetUpSet(s.getScriptId(),testSet.getEnvId()));
+                }else {
+                    // 执行数据库前置脚本
+                }
+
+            }
+        }
+        List<ExecutedRow> executedRows = executeSet(testSet.getSetId(),testSet.getEnvId(),variables);
         Integer error = 0;
         Integer total = executedRows.size();
         for (ExecutedRow executedRow : executedRows){
@@ -1079,6 +1107,16 @@ public class TestCaseSetService {
         return error == 0;
     }
 
+    /**
+     * 任务同步执行用例集
+     * @param taskResultId
+     * @param testSet
+     * @throws Exception
+     */
+    public Boolean executeSetBySynchronizeTask(String taskResultId,TestSet testSet) throws Exception {
+        return executeSetByTask(taskResultId,testSet);
+    }
+
 
     /**
      * 异步执行用例集
@@ -1088,26 +1126,7 @@ public class TestCaseSetService {
      */
     @Async("taskExecutor")
     public Future<Boolean> executeSetByAsynchronizeTask(String taskResultId,TestSet testSet) throws Exception {
-//        Map<String,String> variables = executeSetUpSet(testSet.getSetId(),testSet.getEnvId());
-        // 加上前置
-        List<ExecutedRow> executedRows = executeSet(testSet.getSetId(),testSet.getEnvId(),null);
-        Integer error = 0;
-        Integer total = executedRows.size();
-        for (ExecutedRow executedRow : executedRows){
-            if (executedRow.getStatus()==0){
-                error++;
-            }
-        }
-        // 存储用例集执行记录
-        SetResult setResult = new SetResult();
-        setResult.setSetName(testSet.getSetName());
-        setResult.setSuccessNum(total-error);
-        setResult.setTotalNum(total);
-        setResult.setTaskResultId(taskResultId);
-        setResult.setStatus(error==0?1:0);
-        setResult.setCaseResults(JSON.toJSONString(executedRows));
-        setResultMapper.addSetResult(setResult);
-        return new AsyncResult<>(error==0);
+        return new AsyncResult<>(executeSetByTask(taskResultId,testSet));
     }
 
 
