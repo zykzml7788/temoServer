@@ -7,12 +7,12 @@ import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
 import com.creams.temo.entity.ExecutedRow;
 import com.creams.temo.entity.TestResult;
+import com.creams.temo.entity.database.SqlScript;
+import com.creams.temo.entity.database.response.ScriptResponse;
 import com.creams.temo.entity.project.response.EnvResponse;
 import com.creams.temo.entity.task.SetResult;
 import com.creams.temo.entity.task.TestSet;
 import com.creams.temo.entity.testcase.SetupScript;
-import com.creams.temo.entity.testcase.request.StScriptRequest;
-import com.creams.temo.entity.testcase.request.StScriptRequests;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.SavesResponse;
 import com.creams.temo.entity.testcase.response.TestCaseResponse;
@@ -20,12 +20,12 @@ import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.entity.testcase.response.VerifyResponse;
 import com.creams.temo.mapper.database.ScriptMapper;
 import com.creams.temo.mapper.project.EnvMapper;
-import com.creams.temo.mapper.project.ProjectMapper;
 import com.creams.temo.mapper.task.ExecuteRowMapper;
 import com.creams.temo.mapper.task.SetResultMapper;
 import com.creams.temo.mapper.task.TaskMapper;
 import com.creams.temo.mapper.testcase.*;
 import com.creams.temo.service.WebSocketServer;
+import com.creams.temo.service.database.SqlExecuteService;
 import com.creams.temo.util.RedisUtil;
 import com.creams.temo.util.StringUtil;
 import com.creams.temo.util.WebClientUtil;
@@ -36,6 +36,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -44,10 +46,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,6 +76,9 @@ public class TestCaseSetService {
 
     @Autowired
     EnvMapper envMapper;
+
+    @Autowired
+    SqlExecuteService sqlExecuteService;
 
     @Autowired
     ExecuteRowMapper executeRowMapper;
@@ -517,6 +519,40 @@ public class TestCaseSetService {
                 webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             }
 
+        }
+        return variables;
+    }
+
+    /**
+     * 执行前置数据库脚本
+     * @param scriptId
+     * @return
+     */
+    public Map<String,String> executeSetupDbScript(String scriptId){
+
+        Map<String,String> variables = new HashMap<>();
+        //1.拿到数据库实例
+        ScriptResponse scriptResponse = scriptMapper.queryScriptById(scriptId);
+        DriverManagerDataSource dataSource = sqlExecuteService.getDataSource(scriptResponse.getDbId());
+        //2. 创建jdbctemplate 实例
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        //3. 遍历sql列表，执行sql
+        List<SqlScript> sqlScripts = JSON.parseArray(scriptResponse.getSqlScript(), SqlScript.class);
+
+        for(SqlScript sqlScript:sqlScripts){
+            try{
+                if (sqlScript.getScript().toLowerCase().trim().startsWith("select")){
+                    Map map = (Map<String,String>)JSON.parseObject(JSON.toJSONString(jdbcTemplate.queryForMap(sqlScript.getScript())),Map.class);
+                    if (sqlScript.getSaveParam()){
+                        variables.putAll((Map<String,String>)map);
+                    }
+                }else{
+                    jdbcTemplate.execute(sqlScript.getScript());
+                }
+                logger.info("sql=====>"+sqlScript.getScript()+" 执行成功");
+            }catch (Exception e){
+                logger.error("sql=====>"+sqlScript.getScript()+" 执行异常！错误原因："+e);
+            }
         }
         return variables;
     }
@@ -1059,6 +1095,7 @@ public class TestCaseSetService {
                     variables.putAll(executeSetUpSet(s.getScriptId(),envId));
                 }else {
                     // 执行数据库前置脚本
+                    variables.putAll(executeSetupDbScript(s.getScriptId()));
                 }
             }
         }
@@ -1083,6 +1120,7 @@ public class TestCaseSetService {
                     variables.putAll(executeSetUpSet(s.getScriptId(),testSet.getEnvId()));
                 }else {
                     // 执行数据库前置脚本
+                    variables.putAll(executeSetupDbScript(s.getScriptId()));
                 }
 
             }
