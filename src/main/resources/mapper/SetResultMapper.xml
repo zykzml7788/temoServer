@@ -7,9 +7,9 @@
 
     <insert id="addSetResult">
         insert into set_result
-        (set_name,success_num,total_num,case_results,task_result_id,`status`)
+        (set_name,success_num,total_num,case_results,task_result_id,`status`, executor)
         values
-        (#{setName},#{successNum},#{totalNum},#{caseResults},#{taskResultId},#{status})
+        (#{setName},#{successNum},#{totalNum},#{caseResults},#{taskResultId},#{status}, #{executor})
     </insert>
 
     <select id="querySetResultsByTaskResultId" resultType="com.creams.temo.entity.task.SetResult">

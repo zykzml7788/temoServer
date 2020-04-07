@@ -31,6 +31,9 @@ public class TaskResponse {
     @TableField(value = "times")
     private Integer times;
 
+    @ApiModelProperty("创建人")
+    private String creator;
+
     @ApiModelProperty("邮件")
     @TableField(value = "mail")
     private String mail;

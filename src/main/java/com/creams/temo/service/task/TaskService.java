@@ -3,6 +3,7 @@ package com.creams.temo.service.task;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.creams.temo.entity.database.response.ScriptDbResponse;
+import com.creams.temo.entity.sys.UserEntity;
 import com.creams.temo.entity.task.SetResult;
 import com.creams.temo.entity.task.TaskResult;
 import com.creams.temo.entity.task.TestSet;
@@ -22,6 +23,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jdk.nashorn.internal.runtime.Timing;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +75,8 @@ public class TaskService {
      */
     public void addTask(TaskRequest taskRequest) {
         taskRequest.setTaskId(StringUtil.uuid());
+        UserEntity user = (UserEntity) SecurityUtils.getSubject().getPrincipal();
+        taskRequest.setCreator(user.getUserName());
         taskMapper.addTask(taskRequest);
     }
 
@@ -173,11 +178,12 @@ public class TaskService {
         // 添加执行记录
         String taskResultId = StringUtil.uuid();
         TaskResult taskResult = new TaskResult();
+        UserEntity user = (UserEntity) SecurityUtils.getSubject().getPrincipal();
         taskResult.setTaskResultNum("task-"+System.currentTimeMillis());
         taskResult.setTaskName(taskResponse.getTaskName());
         taskResult.setStatus(1);
         taskResult.setStartTime(DateUtil.getCurrentTimestamp());
-        taskResult.setPerson("系统用户");
+        taskResult.setPerson(user.getUserName());
         taskResult.setTaskId(taskId);
         taskResult.setTaskResultId(taskResultId);
         taskResultMapper.addTaskResult(taskResult);
@@ -226,12 +232,13 @@ public class TaskService {
         TaskResponse taskResponse = queryTaskDetail(taskId);
         // 添加执行记录
         TaskResult taskResult = new TaskResult();
+        UserEntity user = (UserEntity) SecurityUtils.getSubject().getPrincipal();
         String taskResultId = StringUtil.uuid();
         taskResult.setTaskResultNum("task-"+System.currentTimeMillis());
         taskResult.setTaskName(taskResponse.getTaskName());
         taskResult.setStatus(1);
         taskResult.setStartTime(DateUtil.getCurrentTimestamp());
-        taskResult.setPerson("系统用户");
+        taskResult.setPerson(user.getUserName());
         taskResult.setTaskId(taskId);
         taskResult.setTaskResultId(taskResultId);
         taskResultMapper.addTaskResult(taskResult);

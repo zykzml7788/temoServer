@@ -39,6 +39,9 @@ public class TimingTaskRequest {
     @TableField(value = "is_open")
     private String isOpen;
 
+    @ApiModelProperty("创建人")
+    private String creator;
+
     @ApiModelProperty("接受邮箱")
     @TableField(value = "mail")
     private String mail;
@@ -50,4 +53,5 @@ public class TimingTaskRequest {
     @ApiModelProperty("用例集")
     @TableField(value = "testSets")
     private String testSets;
+
 }

@@ -53,6 +53,9 @@ public class Task {
     @TableField(value = "status")
     private Integer status;
 
+    @ApiModelProperty("创建人")
+    private String creator;
+
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time")
     private String createTime;

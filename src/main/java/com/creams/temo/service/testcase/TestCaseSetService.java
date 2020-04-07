@@ -8,10 +8,13 @@ import com.alibaba.fastjson.TypeReference;
 import com.creams.temo.entity.ExecutedRow;
 import com.creams.temo.entity.TestResult;
 import com.creams.temo.entity.project.response.EnvResponse;
+import com.creams.temo.entity.sys.UserEntity;
 import com.creams.temo.entity.task.SetResult;
 import com.creams.temo.entity.task.TestSet;
+import com.creams.temo.entity.testcase.TestCase;
 import com.creams.temo.entity.testcase.request.StScriptRequest;
 import com.creams.temo.entity.testcase.request.StScriptRequests;
+import com.creams.temo.entity.testcase.request.TestCaseRequest;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.SavesResponse;
 import com.creams.temo.entity.testcase.response.TestCaseResponse;
@@ -30,6 +33,7 @@ import com.creams.temo.util.StringUtil;
 import com.creams.temo.util.WebClientUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.shiro.SecurityUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +44,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.ClientResponse;
 
 import java.text.DecimalFormat;
@@ -171,6 +176,8 @@ public class TestCaseSetService {
     public String addTestCaseSet(TestCaseSetRequest testCaseSetRequest){
         String setId = StringUtil.uuid();
         testCaseSetRequest.setSetId(setId);
+        UserEntity user = (UserEntity) SecurityUtils.getSubject().getPrincipal();
+        testCaseSetRequest.setCreator(user.getUserName());
         testCaseSetMapper.addTestCaseSet(testCaseSetRequest);
         return setId;
     }
@@ -230,6 +237,36 @@ public class TestCaseSetService {
         );
         testCaseSetResponse.setTestCase(testCaseResponses);
         return testCaseSetResponse;
+    }
+
+    /**
+     * 复制用例集
+     * @param setId
+     * @return
+     */
+    public TestCaseSetRequest copyTestCaseSet(String setId){
+
+        TestCaseSetRequest testCaseSetRequest = testCaseSetMapper.queryCopyTestCaseSetById(setId);
+        String setUuid = StringUtil.uuid();
+        if (StringUtils.isEmpty(testCaseSetRequest)){
+            return testCaseSetRequest;
+        }else {
+
+            testCaseSetRequest.setSetId(setUuid);
+            testCaseSetMapper.addTestCaseSet(testCaseSetRequest);
+        }
+        List<TestCaseRequest> testCases = testCaseMapper.queryCopyTestCaseBySetId(setId);
+        if (testCases.size()> 0){
+            for (TestCaseRequest testCaseRequest: testCases
+                 ) {
+                testCaseRequest.setSetId(setUuid);
+                String testCaseId = StringUtil.uuid();
+                testCaseRequest.setCaseId(testCaseId);
+                testCaseMapper.addTestCase(testCaseRequest);
+            }
+        }
+
+        return testCaseSetRequest;
     }
 
     /**
@@ -745,6 +782,8 @@ public class TestCaseSetService {
         }
         // 存储用例集执行记录
         SetResult setResult = new SetResult();
+        UserEntity user = (UserEntity) SecurityUtils.getSubject().getPrincipal();
+        setResult.setExecutor(user.getUserName());
         setResult.setSetName(testSet.getSetName());
         setResult.setSuccessNum(total-error);
         setResult.setTotalNum(total);
@@ -775,6 +814,8 @@ public class TestCaseSetService {
         }
         // 存储用例集执行记录
         SetResult setResult = new SetResult();
+        UserEntity user = (UserEntity) SecurityUtils.getSubject().getPrincipal();
+        setResult.setExecutor(user.getUserName());
         setResult.setSetName(testSet.getSetName());
         setResult.setSuccessNum(total-error);
         setResult.setTotalNum(total);
