@@ -57,4 +57,16 @@
         where set_id = #{setId}
     </update>
 
+    <update id="updateTestCaseSetOfSetUpScript">
+        update  testcase_set set
+        setup_script = #{setupScript}
+        where set_id = #{setId}
+    </update>
+
+    <update id="updateTestCaseSetOfTearDownScript">
+        update  testcase_set set
+        teardown_script = #{teardownScript}
+        where set_id = #{setId}
+    </update>
+
 </mapper>
