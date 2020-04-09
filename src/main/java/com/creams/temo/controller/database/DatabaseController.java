@@ -4,6 +4,7 @@ import com.creams.temo.entity.JsonResult;
 import com.creams.temo.entity.database.request.DatabaseRequest;
 import com.creams.temo.entity.database.response.DatabaseResponse;
 import com.creams.temo.service.database.DatabaseService;
+import com.creams.temo.service.database.SqlExecuteService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +29,9 @@ public class DatabaseController {
 
     @Autowired
     private DatabaseService databaseService;
+
+    @Autowired
+    private SqlExecuteService sqlExecuteService;
 
     @ApiOperation("查询所有数据库信息")
     @GetMapping(value = "/")
@@ -119,6 +123,18 @@ public class DatabaseController {
             return new JsonResult("操作失败",500,null,false);
         }
 
+    }
+
+    @ApiOperation("测试数据库连接")
+    @PostMapping(value = "/testConnect")
+    public JsonResult testConnect(@RequestBody DatabaseRequest databaseRequest){
+        try{
+            sqlExecuteService.testConnect(databaseRequest);
+            return new JsonResult("连接成功", 200, null, true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("连接失败",500,e.getMessage(),false);
+        }
     }
 
 

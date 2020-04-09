@@ -26,6 +26,7 @@
         </where>
         order by createTime desc
     </select>
+
     <select id="queryTestCaseSetByNameandId" resultType="com.creams.temo.entity.testcase.response.TestCaseSetResponse">
         select * from testcase_set
         <where>
@@ -53,6 +54,18 @@
         project_id = #{projectId},
         set_status = #{setStatus},
         valid = #{valid}
+        where set_id = #{setId}
+    </update>
+
+    <update id="updateTestCaseSetOfSetUpScript">
+        update  testcase_set set
+        setup_script = #{setupScript}
+        where set_id = #{setId}
+    </update>
+
+    <update id="updateTestCaseSetOfTearDownScript">
+        update  testcase_set set
+        teardown_script = #{teardownScript}
         where set_id = #{setId}
     </update>
 

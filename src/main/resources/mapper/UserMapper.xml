@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.creams.temo.mapper.sys.UserMapper">
+
+    <insert id="addUser">
+       INSERT INTO user (user_id, user_name, password, email)
+       VALUES
+       (#{userId}, #{userName}, #{password}, email)
+    </insert>
+
+    <update id="updateUser">
+         UPDATE user SET
+       user_name = #{userName} ,
+       password = #{password},
+       email = #{email},
+       status = #{status}
+       WHERE
+       user_id = #{userId}
+    </update>
+
+</mapper>

@@ -12,5 +12,7 @@ public class TestSet {
 
     private String setId;
 
+    private String envName;
+
     private String envId;
 }

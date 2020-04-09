@@ -7,10 +7,12 @@ import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
 import com.creams.temo.entity.ExecutedRow;
 import com.creams.temo.entity.TestResult;
+import com.creams.temo.entity.database.SqlScript;
+import com.creams.temo.entity.database.response.ScriptResponse;
 import com.creams.temo.entity.project.response.EnvResponse;
-import com.creams.temo.entity.testcase.Verify;
-import com.creams.temo.entity.testcase.request.StScriptRequest;
-import com.creams.temo.entity.testcase.request.StScriptRequests;
+import com.creams.temo.entity.task.SetResult;
+import com.creams.temo.entity.task.TestSet;
+import com.creams.temo.entity.testcase.SetupScript;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.SavesResponse;
 import com.creams.temo.entity.testcase.response.TestCaseResponse;
@@ -19,21 +21,23 @@ import com.creams.temo.entity.testcase.response.VerifyResponse;
 import com.creams.temo.mapper.database.ScriptMapper;
 import com.creams.temo.mapper.project.EnvMapper;
 import com.creams.temo.mapper.task.ExecuteRowMapper;
+import com.creams.temo.mapper.task.SetResultMapper;
 import com.creams.temo.mapper.task.TaskMapper;
 import com.creams.temo.mapper.testcase.*;
 import com.creams.temo.service.WebSocketServer;
+import com.creams.temo.service.database.SqlExecuteService;
 import com.creams.temo.util.RedisUtil;
 import com.creams.temo.util.StringUtil;
 import com.creams.temo.util.WebClientUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import org.assertj.core.api.Assertions;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -41,12 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
 
-import javax.swing.event.InternalFrameEvent;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,9 +61,6 @@ public class TestCaseSetService {
 
     @Autowired
     TestCaseSetMapper testCaseSetMapper;
-
-    @Autowired
-    StScriptMapper stScriptMapper;
 
     @Autowired
     TestCaseMapper testCaseMapper;
@@ -81,10 +78,16 @@ public class TestCaseSetService {
     EnvMapper envMapper;
 
     @Autowired
+    SqlExecuteService sqlExecuteService;
+
+    @Autowired
     ExecuteRowMapper executeRowMapper;
 
     @Autowired
     TaskMapper taskMapper;
+
+    @Autowired
+    SetResultMapper setResultMapper;
 
     @Autowired
     RedisUtil redisUtil;
@@ -98,6 +101,11 @@ public class TestCaseSetService {
      * 替换符，如果数据中包含“${}”则会被替换成公共参数中存储的数据
      */
     private Pattern replaceParamPattern = Pattern.compile("\\$\\{(.*?)\\}");
+
+    /**
+     * 替换符，如果数据中包含“#{}”则会被替换成公共参数中存储的数据
+     */
+    private Pattern replaceSetUpParamPattern = Pattern.compile("\\$\\{setup_(.*?)\\}");
 
     /**
      * 查询用例集
@@ -123,26 +131,7 @@ public class TestCaseSetService {
         return testCaseSetResponses;
     }
 
-    /**
-     * 批量新增前后置脚本
-     * @return
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public String addTestCaseSetStScript(StScriptRequests stScriptRequests){
 
-        stScriptMapper.deleteStScript(stScriptRequests.getSetId());
-
-        if (!stScriptRequests.getStScriptRequests().isEmpty()){
-            for (StScriptRequest st: stScriptRequests.getStScriptRequests()
-            ) {
-                st.setStScriptId(StringUtil.uuid());
-                stScriptMapper.addStScript(st);
-            }
-
-        }
-        return stScriptRequests.getSetId();
-
-    }
 
     /**
      * 根据用例集name,项目id,状态查询用例集
@@ -203,13 +192,21 @@ public class TestCaseSetService {
     }
 
     /**
+     * 获取用例集的执行环境
+     * @param setId
+     */
+    public List<EnvResponse> getEnvsOfSet(String setId) {
+        TestCaseSetResponse testCaseSetResponse = testCaseSetMapper.queryTestCaseSetById(setId);
+        return envMapper.queryEnvByProjectId(testCaseSetResponse.getProjectId());
+    }
+
+    /**
      * 查询用例集详情
      * @param setId
      * @return
      */
     public TestCaseSetResponse queryTestCaseSetInfo(String setId){
         TestCaseSetResponse testCaseSetResponse = testCaseSetMapper.queryTestCaseSetById(setId);
-        testCaseSetResponse.setStScript(stScriptMapper.queryStScriptBySetId(setId));
         List<TestCaseResponse> testCaseResponses = testCaseMapper.queryTestCaseBySetId(setId);
         testCaseResponses.forEach(n->{
             n.setSaves(savesMapper.querySaves(n.getCaseId()));
@@ -221,11 +218,351 @@ public class TestCaseSetService {
     }
 
     /**
+     * 保存前置脚本
+     * @param setId
+     * @param setupScript
+     * @return
+     */
+    public boolean saveSetUpScript(String setId,String setupScript){
+        return testCaseSetMapper.updateTestCaseSetOfSetUpScript(setId, setupScript);
+    }
+
+    /**
+     * 保存后置脚本
+     * @param setId
+     * @param teardownScript
+     * @return
+     */
+    public boolean saveTearDownScript(String setId,String teardownScript){
+        return testCaseSetMapper.updateTestCaseSetOfTearDownScript(setId, teardownScript);
+    }
+
+    /**
+     * 执行前置用例集
+     * @param setId 用例集ID
+     * @param envId 调试环境ID
+     */
+    public Map<String,String> executeSetUpSet(String setId, String envId) throws Exception {
+        Map<String,String> variables = new HashMap<>();
+        TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
+        EnvResponse env = envMapper.queryEnvById(envId);
+        // 获取用例集下全部的用例
+        List<TestCaseResponse> testCases = testCaseSet.getTestCase();
+        Map<String,String> globalCookies = new HashMap<>();
+        Map<String,String> globalHeaders = new HashMap<>();
+        WebClientUtil webClientUtil  = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
+        // 遍历所有用例集合
+        for (TestCaseResponse testCase:testCases){
+            int index = testCases.indexOf(testCase)+1;
+
+            logger.info(String.format("setUp:正在执行第%s条前置用例...",index));
+            // 取到用例相关信息，并处理${key}的关联部分
+            String url = getCommonParamFromMap(testCase.getUrl(),variables);
+            webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
+            String method = getCommonParamFromMap(testCase.getMethod(),variables);
+            String body = getCommonParamFromMap(testCase.getBody(),variables);
+            String delayTime = testCase.getDelayTime();
+            String jsonAssert = getCommonParamFromMap(testCase.getJsonAssert(),variables);
+            String cookies = getCommonParamFromMap(testCase.getCookies(),variables);
+            String headers = getCommonParamFromMap(testCase.getHeader(),variables);
+            String param = getCommonParamFromMap(testCase.getParam(),variables);
+            String contentType = testCase.getContentType();
+            List<SavesResponse> saves = testCase.getSaves();
+            if (saves==null){
+                saves = new ArrayList<>();
+            }
+            List<VerifyResponse> verifys = testCase.getVerify();
+            if (verifys==null){
+                verifys = new ArrayList<>();
+            }
+            if (delayTime!=null){
+                logger.info(log("INFO","正在等待"+delayTime+"秒..."));
+                Thread.sleep(Integer.valueOf(delayTime)*1000);
+            }
+
+
+            // 判断是否有附带请求头或者cookie
+            Map cookiesKv = new HashMap<>();
+            Map headersKv = new HashMap<>();
+
+            // 判断请求体是否为空，进行转换
+            Map paramKv = new HashMap<>();
+            if (param != null &&  !"".equals(param)){
+                paramKv = (Map) JSON.parse(param);
+            }
+            if (cookies != null &&  !"".equals(cookies)){
+                cookiesKv = (Map) JSON.parse(cookies);
+            }
+            if (headers != null &&  !"".equals(headers)){
+                headersKv = JSON.parseObject(headers,new TypeReference<Map<String, String>>(){});
+            }
+            // 判断请求体是否为空，进行转换
+            Map<String,String> bodyKV = new HashMap<>();
+            if (body != null &&  !"".equals(body)){
+                bodyKV = JSON.parseObject(body,new TypeReference<Map<String, String>>(){});
+            }
+            ClientResponse response = null;
+            // 设置默认总体断言结果为真
+            boolean verifyResult = true;
+            try{
+                switch (method.toLowerCase()) {
+                    case "get":
+                        response = webClientUtil.get(url, paramKv, headersKv, cookiesKv);
+                        break;
+                    case "post":
+                        // 判断表单提交 or JSON
+                        if ("1".equals(contentType)) {
+                            LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
+                            for (Map.Entry<String, String> kvs : bodyKV.entrySet()) {
+                                linkedMultiValueMap.add(kvs.getKey(), kvs.getValue());
+                            }
+                            response = webClientUtil.postByFormData(url, linkedMultiValueMap, headersKv, cookiesKv);
+                        } else if ("2".equals(contentType)) {
+                            LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
+                            response = webClientUtil.postByFormData(url, linkedMultiValueMap, headersKv, cookiesKv);
+                        } else if ("3".equals(contentType)) {
+                            response = webClientUtil.postByJson(url, body, headersKv, cookiesKv);
+                        } else {
+                            logger.error("暂不支持该POST请求格式");
+                        }
+                        break;
+                    case "put":
+                        response = webClientUtil.put(url, body, headersKv, cookiesKv);
+                        break;
+                    case "delete":
+                        response = webClientUtil.delete(url, headersKv, cookiesKv);
+                        break;
+                    default:
+                        logger.error("暂不支持该请求方式");
+                }
+                // 响应状态吗
+                String status = String.valueOf(response.statusCode().value());
+                logger.info("Status Code : " +status);
+                // 处理响应体，转换为JSON字符串
+                String responseBody = response.bodyToMono(String.class).block();
+                String responseHeaders = "";
+                String responseCookies = "";
+                logger.info("Response Body : " +responseBody);
+                Map<String,Object> rHeaders = new HashMap<>();
+                // 处理响应头，转换为JSON字符串
+                for (Map.Entry<String, List<String>> entry:response.headers().asHttpHeaders().entrySet()){
+                    rHeaders.put(entry.getKey(),entry.getValue());
+                }
+                responseHeaders = new JSONObject(rHeaders).toString();
+                logger.info("Response Header : "+responseHeaders);
+                // 处理响应Cookie,转换为JSON字符串
+                Map<String,Object> rCookies = new HashMap<>();
+                for (Map.Entry<String, List<ResponseCookie>> entry:response.cookies().entrySet()){
+                    rCookies.put(entry.getKey(),entry.getValue());
+                }
+                responseCookies = new JSONObject(rCookies).toString();
+                logger.info("Response Cookie : "+ responseCookies);
+
+                // 处理关联参数
+                for (SavesResponse save:saves){
+                    // 拼接uuid生成唯一key
+                    String key = save.getParamKey();
+                    String jsonpath = save.getJexpression();
+                    String regex = save.getRegex();
+                    String saveFrom = save.getSaveFrom();
+                    String saveType = save.getSaveType();
+                    if ("1".equals(saveFrom)){
+                        if ("1".equals(saveType)){
+                            try{
+                                String value = String.valueOf(JSONPath.read(responseBody,jsonpath));
+                                variables.put(key,value);
+                                logger.info(String.format("储存关联参数到map=> %s:%s",key,value));
+                            }catch (Exception e){
+                                verifyResult = false;
+                                logger.error("发生错误："+e);
+                            }
+
+                        }else {
+                            Pattern pattern = Pattern.compile(regex);
+                            Matcher matcher = pattern.matcher(responseBody);
+                            String value = "";
+                            if(matcher.find()) {
+                                value = matcher.group(0);
+                            }
+                            variables.put(key,value);
+                            logger.info(String.format("储存关联参数到map=> %s:%s",key,value));
+                        }
+                    }else if ("2".equals(saveFrom)){
+                        if ("1".equals(saveType)){
+                            try{
+                                String value = String.valueOf(JSONPath.read(responseHeaders,jsonpath));
+                                variables.put(key,value);
+                                logger.info(String.format("储存关联参数到map=> %s:%s",key,value));
+                            }catch (Exception e){
+                                verifyResult = false;
+                                logger.error("发生错误："+e);
+                            }
+                        }else {
+                            Pattern pattern = Pattern.compile(regex);
+                            Matcher matcher = pattern.matcher(responseHeaders);
+                            String value = "";
+                            if(matcher.find()) {
+                                value = matcher.group(0);
+                            }
+                            logger.info(String.format("储存关联参数到map=> %s:%s",key,value));
+                            variables.put(key,value);
+                        }
+                    }else if ("3".equals(saveFrom)){
+                        if ("1".equals(saveType)){
+                            try{
+                                String value = String.valueOf(JSONPath.read(responseCookies,jsonpath));
+                                variables.put(key,value);
+                                logger.info(String.format("储存关联参数到map=> %s:%s",key,value));
+                            }catch (Exception e){
+                                verifyResult = false;
+                                logger.error("发生错误："+e);
+                            }
+                        }else {
+                            Pattern pattern = Pattern.compile(regex);
+                            Matcher matcher = pattern.matcher(responseCookies);
+                            String value = "";
+                            if(matcher.find()) {
+                                value = matcher.group(0);
+                            }
+                            variables.put(key,value);
+                            logger.info(String.format("储存关联参数到map=> %s:%s",key,value));
+                        }
+                    }else{
+                        logger.error("不支持从该响应类型取值");
+                    }
+                }
+
+                // 遍历断言集合，进行断言
+                for (VerifyResponse verify:verifys){
+                    logger.info("正在进行第"+(verifys.indexOf(verify)+1)+"次断言...");
+                    String verifyType = verify.getVerifyType();
+                    String expect = verify.getExpect();
+                    String jsonpath = verify.getJexpression();
+                    String regex = verify.getRexpression();
+                    String relationShip = verify.getRelationShip();
+                    // 判断断言类型是 JsonPath 还是 正则
+                    if ("1".equals(verifyType)){
+                        Object value = JSONPath.read(responseBody,jsonpath);
+                        if (value == null){
+                            logger.error("JsonPath未匹配到结果，请确认！");
+                            verifyResult = false;
+                            continue;
+                        }
+                        try{
+                            logger.info(String.format("表达式：%s,预期结果：%s,断言类型:jsonpath",verify.getJexpression(),verify.getExpect()));
+                            superAssert(relationShip,String.valueOf(value),expect);
+                            logger.info("断言成功！");
+                        }catch (AssertionError e){
+                            logger.error("断言失败："+e);
+                            verifyResult = false;
+                        }
+                    }else if ("2".equals(verifyType)){
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(responseBody);
+                        String value = "";
+                        if(matcher.find()) {
+                            value = matcher.group(0);
+                        }else {
+                            logger.error("正则表达式未匹配到任何值,请确认！");
+                            verifyResult = false;
+                            continue;
+                        }
+                        try{
+                            logger.info(String.format("表达式：%s,预期结果：%s,断言类型:regex",verify.getRexpression(),verify.getExpect()));
+                            superAssert(relationShip,value,expect);
+                            logger.info("断言成功！");
+                        }catch (AssertionError e){
+                            logger.error("断言失败："+e);
+                            verifyResult = false;
+                        }
+                    }else {
+                        logger.error("不支持该断言方式");
+                    }
+                }
+                if (jsonAssert!=null && !"".equals(jsonAssert)){
+                    // false代表非严格校验，只比较部分字段
+                    logger.info("正在进行json断言...");
+                    try{
+                        JSONAssert.assertEquals(jsonAssert,responseBody,false);
+                        logger.info("JSON断言成功！");
+                    }catch (AssertionError e){
+                        logger.error("JSON断言失败："+e);
+                        verifyResult = false;
+                    }
+                }
+            }catch (Exception e){
+                verifyResult = false;
+                logger.error("发生错误："+e);
+                e.printStackTrace();
+            }
+
+            // 最后生成全局cookie和header
+            String gCookies = getCommonParamFromMap(testCase.getGlobalCookies(),variables);
+            String gHeaders = getCommonParamFromMap(testCase.getGlobalHeaders(),variables);
+            // 判断是否有全局Cookie或者全局Header，如果有则重新生成webclient实例
+            if (gCookies != null &&  !"".equals(gCookies)){
+                Map<String,String> maps = JSON.parseObject(gCookies,new TypeReference<Map<String, String>>(){});
+                for (Map.Entry<String,String> kvs : maps.entrySet()){
+                    String key = getCommonParamFromMap(kvs.getKey(),variables);
+                    String value = getCommonParamFromMap(kvs.getValue(),variables);
+                    globalCookies.put(key,value);
+                }
+                webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
+            }
+            if (gHeaders != null &&  !"".equals(gHeaders)){
+                Map<String,String> maps = JSON.parseObject(gHeaders,new TypeReference<Map<String, String>>(){});
+                for (Map.Entry<String,String> kvs : maps.entrySet()){
+                    String key = getCommonParamFromMap(kvs.getKey(),variables);
+                    String value = getCommonParamFromMap(kvs.getValue(),variables);
+                    globalHeaders.put(key,value);
+                }
+                webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
+            }
+
+        }
+        return variables;
+    }
+
+    /**
+     * 执行前置数据库脚本
+     * @param scriptId
+     * @return
+     */
+    public Map<String,String> executeSetupDbScript(String scriptId){
+
+        Map<String,String> variables = new HashMap<>();
+        //1.拿到数据库实例
+        ScriptResponse scriptResponse = scriptMapper.queryScriptById(scriptId);
+        DriverManagerDataSource dataSource = sqlExecuteService.getDataSource(scriptResponse.getDbId());
+        //2. 创建jdbctemplate 实例
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        //3. 遍历sql列表，执行sql
+        List<SqlScript> sqlScripts = JSON.parseArray(scriptResponse.getSqlScript(), SqlScript.class);
+
+        for(SqlScript sqlScript:sqlScripts){
+            try{
+                if (sqlScript.getScript().toLowerCase().trim().startsWith("select")){
+                    Map map = (Map<String,String>)JSON.parseObject(JSON.toJSONString(jdbcTemplate.queryForMap(sqlScript.getScript())),Map.class);
+                    if (sqlScript.getSaveParam()){
+                        variables.putAll((Map<String,String>)map);
+                    }
+                }else{
+                    jdbcTemplate.execute(sqlScript.getScript());
+                }
+                logger.info("sql=====>"+sqlScript.getScript()+" 执行成功");
+            }catch (Exception e){
+                logger.error("sql=====>"+sqlScript.getScript()+" 执行异常！错误原因："+e);
+            }
+        }
+        return variables;
+    }
+
+    /**
      * 执行用例集
      * @param setId 用例集ID
      * @param envId 调试环境ID
      */
-    public List<ExecutedRow> executeSet(String setId, String envId) throws Exception {
+    public List<ExecutedRow> executeSet(String setId, String envId,Map<String,String> variables) throws Exception {
         List<ExecutedRow> testResults = new ArrayList<>();
         TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
         EnvResponse env = envMapper.queryEnvById(envId);
@@ -249,20 +586,16 @@ public class TestCaseSetService {
             logs.append(log("INFO",String.format("正在执行第%s条用例...",index)));
             logger.info(String.format("正在执行第%s条用例...",index));
             // 取到用例相关信息，并处理${key}的关联部分
-            String url = getCommonParam(testCase.getUrl(),uuid);
+            String url = getCommonParam(testCase.getUrl(),uuid,variables);
             webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
-            String caseId = testCase.getCaseId();
             String caseName = testCase.getCaseDesc();
-            String method = getCommonParam(testCase.getMethod(),uuid);
-            String body = getCommonParam(testCase.getBody(),uuid);
+            String method = getCommonParam(testCase.getMethod(),uuid,variables);
+            String body = getCommonParam(testCase.getBody(),uuid,variables);
             String delayTime = testCase.getDelayTime();
-            String jsonAssert = getCommonParam(testCase.getJsonAssert(),uuid);
-            String caseType = testCase.getCaseType();
-            String cookies = getCommonParam(testCase.getCookies(),uuid);
-            String headers = getCommonParam(testCase.getHeader(),uuid);
-            String sqlScript = getCommonParam(testCase.getSqlScript(),uuid);
-            String param = getCommonParam(testCase.getParam(),uuid);
-            String dbId = testCase.getDbId();
+            String jsonAssert = getCommonParam(testCase.getJsonAssert(),uuid,variables);
+            String cookies = getCommonParam(testCase.getCookies(),uuid,variables);
+            String headers = getCommonParam(testCase.getHeader(),uuid,variables);
+            String param = getCommonParam(testCase.getParam(),uuid,variables);
             String contentType = testCase.getContentType();
             List<SavesResponse> saves = testCase.getSaves();
             if (saves==null){
@@ -553,16 +886,16 @@ public class TestCaseSetService {
             }
 
             // 最后生成全局cookie和header
-            String gCookies = getCommonParam(testCase.getGlobalCookies(),uuid);
-            String gHeaders = getCommonParam(testCase.getGlobalHeaders(),uuid);
+            String gCookies = getCommonParam(testCase.getGlobalCookies(),uuid,variables);
+            String gHeaders = getCommonParam(testCase.getGlobalHeaders(),uuid,variables);
             // 判断是否有全局Cookie或者全局Header，如果有则重新生成webclient实例
             if (gCookies != null &&  !"".equals(gCookies)){
                 logs.append(log("INFO","Set Golbal Cookie : "+gCookies));
                 logs.append(log("INFO","Set Golbal Header : "+gHeaders));
                 Map<String,String> maps = JSON.parseObject(gCookies,new TypeReference<Map<String, String>>(){});
                 for (Map.Entry<String,String> kvs : maps.entrySet()){
-                    String key = getCommonParam(kvs.getKey(),uuid);
-                    String value = getCommonParam(kvs.getValue(),uuid);
+                    String key = getCommonParam(kvs.getKey(),uuid,variables);
+                    String value = getCommonParam(kvs.getValue(),uuid,variables);
                     globalCookies.put(key,value);
                 }
                 webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
@@ -570,24 +903,20 @@ public class TestCaseSetService {
             if (gHeaders != null &&  !"".equals(gHeaders)){
                 Map<String,String> maps = JSON.parseObject(gHeaders,new TypeReference<Map<String, String>>(){});
                 for (Map.Entry<String,String> kvs : maps.entrySet()){
-                    String key = getCommonParam(kvs.getKey(),uuid);
-                    String value = getCommonParam(kvs.getValue(),uuid);
+                    String key = getCommonParam(kvs.getKey(),uuid,variables);
+                    String value = getCommonParam(kvs.getValue(),uuid,variables);
                     globalHeaders.put(key,value);
                 }
                 webClientUtil = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
             }
-            // 查询是第几次执行
-            Integer maxIndexOfExecuted = executeRowMapper.queryMaxIndexOfExecutedRow(setId);
-            if (maxIndexOfExecuted==null){
-                maxIndexOfExecuted = 0;
-            }
+
             if (verifyResult){
                 // 这边0需要从数据库查询出最大的，再加一，后续修改
-                testResultRow = new ExecutedRow(setId,caseId,maxIndexOfExecuted+1,index,caseName,1,logs.toString());
+                testResultRow = new ExecutedRow(index,caseName,1,logs.toString());
                 executedRow = JSON.toJSONString(testResultRow);
             }else {
                 error++;
-                testResultRow = new ExecutedRow(setId,caseId,maxIndexOfExecuted+1,index,caseName,0,logs.toString());
+                testResultRow = new ExecutedRow(index,caseName,0,logs.toString());
                 executedRow = JSON.toJSONString(testResultRow);
         }
             // 把执行结果加到总体的执行结果中
@@ -675,17 +1004,18 @@ public class TestCaseSetService {
     }
 
     /**
-     * 处理${key}，从redis查询key
+     * 处理${key}和#{KEY}，从redis查询key
      * @param param 需要匹配的字符串参数
      * @param uuid 唯一标识
      * @return  替换${key}后的字符串参数
      */
-    private String getCommonParam(String param,String uuid) {
+    private String getCommonParam(String param,String uuid,Map<String,String> variables) {
         if (StringUtil.isEmptyOrNull(param)) {
             return "";
         }
         // 取公共参数正则
         Matcher m = replaceParamPattern.matcher(param);
+        Matcher sm = replaceSetUpParamPattern.matcher(param);
         while (m.find()) {
             String replaceKey = m.group(1);
             String value;
@@ -694,6 +1024,42 @@ public class TestCaseSetService {
             // 如果redis中未能找到对应的值，该用例失败。
             if (value==null){
                 logger.error("从redis中未能查询到相关参数,请确认！");
+            }else{
+                param = param.replace(m.group(), value);
+            }
+        }
+        while (sm.find()) {
+            String replaceKey = m.group(1);
+            String value;
+            // 从redis中获取值
+            value = variables.get(replaceKey);
+            // 如果redis中未能找到对应的值，该用例失败。
+            if (value==null){
+                logger.error("从setup map中未能查询到相关参数,请确认！");
+            }else{
+                param = param.replace(m.group(), value);
+            }
+        }
+        return param;
+    }
+
+    /**
+     * 处理${key}，从map查询key
+     * @param param 需要匹配的字符串参数
+     *
+     * @return  替换${key}后的字符串参数
+     */
+    private String getCommonParamFromMap(String param,Map<String,String> map) {
+        if (StringUtil.isEmptyOrNull(param)) {
+            return "";
+        }
+        // 取公共参数正则
+        Matcher m = replaceParamPattern.matcher(param);
+        while (m.find()) {
+            String replaceKey = m.group(1);
+            String value = map.get(replaceKey) ;
+            if (value==null){
+                logger.error("从map中未能查询到相关参数,请确认！");
             }else{
                 param = param.replace(m.group(), value);
             }
@@ -717,38 +1083,89 @@ public class TestCaseSetService {
      */
     @Async
     public void debugSet(String setId, String envId) throws Exception {
-        executeSet(setId,envId);
+        Map<String,String> variables = new HashMap<>();
+        TestCaseSetResponse testCaseSet = queryTestCaseSetInfo(setId);
+        String setupScript = testCaseSet.getSetupScript();
+        String teardownScript = testCaseSet.getTeardownScript();
+        // 执行前置
+        if (setupScript!=null){
+            List<SetupScript> setupScripts = JSON.parseArray(setupScript,SetupScript.class);
+            for (SetupScript s: setupScripts){
+                if ("SET".equals(s.getScriptTypecript().getType())){
+                    variables.putAll(executeSetUpSet(s.getScriptId(),envId));
+                }else {
+                    // 执行数据库前置脚本
+                    variables.putAll(executeSetupDbScript(s.getScriptId()));
+                }
+            }
+        }
+        // 执行用例集
+        executeSet(setId,envId,variables);
+        // 执行后置
+
+    }
+
+
+    public Boolean executeSetByTask(String taskResultId,TestSet testSet) throws Exception {
+        // 加上前置（需要遍历获取所有前置id）
+        Map<String,String> variables = new HashMap<>();
+        TestCaseSetResponse testCaseSet = queryTestCaseSetInfo(testSet.getSetId());
+        String setupScript = testCaseSet.getSetupScript();
+        String teardownScript = testCaseSet.getTeardownScript();
+        // 执行前置
+        if (setupScript!=null){
+            List<SetupScript> setupScripts = JSON.parseArray(setupScript,SetupScript.class);
+            for (SetupScript s: setupScripts){
+                if ("SET".equals(s.getScriptTypecript().getType())){
+                    variables.putAll(executeSetUpSet(s.getScriptId(),testSet.getEnvId()));
+                }else {
+                    // 执行数据库前置脚本
+                    variables.putAll(executeSetupDbScript(s.getScriptId()));
+                }
+
+            }
+        }
+        List<ExecutedRow> executedRows = executeSet(testSet.getSetId(),testSet.getEnvId(),variables);
+        Integer error = 0;
+        Integer total = executedRows.size();
+        for (ExecutedRow executedRow : executedRows){
+            if (executedRow.getStatus()==0){
+                error++;
+            }
+        }
+        // 存储用例集执行记录
+        SetResult setResult = new SetResult();
+        setResult.setSetName(testSet.getSetName());
+        setResult.setSuccessNum(total-error);
+        setResult.setTotalNum(total);
+        setResult.setTaskResultId(taskResultId);
+        setResult.setStatus(error==0?1:0);
+        setResult.setCaseResults(JSON.toJSONString(executedRows));
+        setResultMapper.addSetResult(setResult);
+        return error == 0;
     }
 
     /**
      * 任务同步执行用例集
-     * @param setId
-     * @param envId
+     * @param taskResultId
+     * @param testSet
      * @throws Exception
      */
-    public void executeSetBySynchronizeTask(String setId, String envId) throws Exception {
-        List<ExecutedRow> executedRows = executeSet(setId,envId);
-        // 把执行记录落库
-        for (ExecutedRow executedRow:executedRows){
-            executeRowMapper.addExecutedRow(executedRow);
-        }
+    public Boolean executeSetBySynchronizeTask(String taskResultId,TestSet testSet) throws Exception {
+        return executeSetByTask(taskResultId,testSet);
     }
 
 
     /**
      * 异步执行用例集
-     * @param setId
-     * @param envId
+     * @param taskResultId
+     * @param testSet
      * @throws Exception
      */
     @Async("taskExecutor")
-    public Future<Boolean> executeSetByAsynchronizeTask(String setId, String envId) throws Exception {
-
-        List<ExecutedRow> executedRows = executeSet(setId,envId);
-        // 把执行记录落库
-        for (ExecutedRow executedRow:executedRows){
-            executeRowMapper.addExecutedRow(executedRow);
-        }
-        return new AsyncResult<>(true);
+    public Future<Boolean> executeSetByAsynchronizeTask(String taskResultId,TestSet testSet) throws Exception {
+        return new AsyncResult<>(executeSetByTask(taskResultId,testSet));
     }
+
+
 }

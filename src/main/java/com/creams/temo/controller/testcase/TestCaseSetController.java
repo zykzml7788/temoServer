@@ -78,19 +78,6 @@ public class TestCaseSetController {
 
     }
 
-    @ApiOperation(value = "批量新增关联脚本")
-    @PostMapping("/stScript")
-    public JsonResult addTestCaseSetStScript(@RequestBody StScriptRequests stScriptRequests){
-        try {
-            String result = testCaseSetService.addTestCaseSetStScript(stScriptRequests);
-            return new JsonResult("操作成功", 200, result, true);
-
-        }catch (Exception e){
-            e.printStackTrace();
-            return new JsonResult("操作失败", 500, null, false);
-        }
-    }
-
 
     @ApiOperation(value = "查询用例集(已废弃)")
     @PostMapping (value = "/{page}/discard")
@@ -121,6 +108,7 @@ public class TestCaseSetController {
         }
     }
 
+
     @ApiOperation(value = "修改用例集")
     @PutMapping(value = "/{id}")
     public JsonResult updateTestCaseSet(@RequestBody TestCaseSetRequest testCaseSetRequest){
@@ -139,6 +127,43 @@ public class TestCaseSetController {
         try {
             testCaseSetService.deleteTestCaseSetById(setId);
             return new JsonResult("操作成功", 200, setId, true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+    }
+
+    @ApiOperation("保存前置用例")
+    @PutMapping(value = "/setup/{id}")
+    public JsonResult saveSetUpScript(@PathVariable("id") @ApiParam("用例集id")  String setId,
+                                      @RequestParam(value = "setupScript",required = false) String setupScript){
+        try {
+            testCaseSetService.saveSetUpScript(setId, setupScript);
+            return new JsonResult("操作成功", 200, setId, true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+    }
+
+    @ApiOperation("保存后置用例")
+    @PutMapping(value = "/teardown/{id}")
+    public JsonResult saveTearDownScript(@PathVariable("id") @ApiParam("用例集id")  String setId,
+                                      @RequestParam(value = "teardownScript",required = false) String teardownScript){
+        try {
+            testCaseSetService.saveTearDownScript(setId, teardownScript);
+            return new JsonResult("操作成功", 200, setId, true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+    }
+
+    @ApiOperation("查询用例集的执行环境")
+    @GetMapping(value = "/{id}/env")
+    public JsonResult queryEnvOfSet(@PathVariable("id") @ApiParam("用例集id")  String setId){
+        try {
+            return new JsonResult("操作成功", 200, testCaseSetService.getEnvsOfSet(setId), true);
         }catch (Exception e){
             e.printStackTrace();
             return new JsonResult("操作失败", 500, null, false);

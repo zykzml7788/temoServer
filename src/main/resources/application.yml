@@ -6,9 +6,9 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT-5
   datasource:
-    url: jdbc:mysql://193.112.136.113:4306/temo-server?characterEncoding=UTF-8
+    url: jdbc:mysql://39.105.34.24:3306/temo-server?characterEncoding=UTF-8
     username: root
-    password: temo2019
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     # 初始化大小，最小，最大
@@ -37,8 +37,8 @@ spring:
   redis:
     open: false  # 是否开启redis缓存  true开启   false关闭
     database: 0
-    host: 193.112.136.113
-    port: 7379
+    host: 39.105.34.24
+    port: 6379
     password:    # 密码（默认为空）
     timeout: 6000ms  # 连接超时时长（毫秒）
     jedis:
@@ -47,9 +47,9 @@ spring:
         max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
         max-idle: 8      # 连接池中的最大空闲连接
         min-idle: 0       # 连接池中的最小空闲连接
-  data:
-    mongodb:
-      uri: mongodb://193.112.136.113:27017/teemo_log
+#  data:
+#    mongodb:
+#      uri: mongodb://193.112.136.113:27017/teemo_log
 
 
 #mybatis-plus配置控制台打印完整带参数SQL语句

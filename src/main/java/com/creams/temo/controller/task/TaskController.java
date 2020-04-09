@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 任务
@@ -38,10 +39,10 @@ public class TaskController {
 
     }
 
-    @ApiOperation(value = "根据任务名和执行状态查询任务")
+    @ApiOperation(value = "根据任务名和执行方式查询任务")
     @GetMapping("/{page}")
-    public JsonResult queryTasks(@PathVariable(value = "page") Integer page,@RequestParam(value = "taskName", required = false) String taskName, @RequestParam(value = "status", required = false) Integer status) {
-        PageInfo<TaskResponse> pageInfo = taskService.queryTasks(page,taskName, status);
+    public JsonResult queryTasks(@PathVariable(value = "page") Integer page,@RequestParam(value = "taskName", required = false) String taskName, @RequestParam(value = "isParallel", required = false) String isParallel) {
+        PageInfo<TaskResponse> pageInfo = taskService.queryTasks(page,taskName, isParallel);
         HashMap<String,Object> map = new HashMap<>();
         map.put("list", pageInfo.getList());
         map.put("total", pageInfo.getTotal());
@@ -82,28 +83,34 @@ public class TaskController {
     }
 
 
-    @ApiOperation(value = "发起任务")
-    @PostMapping("/start/{taskId}")
-    public JsonResult startTask(@PathVariable("taskId") String taskId) {
+    @ApiOperation(value = "发起普通任务")
+    @PostMapping("/startTask/{taskId}")
+    public JsonResult startTask(@PathVariable("taskId") String taskId) throws ExecutionException, InterruptedException {
         TaskResponse taskResponse = taskService.queryTaskDetail(taskId);
         String isParallel = taskResponse.getIsParallel();
-        String isTiming = taskResponse.getIsTiming();
-        // 判断是否是定时任务
-        if ("0".equals(isTiming)) {
+        // 判断是并发执行还是同步执行
+        if ("0".equals(isParallel)) {
+            taskService.startSynchronizeTask(taskId);
+            return new JsonResult("已成功发起普通任务", 200, null, true);
+        } else {
+            taskService.startAsnchronizeTask(taskId);
+            return new JsonResult("已成功发起并发任务", 200, null, true);
+        }
+    }
+
+    @ApiOperation(value = "批量发起普通任务")
+    @PostMapping("/startTasks/")
+    public JsonResult startTasks(@RequestBody List<String> taskIds) throws ExecutionException, InterruptedException {
+        for (String taskId : taskIds){
+            TaskResponse taskResponse = taskService.queryTaskDetail(taskId);
+            String isParallel = taskResponse.getIsParallel();
             // 判断是并发执行还是同步执行
             if ("0".equals(isParallel)) {
                 taskService.startSynchronizeTask(taskId);
-                return new JsonResult("已成功发起同步任务", 200, null, true);
             } else {
                 taskService.startAsnchronizeTask(taskId);
-                return new JsonResult("已成功发起异步任务", 200, null, true);
             }
-        } else {
-            // 发起定时任务
-            taskService.startTimingTask(taskId);
-            return new JsonResult("已成功发起定时任务", 200, null, true);
         }
-
+        return new JsonResult("已批量发起任务", 200, null, true);
     }
-
 }

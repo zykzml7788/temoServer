@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.creams.temo.mapper.datastatistics.ExecuteTodayMapper">
+
+    <select id="queryExecuteTodayInfo" resultType="com.creams.temo.entity.datastatistics.response.ExecuteTodayResponse">
+         SELECT
+	        SUM(n.total_num) as executeCaseTodayNum ,SUM(n.success_num)  / SUM(n.total_num) as successRate
+        FROM
+	        task_result m LEFT JOIN set_result n ON m.task_result_id = n.task_result_id
+        WHERE
+	        TO_DAYS(m.start_time) = TO_DAYS(NOW());
+    </select>
+
+    <select id="queryExecuteTodayTestCaseInfo"
+            resultType="com.creams.temo.entity.datastatistics.response.ExecuteTodayResponse">
+        SELECT
+	        SUM(n.success_num) as successNum, SUM(n.total_num) - SUM(n.success_num) as falseNum
+        FROM
+	        task_result m LEFT JOIN set_result n ON m.task_result_id = n.task_result_id
+        WHERE
+	        TO_DAYS(m.start_time) = TO_DAYS(NOW());
+
+    </select>
+
+</mapper>

@@ -8,6 +8,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author ronin
+ */
 @Component
 public class MongoMapper {
 
@@ -30,21 +33,21 @@ public class MongoMapper {
         return executedRow;
     }
 
-    /**
-     * 更新对象
-     */
-    public void update(ExecutedRow executedRow) {
-        Query query=new Query(Criteria.where("caseId").is(executedRow.getCaseId()));
-        Update update= new Update()
-                .set("logs",executedRow.getLogs())
-                .set("status", executedRow.getStatus())
-                .set("caseName", executedRow.getCaseName())
-                .set("index", executedRow.getIndex());
-        //更新查询返回结果集的第一条
-        mongoTemplate.updateFirst(query,update,ExecutedRow.class);
-        //更新查询返回结果集的所有
-        // mongoTemplate.updateMulti(query,update,ExecutedRow.class);
-    }
+//    /**
+//     * 更新对象
+//     */
+//    public void update(ExecutedRow executedRow) {
+//        Query query=new Query(Criteria.where("caseId").is(executedRow.getCaseId()));
+//        Update update= new Update()
+//                .set("logs",executedRow.getLogs())
+//                .set("status", executedRow.getStatus())
+//                .set("caseName", executedRow.getCaseName())
+//                .set("index", executedRow.getIndex());
+//        //更新查询返回结果集的第一条
+//        mongoTemplate.updateFirst(query,update,ExecutedRow.class);
+//        //更新查询返回结果集的所有
+//        // mongoTemplate.updateMulti(query,update,ExecutedRow.class);
+//    }
 
     /**
      * 删除对象

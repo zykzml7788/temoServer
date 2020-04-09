@@ -37,8 +37,15 @@ public class TestCaseSetResponse {
     @TableField(value = "valid")
     private String valid;
 
+    @ApiModelProperty("用例集合")
     private List<TestCaseResponse> testCase;
 
-    private List<StScriptResponse> stScript;
+
+    @ApiModelProperty("前置脚本")
+    private String setupScript;
+
+
+    @ApiModelProperty("后置脚本")
+    private String teardownScript;
 
 }

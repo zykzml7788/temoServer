@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.creams.temo.mapper.sys.RoleMapper">
+
+    <insert id="addRole">
+       INSERT INTO role (user_id, role_id, role_name)
+       VALUES
+       (#{userId},#{roleId}, #{roleName})
+    </insert>
+
+
+    <update id="updateRole">
+       UPDATE role SET
+       user_id = #{userId} ,
+       role_name = #{roleName},
+       status = #{status}
+       WHERE
+       role_id = #{roleId}
+    </update>
+
+</mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.creams.temo.mapper.sys.PermissionsMapper">
+
+    <insert id="addPermissions">
+       INSERT INTO permissions (role_id, permissions_id, permissions_name)
+       VALUES
+       (#{roleId}, #{permissionsId}, #{permissionsName})
+    </insert>
+    <update id="updatePermission">
+         UPDATE permissions SET
+       role_id = #{roleId} ,
+       permissions_name = #{permissionsName},
+       status = #{status}
+       WHERE
+       permissions_id = #{permissionsId}
+    </update>
+
+</mapper>
