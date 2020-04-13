@@ -1091,7 +1091,7 @@ public class TestCaseSetService {
         if (setupScript!=null){
             List<SetupScript> setupScripts = JSON.parseArray(setupScript,SetupScript.class);
             for (SetupScript s: setupScripts){
-                if ("SET".equals(s.getScriptTypecript().getType())){
+                if ("SET".equals(s.getScriptType().getType())){
                     variables.putAll(executeSetUpSet(s.getScriptId(),envId));
                 }else {
                     // 执行数据库前置脚本
@@ -1116,7 +1116,7 @@ public class TestCaseSetService {
         if (setupScript!=null){
             List<SetupScript> setupScripts = JSON.parseArray(setupScript,SetupScript.class);
             for (SetupScript s: setupScripts){
-                if ("SET".equals(s.getScriptTypecript().getType())){
+                if ("SET".equals(s.getScriptType().getType())){
                     variables.putAll(executeSetUpSet(s.getScriptId(),testSet.getEnvId()));
                 }else {
                     // 执行数据库前置脚本

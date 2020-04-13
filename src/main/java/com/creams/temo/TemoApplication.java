@@ -17,7 +17,7 @@ public class TemoApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(TemoApplication.class, args);
- 
+
     }
 
 

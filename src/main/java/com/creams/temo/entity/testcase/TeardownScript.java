@@ -14,5 +14,5 @@ public class TeardownScript {
     private String scriptId;
 
     @ApiModelProperty("脚本类型(SET,DB)")
-    private ScriptType isDbScript;
+    private ScriptType scriptType;
 }
