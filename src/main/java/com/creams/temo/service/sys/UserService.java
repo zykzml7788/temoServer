@@ -97,7 +97,7 @@ public class UserService {
     }
 
     /**
-     * 修改用户
+     * 修改用户信息
      * @param user
      * @return
      */

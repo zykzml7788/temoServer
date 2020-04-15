@@ -29,6 +29,9 @@ public class TaskRequest {
     @TableField(value = "is_parallel")
     private String isParallel;
 
+    @ApiModelProperty("创建人")
+    private String creator;
+
     @ApiModelProperty("轮询次数")
     @TableField(value = "times")
     private Integer times;

@@ -14,6 +14,7 @@ import com.creams.temo.entity.project.response.EnvResponse;
 import com.creams.temo.entity.task.SetResult;
 import com.creams.temo.entity.task.TestSet;
 import com.creams.temo.entity.testcase.SetupScript;
+import com.creams.temo.entity.testcase.request.TestCaseRequest;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.SavesResponse;
 import com.creams.temo.entity.testcase.response.TestCaseResponse;
@@ -45,6 +46,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.ClientResponse;
 
 import java.text.DecimalFormat;
@@ -218,6 +220,45 @@ public class TestCaseSetService {
         testCaseSetResponse.setTestCase(testCaseResponses);
         return testCaseSetResponse;
     }
+
+    /**
+     * 统计个人用例集个数
+     * @param userId
+     * @return
+     */
+    public Integer statisticsTestCaseSetByUserId(String userId){
+        return  testCaseSetMapper.statisticsTestCaseSetByUserId(userId);
+    }
+
+
+    /**
+     * 复制用例集
+     * @param setId
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public boolean copyTestCaseSet(String setId){
+        String copySetId = StringUtil.uuid();
+        TestCaseSetRequest testCaseSetRequest = testCaseSetMapper.queryCopyTestCaseSetById(setId);
+        if (!StringUtils.isEmpty(testCaseSetRequest)){
+            testCaseSetRequest.setSetId(copySetId);
+            testCaseSetMapper.addTestCaseSet(testCaseSetRequest);
+        }else {
+            return false;
+        }
+        List<TestCaseRequest> testCaseRequests = testCaseMapper.queryCopyTestCaseBySetId(setId);
+        if (testCaseRequests.size()>0){
+            for (TestCaseRequest testCaseRequest:testCaseRequests
+                 ) {
+                String copyTestCaseId = StringUtil.uuid();
+                testCaseRequest.setCaseId(copyTestCaseId);
+                testCaseRequest.setSetId(copySetId);
+                testCaseMapper.addTestCase(testCaseRequest);
+            }
+        }
+        return true;
+    }
+
 
     /**
      * 保存前置脚本

@@ -26,6 +26,12 @@ public interface TestCaseSetMapper {
     @Select("select * from testcase_set where set_id = #{set_id}")
     TestCaseSetResponse queryTestCaseSetById(@Param("set_id") String setId);
 
+    @Select("select * from testcase_set where set_id = #{set_id}")
+    TestCaseSetRequest queryCopyTestCaseSetById(@Param("set_id") String setId);
+
+    @Select("SELECT COUNT(*) FROM testcase_set WHERE user_id = #{user_id}")
+    Integer statisticsTestCaseSetByUserId(@Param("user_id") String userId);
+
     boolean addTestCaseSet(TestCaseSetRequest testCaseSetRequest);
 
     boolean updateTestCaseSetById(TestCaseSetRequest testCaseSetRequest);

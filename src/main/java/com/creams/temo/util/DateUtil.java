@@ -1,13 +1,12 @@
 package com.creams.temo.util;
 
+import com.google.common.collect.Sets;
+
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 日期处理工具
@@ -80,11 +79,62 @@ public class DateUtil {
     }
 
 
+
+    /**
+     * 获取当前时间往前7天日期
+     * 年-月-日
+     * @return
+     */
+    public static  List<String> getSevenDays(){
+        //List<Map<String, String>> list = new ArrayList<>();
+        List<String> list = new ArrayList<>();
+        // 其日历字段已由当前日期和时间初始化：
+        Calendar rightNow = Calendar.getInstance(); // 子类对象
+        int resDate = rightNow.get(Calendar.DATE);
+        int resYear = rightNow.get(Calendar.YEAR);
+        int resMonth = rightNow.get(Calendar.MONTH);
+        System.out.println();
+        for (int i =0; i<7; i++){
+            StringBuffer stringBuffer = new StringBuffer();
+            String days = String.valueOf(stringBuffer.append(resYear).append("-0").append(resMonth+1).append("-").append(resDate-i));
+            list.add(days);
+        }
+        return list;
+    }
+
+    /**
+     * 获取日期差集，计算7天没有数据的日期
+     * @param SevenDayList 7天的日期统计
+     * @return
+     */
+    public static List  dateDifference(List<String> SevenDayList){
+        List<String> list = DateUtil.getSevenDays();
+        List<String> list1 = new ArrayList<>();
+        //获取系统7天统计日期
+        for (int i =0; i<SevenDayList.size(); i++){
+            String a = SevenDayList.get(i);
+            list1.add(a);
+        }
+
+        list.removeAll(list1);
+        return list;
+
+    }
+
+
+
+
     public static Timestamp getCurrentTimestamp(){
         return new Timestamp(System.currentTimeMillis());
     }
 
     public static void main(String[] args) {
-        System.out.println(DateUtil.getCurrentTimestamp());
+        List< String> list = new ArrayList<>();
+        list.add("2020-2-23");
+        list.add("2020-2-16");
+        list.add("2020-2-219");
+
+        System.out.println(DateUtil.dateDifference(list));
+        //System.out.println(DateUtil.getCurrentTimestamp());
     }
 }

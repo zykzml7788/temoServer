@@ -22,6 +22,9 @@ public class TimingTaskResponse {
     @TableField(value = "task_desc")
     private String taskDesc;
 
+    @ApiModelProperty("创建人")
+    private String creator;
+
     @ApiModelProperty("是否并行，0为否，1为是")
     @TableField(value = "is_parallel")
     private String isParallel;
