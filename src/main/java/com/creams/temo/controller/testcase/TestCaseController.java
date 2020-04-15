@@ -65,6 +65,17 @@ public class TestCaseController {
 
     }
 
+    @ApiOperation(value = "统计个人用例")
+    @GetMapping(value = "statisticsTestCase/{userId}")
+    public JsonResult statisticsTestCaseByUserId(@PathVariable("userId") String userId){
+        try{
+            return new JsonResult("操作成功", 200, testCaseService.statisticsTestCaseByUserId(userId), true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+    }
+
     @ApiOperation(value = "新增用例")
     @PostMapping(value = "/")
     public JsonResult addTestCase(@RequestBody TestCaseRequest testCaseRequest){
@@ -85,6 +96,21 @@ public class TestCaseController {
             String caseId = testCaseRequest.getCaseId();
             testCaseService.updateTestCase(testCaseRequest);
             return new JsonResult("操作成功", 200, caseId, true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+    }
+
+    @ApiOperation(value = "复制用例")
+    @PostMapping("/copyTestCase/{caseId}")
+    public JsonResult copyTestCaseSet(@PathVariable  String caseId){
+        try {
+            if (testCaseService.copyTestCase(caseId)){
+                return new JsonResult("操作成功", 200, caseId, true);
+            }else {
+                return new JsonResult("用例集不存在", 500, caseId, false);
+            }
         }catch (Exception e){
             e.printStackTrace();
             return new JsonResult("操作失败", 500, null, false);

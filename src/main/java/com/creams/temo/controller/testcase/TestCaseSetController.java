@@ -78,14 +78,27 @@ public class TestCaseSetController {
 
     }
 
+    @ApiOperation(value = "统计个人用例集")
+    @GetMapping(value = "statisticsTestCaseSet/{userId}")
+    public JsonResult statisticsTestCaseSetByUserId(@PathVariable("userId") String userId){
+        try{
+            return new JsonResult("操作成功", 200, testCaseSetService.statisticsTestCaseSetByUserId(userId), true);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult("操作失败", 500, null, false);
+        }
+    }
+
 
     @ApiOperation(value = "复制用例集")
     @PostMapping("/copySet/{setId}")
     public JsonResult copyTestCaseSet(@PathVariable  String setId){
         try {
-            testCaseSetService.copyTestCaseSet(setId);
-            return new JsonResult("操作成功", 200, null, true);
-
+            if (testCaseSetService.copyTestCaseSet(setId)){
+                return new JsonResult("操作成功", 200, setId, true);
+            }else {
+                return new JsonResult("用例集不存在", 500, setId, false);
+            }
         }catch (Exception e){
             e.printStackTrace();
             return new JsonResult("操作失败", 500, null, false);
