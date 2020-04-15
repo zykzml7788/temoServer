@@ -110,7 +110,7 @@ public class TestCaseSetService {
     /**
      * 替换符，如果数据中包含“#{}”则会被替换成公共参数中存储的数据
      */
-    private Pattern replaceSetUpParamPattern = Pattern.compile("\\$\\{setup_(.*?)\\}");
+    private Pattern replaceSetUpParamPattern = Pattern.compile("\\#\\{(.*?)\\}");
 
     /**
      * 查询用例集
@@ -1089,7 +1089,7 @@ public class TestCaseSetService {
             }
         }
         while (sm.find()) {
-            String replaceKey = m.group(1);
+            String replaceKey = sm.group(1);
             String value;
             // 从redis中获取值
             value = variables.get(replaceKey);
@@ -1097,7 +1097,7 @@ public class TestCaseSetService {
             if (value==null){
                 logger.error("从setup map中未能查询到相关参数,请确认！");
             }else{
-                param = param.replace(m.group(), value);
+                param = param.replace(sm.group(), value);
             }
         }
         return param;
