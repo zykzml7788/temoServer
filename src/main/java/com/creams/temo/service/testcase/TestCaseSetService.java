@@ -5,8 +5,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
-import com.creams.temo.entity.ExecutedRow;
-import com.creams.temo.entity.TestResult;
+import com.creams.temo.entity.testcase.ExecutedRow;
+import com.creams.temo.entity.testcase.SetUpTestResult;
+import com.creams.temo.entity.testcase.TestResult;
 import com.creams.temo.entity.database.SqlScript;
 import com.creams.temo.entity.database.response.ScriptResponse;
 import com.creams.temo.entity.project.response.EnvResponse;
@@ -29,6 +30,7 @@ import com.creams.temo.service.database.SqlExecuteService;
 import com.creams.temo.util.RedisUtil;
 import com.creams.temo.util.StringUtil;
 import com.creams.temo.util.WebClientUtil;
+import com.fasterxml.jackson.databind.Module;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -245,9 +247,12 @@ public class TestCaseSetService {
     public Map<String,String> executeSetUpSet(String setId, String envId) throws Exception {
         Map<String,String> variables = new HashMap<>();
         TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
+        String setName = testCaseSet.getSetName();
         EnvResponse env = envMapper.queryEnvById(envId);
         // 获取用例集下全部的用例
         List<TestCaseResponse> testCases = testCaseSet.getTestCase();
+        // 设置初始失败用例数为 0
+        int error = 0;
         Map<String,String> globalCookies = new HashMap<>();
         Map<String,String> globalHeaders = new HashMap<>();
         WebClientUtil webClientUtil  = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
@@ -495,7 +500,9 @@ public class TestCaseSetService {
                 logger.error("发生错误："+e);
                 e.printStackTrace();
             }
-
+            if (!verifyResult){
+                error++;
+            }
             // 最后生成全局cookie和header
             String gCookies = getCommonParamFromMap(testCase.getGlobalCookies(),variables);
             String gHeaders = getCommonParamFromMap(testCase.getGlobalHeaders(),variables);
@@ -520,6 +527,11 @@ public class TestCaseSetService {
             }
 
         }
+        // 发送前置脚本执行结果
+        WebSocketServer.sendInfo(JSON.toJSONString(SetUpTestResult.builder().scriptId(setId).scriptName(setName).
+                success(error==0).type("setUpResult").build()),"123");
+
+
         return variables;
     }
 
@@ -554,6 +566,7 @@ public class TestCaseSetService {
                 logger.error("sql=====>"+sqlScript.getScript()+" 执行异常！错误原因："+e);
             }
         }
+
         return variables;
     }
 
@@ -912,11 +925,11 @@ public class TestCaseSetService {
 
             if (verifyResult){
                 // 这边0需要从数据库查询出最大的，再加一，后续修改
-                testResultRow = new ExecutedRow(index,caseName,1,logs.toString());
+                testResultRow = new ExecutedRow("executedRow",index,caseName,1,logs.toString());
                 executedRow = JSON.toJSONString(testResultRow);
             }else {
                 error++;
-                testResultRow = new ExecutedRow(index,caseName,0,logs.toString());
+                testResultRow = new ExecutedRow("executedRow",index,caseName,0,logs.toString());
                 executedRow = JSON.toJSONString(testResultRow);
         }
             // 把执行结果加到总体的执行结果中
@@ -929,7 +942,7 @@ public class TestCaseSetService {
             String executedRate = df.format(((float)index/casesNum)*100);
             // 计算成功率
             String successRate = df.format(((float)(index-error)/casesNum)*100);
-            TestResult testResult = new TestResult(index,index-error,error,casesNum,successRate,executedRate);
+            TestResult testResult = new TestResult("testResult",index,index-error,error,casesNum,successRate,executedRate);
             String result = JSON.toJSONString(testResult);
             WebSocketServer.sendInfo(result,"123");
         }

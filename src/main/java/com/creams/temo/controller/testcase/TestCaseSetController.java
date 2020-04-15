@@ -1,8 +1,6 @@
 package com.creams.temo.controller.testcase;
 
 import com.creams.temo.entity.JsonResult;
-import com.creams.temo.entity.testcase.request.StScriptRequest;
-import com.creams.temo.entity.testcase.request.StScriptRequests;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.TestCaseSetResponse;
 import com.creams.temo.service.testcase.TestCaseSetService;
@@ -16,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
