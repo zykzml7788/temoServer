@@ -26,6 +26,9 @@ public interface TestCaseSetMapper {
     @Select("select * from testcase_set where set_id = #{set_id}")
     TestCaseSetResponse queryTestCaseSetById(@Param("set_id") String setId);
 
+    @Select("select * from testcase_set where set_id = #{set_id}")
+    TestCaseSetRequest queryCopyTestCaseSetById(@Param("set_id") String setId);
+
     boolean addTestCaseSet(TestCaseSetRequest testCaseSetRequest);
 
     boolean updateTestCaseSetById(TestCaseSetRequest testCaseSetRequest);

@@ -25,6 +25,7 @@ public class CustomRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
+
         //获取登录用户名
         String userName = (String) principalCollection.getPrimaryPrincipal();
         //根据用户名去数据库查询用户信息

@@ -30,6 +30,13 @@ public class UserEntity implements Serializable {
     @TableField(value = "password")
     private String password;
 
+
+
+    @ApiModelProperty("用户邮箱")
+    @TableField(value = "email")
+    private String email;
+
+
     @ApiModelProperty("用户状态")
     @TableField(value = "status")
     private Integer status;

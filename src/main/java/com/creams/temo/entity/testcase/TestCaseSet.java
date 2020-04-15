@@ -35,6 +35,9 @@ public class TestCaseSet {
     @TableField(value = "create_time")
     private String createTime;
 
+    @ApiModelProperty("创建人")
+    private String creator;
+
     @ApiModelProperty("用例集状态(0-待完成、1待维护、2-已完成)")
     @TableField(value = "set_status")
     private String setStatus;
