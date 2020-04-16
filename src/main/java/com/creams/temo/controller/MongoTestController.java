@@ -1,6 +1,6 @@
 package com.creams.temo.controller;
 
-import com.creams.temo.entity.ExecutedRow;
+import com.creams.temo.entity.testcase.ExecutedRow;
 import com.creams.temo.entity.JsonResult;
 import com.creams.temo.mapper.MongoMapper;
 import io.swagger.annotations.Api;

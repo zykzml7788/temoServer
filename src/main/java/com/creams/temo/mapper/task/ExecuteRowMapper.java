@@ -1,6 +1,6 @@
 package com.creams.temo.mapper.task;
 
-import com.creams.temo.entity.ExecutedRow;
+import com.creams.temo.entity.testcase.ExecutedRow;
 import com.creams.temo.entity.task.response.ExecutedRowResponse;
 import org.apache.ibatis.annotations.Mapper;
 

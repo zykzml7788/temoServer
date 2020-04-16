@@ -35,6 +35,9 @@ public interface TestCaseMapper {
     @Select("select * from testcase where case_id = #{case_id}")
     TestCaseResponse queryTestCaseById(@Param("case_id") String caseId);
 
+    @Select("select * from testcase where case_id = #{case_id}")
+    TestCaseRequest queryCopyTestCaseById(@Param("case_id") String caseId);
+
 
     @Select("select * from testcase where set_id = #{set_id} order by sorting asc")
     List<TestCaseResponse> queryTestCaseBySetId(@Param("set_id") String setId);
@@ -42,6 +45,8 @@ public interface TestCaseMapper {
     @Select("select * from testcase where set_id = #{set_id} order by sorting asc")
     List<TestCaseRequest> queryCopyTestCaseBySetId(@Param("set_id") String setId);
 
+    @Select("SELECT COUNT(*) FROM testcase WHERE user_id = #{user_id}")
+    Integer statisticsTestCaseByUserId(@Param("user_id") String userId);
 
     boolean addTestCase(TestCaseRequest testCaseRequest);
 
