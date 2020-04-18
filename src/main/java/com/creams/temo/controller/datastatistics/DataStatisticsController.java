@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Api("DataStatisticsController Api")
 @RestController
 @RequestMapping("/dataStatistics")
@@ -125,8 +127,8 @@ public class DataStatisticsController {
     @GetMapping("/SevenDaysInfo")
     public JsonResult querySevenDaysExecuteInfo() {
         try {
-            ExecuteSevenDaysResponse executeSevenDaysResponse = sevenDaysExecuteInfoService.querySevenDaysExecuteInfo();
-            return new JsonResult("获取成功", 200, executeSevenDaysResponse, true);
+            List<ExecuteSevenDaysResponse> list = sevenDaysExecuteInfoService.querySevenDaysExecuteInfo();
+            return new JsonResult("获取成功", 200, list, true);
         }catch (Exception e){
             return new JsonResult("获取失败", 500, null, false);
         }

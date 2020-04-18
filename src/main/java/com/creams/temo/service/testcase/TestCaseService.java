@@ -16,6 +16,7 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -125,6 +126,34 @@ public class TestCaseService {
 
         return testCaseMapper.deleteTestCase(caseId) && verifyMapper.deleteVerify(caseId) && savesMapper.deleteSaves(caseId);
 
+    }
+
+    /**
+     * 复制用例
+     * @param caseId
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public boolean copyTestCase(String caseId){
+        TestCaseRequest testCaseRequest = testCaseMapper.queryCopyTestCaseById(caseId);
+        if (StringUtils.isEmpty(testCaseRequest)){
+            return false;
+        }else {
+            Integer maxSort = testCaseMapper.queryMaxSorting(testCaseRequest.getSetId());
+            String testCaseId = StringUtil.uuid();
+            testCaseRequest.setCaseId(testCaseId);
+            testCaseRequest.setSorting(maxSort + 1);
+            return testCaseMapper.addTestCase(testCaseRequest);
+        }
+    }
+
+    /**
+     * 统计个人用例个数
+     * @param userId
+     * @return
+     */
+    public Integer statisticsTestCaseByUserId(String userId){
+       return  testCaseMapper.statisticsTestCaseByUserId(userId);
     }
 
 

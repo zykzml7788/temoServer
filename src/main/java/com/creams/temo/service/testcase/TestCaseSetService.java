@@ -5,14 +5,17 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.TypeReference;
-import com.creams.temo.entity.ExecutedRow;
-import com.creams.temo.entity.TestResult;
+import com.creams.temo.entity.sys.UserEntity;
+import com.creams.temo.entity.testcase.ExecutedRow;
+import com.creams.temo.entity.testcase.SetUpTestResult;
+import com.creams.temo.entity.testcase.TestResult;
 import com.creams.temo.entity.database.SqlScript;
 import com.creams.temo.entity.database.response.ScriptResponse;
 import com.creams.temo.entity.project.response.EnvResponse;
 import com.creams.temo.entity.task.SetResult;
 import com.creams.temo.entity.task.TestSet;
 import com.creams.temo.entity.testcase.SetupScript;
+import com.creams.temo.entity.testcase.request.TestCaseRequest;
 import com.creams.temo.entity.testcase.request.TestCaseSetRequest;
 import com.creams.temo.entity.testcase.response.SavesResponse;
 import com.creams.temo.entity.testcase.response.TestCaseResponse;
@@ -31,6 +34,7 @@ import com.creams.temo.util.StringUtil;
 import com.creams.temo.util.WebClientUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.shiro.SecurityUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +47,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.ClientResponse;
 
 import java.text.DecimalFormat;
@@ -53,7 +58,7 @@ import java.util.regex.Pattern;
 
 import static com.creams.temo.util.StringUtil.log;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+
 
 @Service
 public class TestCaseSetService {
@@ -105,7 +110,7 @@ public class TestCaseSetService {
     /**
      * 替换符，如果数据中包含“#{}”则会被替换成公共参数中存储的数据
      */
-    private Pattern replaceSetUpParamPattern = Pattern.compile("\\$\\{setup_(.*?)\\}");
+    private Pattern replaceSetUpParamPattern = Pattern.compile("\\#\\{(.*?)\\}");
 
     /**
      * 查询用例集
@@ -157,6 +162,8 @@ public class TestCaseSetService {
     public String addTestCaseSet(TestCaseSetRequest testCaseSetRequest){
         String setId = StringUtil.uuid();
         testCaseSetRequest.setSetId(setId);
+        UserEntity user = (UserEntity) SecurityUtils.getSubject().getPrincipal();
+        testCaseSetRequest.setCreator(user.getUserName());
         testCaseSetMapper.addTestCaseSet(testCaseSetRequest);
         return setId;
     }
@@ -218,6 +225,45 @@ public class TestCaseSetService {
     }
 
     /**
+     * 统计个人用例集个数
+     * @param userId
+     * @return
+     */
+    public Integer statisticsTestCaseSetByUserId(String userId){
+        return  testCaseSetMapper.statisticsTestCaseSetByUserId(userId);
+    }
+
+
+    /**
+     * 复制用例集
+     * @param setId
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public boolean copyTestCaseSet(String setId){
+        String copySetId = StringUtil.uuid();
+        TestCaseSetRequest testCaseSetRequest = testCaseSetMapper.queryCopyTestCaseSetById(setId);
+        if (!StringUtils.isEmpty(testCaseSetRequest)){
+            testCaseSetRequest.setSetId(copySetId);
+            testCaseSetMapper.addTestCaseSet(testCaseSetRequest);
+        }else {
+            return false;
+        }
+        List<TestCaseRequest> testCaseRequests = testCaseMapper.queryCopyTestCaseBySetId(setId);
+        if (testCaseRequests.size()>0){
+            for (TestCaseRequest testCaseRequest:testCaseRequests
+                 ) {
+                String copyTestCaseId = StringUtil.uuid();
+                testCaseRequest.setCaseId(copyTestCaseId);
+                testCaseRequest.setSetId(copySetId);
+                testCaseMapper.addTestCase(testCaseRequest);
+            }
+        }
+        return true;
+    }
+
+
+    /**
      * 保存前置脚本
      * @param setId
      * @param setupScript
@@ -245,9 +291,13 @@ public class TestCaseSetService {
     public Map<String,String> executeSetUpSet(String setId, String envId) throws Exception {
         Map<String,String> variables = new HashMap<>();
         TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
+        UserEntity user = (UserEntity) SecurityUtils.getSubject().getPrincipal();
+        String setName = testCaseSet.getSetName();
         EnvResponse env = envMapper.queryEnvById(envId);
         // 获取用例集下全部的用例
         List<TestCaseResponse> testCases = testCaseSet.getTestCase();
+        // 设置初始失败用例数为 0
+        int error = 0;
         Map<String,String> globalCookies = new HashMap<>();
         Map<String,String> globalHeaders = new HashMap<>();
         WebClientUtil webClientUtil  = new WebClientUtil(env.getHost(),env.getPort().toString(),globalHeaders,globalCookies);
@@ -495,7 +545,9 @@ public class TestCaseSetService {
                 logger.error("发生错误："+e);
                 e.printStackTrace();
             }
-
+            if (!verifyResult){
+                error++;
+            }
             // 最后生成全局cookie和header
             String gCookies = getCommonParamFromMap(testCase.getGlobalCookies(),variables);
             String gHeaders = getCommonParamFromMap(testCase.getGlobalHeaders(),variables);
@@ -520,6 +572,12 @@ public class TestCaseSetService {
             }
 
         }
+
+        // 发送前置脚本执行结果
+        WebSocketServer.sendInfo(JSON.toJSONString(SetUpTestResult.builder().scriptId(setId).scriptName(setName).
+                success(error==0).type("setUpResult").build()),user.getUserId());
+
+
         return variables;
     }
 
@@ -554,6 +612,7 @@ public class TestCaseSetService {
                 logger.error("sql=====>"+sqlScript.getScript()+" 执行异常！错误原因："+e);
             }
         }
+
         return variables;
     }
 
@@ -565,6 +624,7 @@ public class TestCaseSetService {
     public List<ExecutedRow> executeSet(String setId, String envId,Map<String,String> variables) throws Exception {
         List<ExecutedRow> testResults = new ArrayList<>();
         TestCaseSetResponse testCaseSet = this.queryTestCaseSetInfo(setId);
+        UserEntity user = (UserEntity) SecurityUtils.getSubject().getPrincipal();
         EnvResponse env = envMapper.queryEnvById(envId);
         String uuid = StringUtil.uuid();
         // 获取用例集下全部的用例
@@ -912,26 +972,26 @@ public class TestCaseSetService {
 
             if (verifyResult){
                 // 这边0需要从数据库查询出最大的，再加一，后续修改
-                testResultRow = new ExecutedRow(index,caseName,1,logs.toString());
+                testResultRow = new ExecutedRow("executedRow",index,caseName,1,logs.toString());
                 executedRow = JSON.toJSONString(testResultRow);
             }else {
                 error++;
-                testResultRow = new ExecutedRow(index,caseName,0,logs.toString());
+                testResultRow = new ExecutedRow("executedRow",index,caseName,0,logs.toString());
                 executedRow = JSON.toJSONString(testResultRow);
         }
             // 把执行结果加到总体的执行结果中
             testResults.add(testResultRow);
             // 发送消息
-            WebSocketServer.sendInfo(executedRow,"101");
+            WebSocketServer.sendInfo(executedRow,user.getUserId());
             //格式化小数
             DecimalFormat df = new DecimalFormat("0.00");
             // 计算执行进度百分比
             String executedRate = df.format(((float)index/casesNum)*100);
             // 计算成功率
             String successRate = df.format(((float)(index-error)/casesNum)*100);
-            TestResult testResult = new TestResult(index,index-error,error,casesNum,successRate,executedRate);
+            TestResult testResult = new TestResult("testResult",index,index-error,error,casesNum,successRate,executedRate);
             String result = JSON.toJSONString(testResult);
-            WebSocketServer.sendInfo(result,"123");
+            WebSocketServer.sendInfo(result,user.getUserId());
         }
         return testResults;
     }
@@ -1029,7 +1089,7 @@ public class TestCaseSetService {
             }
         }
         while (sm.find()) {
-            String replaceKey = m.group(1);
+            String replaceKey = sm.group(1);
             String value;
             // 从redis中获取值
             value = variables.get(replaceKey);
@@ -1037,7 +1097,7 @@ public class TestCaseSetService {
             if (value==null){
                 logger.error("从setup map中未能查询到相关参数,请确认！");
             }else{
-                param = param.replace(m.group(), value);
+                param = param.replace(sm.group(), value);
             }
         }
         return param;
@@ -1091,7 +1151,7 @@ public class TestCaseSetService {
         if (setupScript!=null){
             List<SetupScript> setupScripts = JSON.parseArray(setupScript,SetupScript.class);
             for (SetupScript s: setupScripts){
-                if ("SET".equals(s.getScriptTypecript().getType())){
+                if ("SET".equals(s.getScriptType())){
                     variables.putAll(executeSetUpSet(s.getScriptId(),envId));
                 }else {
                     // 执行数据库前置脚本
@@ -1116,7 +1176,7 @@ public class TestCaseSetService {
         if (setupScript!=null){
             List<SetupScript> setupScripts = JSON.parseArray(setupScript,SetupScript.class);
             for (SetupScript s: setupScripts){
-                if ("SET".equals(s.getScriptTypecript().getType())){
+                if ("SET".equals(s.getScriptType())){
                     variables.putAll(executeSetUpSet(s.getScriptId(),testSet.getEnvId()));
                 }else {
                     // 执行数据库前置脚本

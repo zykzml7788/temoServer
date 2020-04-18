@@ -1,4 +1,4 @@
-package com.creams.temo.entity;
+package com.creams.temo.entity.testcase;
 
 import lombok.Data;
 
@@ -28,11 +28,17 @@ public class ExecutedRow {
      */
     private Integer index;
 
+    /**
+     *  类型
+     */
+    private String  type;
 
 
 
 
-    public ExecutedRow(Integer index, String caseName, Integer status, String logs) {
+
+    public ExecutedRow(String type,Integer index, String caseName, Integer status, String logs) {
+        this.type = type;
         this.logs = logs;
         this.status = status;
         this.caseName = caseName;

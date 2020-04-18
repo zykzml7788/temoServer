@@ -23,6 +23,10 @@ public class TestCaseSetRequest {
     @TableField(value = "project_id")
     private String projectId;
 
+
+    @ApiModelProperty("创建人")
+    private String creator;
+
     @ApiModelProperty(value = "创建时间", hidden = true)
     @TableField(value = "create_time")
     private String createTime;

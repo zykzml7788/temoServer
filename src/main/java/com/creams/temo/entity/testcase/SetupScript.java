@@ -15,6 +15,6 @@ public class SetupScript {
     private String scriptId;
 
     @ApiModelProperty("脚本类型(SET,DB)")
-    private ScriptType scriptTypecript;
+    private String scriptType;
 
 }

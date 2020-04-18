@@ -1,4 +1,4 @@
-package com.creams.temo.entity;
+package com.creams.temo.entity.testcase;
 
 import lombok.Data;
 
@@ -16,8 +16,11 @@ public class TestResult {
     private String successRate;
     // 执行进度百分比
     private String executedRate;
+    // 类型
+    private String type;
 
-    public TestResult(Integer executedNum, Integer success, Integer error, Integer caseNum, String successRate, String executedRate) {
+    public TestResult(String type,Integer executedNum, Integer success, Integer error, Integer caseNum, String successRate, String executedRate) {
+        this.type = type;
         this.executedNum = executedNum;
         this.success = success;
         this.error = error;

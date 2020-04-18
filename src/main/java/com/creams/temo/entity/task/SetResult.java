@@ -30,4 +30,7 @@ public class SetResult {
 
     @ApiModelProperty("任务执行结果id")
     private String taskResultId;
+
+    @ApiModelProperty("执行人员")
+    private String executor;
 }

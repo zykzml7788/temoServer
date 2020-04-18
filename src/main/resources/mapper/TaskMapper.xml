@@ -7,16 +7,16 @@
 
     <insert id="addTask">
         INSERT into task
-        (task_id, task_name, task_desc, is_timing, is_parallel,  times,  testsets)
+        (task_id, task_name, task_desc, is_timing, is_parallel,  times,  testsets, creator)
         values
-        (#{taskId}, #{taskName}, #{taskDesc}, #{isTiming},#{isParallel},  #{times},  #{testSets})
+        (#{taskId}, #{taskName}, #{taskDesc}, #{isTiming},#{isParallel},  #{times},  #{testSets}, #{creator})
     </insert>
 
     <insert id="addTimingTask">
         INSERT into task
-        (task_id, task_name, task_desc, is_timing, cron, is_mail,mail, is_parallel, times,is_open, testsets)
+        (task_id, task_name, task_desc, is_timing, cron, is_mail,mail, is_parallel, times,is_open, testsets, creator)
         values
-        (#{taskId}, #{taskName}, #{taskDesc}, #{isTiming},#{cron},#{isMail},#{mail},#{isParallel}, #{times},#{isOpen}, #{testSets})
+        (#{taskId}, #{taskName}, #{taskDesc}, #{isTiming},#{cron},#{isMail},#{mail},#{isParallel}, #{times},#{isOpen}, #{testSets}, #{creator})
     </insert>
 
     <select id="queryTasks" resultType="com.creams.temo.entity.task.response.TaskResponse">

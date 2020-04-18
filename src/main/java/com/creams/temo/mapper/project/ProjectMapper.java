@@ -3,7 +3,6 @@ package com.creams.temo.mapper.project;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.creams.temo.entity.project.Project;
 import com.creams.temo.entity.project.response.ProjectResponse;
-import javafx.scene.control.Pagination;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
