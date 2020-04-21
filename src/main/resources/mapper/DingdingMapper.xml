@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.creams.temo.mapper.DingdingMapper">
+
+    <insert id="addDingding">
+        INSERT INTO `dingding` (`desc_id`, `desc`,`keysword`,`webhook`,`creater`)
+        values (#{descId}, #{desc}, #{keysWord}, #{webhook}, #{creater})
+    </insert>
+
+    <update id="updateDingding">
+        UPDATE `dingding`
+            SET
+            `desc` = #{desc},
+            `keysword` = #{keysWord},
+            `webhook` = #{webhook}
+        WHERE
+            `desc_id` = #{descId};
+    </update>
+
+
+    <select id="queryDingding" resultType="com.creams.temo.entity.dingding.DingdingEntity">
+        SELECT * FROM dingding
+        <where>
+           desc like "%#{desc}%"
+        </where>
+    </select>
+
+
+
+
+
+</mapper>
